@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#2C1810">
+  <title>Santa Fe Histórica - CEIP Capitulaciones</title>
+  <link id="manifest-link" rel="manifest">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold: #C9A227;
+      --terra: #C1440E;
+      --brown-dark: #2C1810;
+      --brown-mid: #6B3A2A;
+      --parchment: #FDF3E0;
+      --parchment-dark: #EDE0C4;
+      --green: #2E7D32;
+      --shadow: 0 4px 20px rgba(44,24,16,0.3);
+      --radius: 16px;
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Source Serif 4', serif;
+      --topbar-h: 60px;
+      --nav-h: 70px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--brown-dark);
+      font-family: var(--font-body);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ---- SPLASH ---- */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--brown-dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
+    }
+    #splash .crest { font-size: 72px; animation: float 3s ease-in-out infinite; }
+    #splash h1 {
+      font-family: var(--font-display); color: var(--gold);
+      font-size: clamp(26px, 7vw, 40px); letter-spacing: 0.08em; text-align: center;
+    }
+    #splash p { color: var(--parchment-dark); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+    #splash .bar-wrap { width: 130px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+    #splash .bar { height: 100%; width: 0; background: var(--gold); animation: loadbar 2.1s ease forwards; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    @keyframes loadbar { to { width: 100% } }
+
+    /* ---- APP ---- */
+    #app { position: fixed; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.5s; }
+    #app.ready { opacity: 1; }
+    #app.gone { display: none; }
+
+    /* ---- TOP BAR ---- */
+    #topbar {
+      position: absolute; top: 0; left: 0; right: 0; height: var(--topbar-h); z-index: 1000;
+      background: var(--brown-dark);
+      display: flex; align-items: center; padding: 0 14px; gap: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.45);
+    }
+    #topbar-brand { flex: 1; }
+    #topbar-title {
+      font-family: var(--font-display); color: var(--gold);
+      font-size: 17px; letter-spacing: 0.04em;
+    }
+    #topbar-sub { font-size: 11px; color: var(--parchment-dark); opacity: 0.6; letter-spacing: 0.08em; margin-top: 1px; }
+    #lang-btn, #admin-btn, #route-btn {
+      background: rgba(201,162,39,0.12); border: 1px solid rgba(201,162,39,0.35);
+      color: var(--gold); padding: 7px 13px; border-radius: 20px;
+      font-size: 13px; cursor: pointer; font-family: var(--font-body); white-space: nowrap;
+    }
+    #admin-btn { background: rgba(46,125,50,0.2); border-color: rgba(46,125,50,0.5); color: var(--green); }
+    #route-btn { background: rgba(193,68,14,0.2); border-color: rgba(193,68,14,0.5); color: var(--terra); }
+
+    /* ---- LANG PANEL ---- */
+    #lang-panel {
+      position: absolute; top: var(--topbar-h); right: 12px; z-index: 2000;
+      background: var(--brown-dark); border: 1px solid rgba(201,162,39,0.25);
+      border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); min-width: 165px;
+    }
+    #lang-panel.off { display: none; }
+    .lang-opt {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; cursor: pointer;
+      color: var(--parchment); font-size: 14px;
+      transition: background .15s; border: none; background: transparent;
+      width: 100%; text-align: left; font-family: var(--font-body);
+    }
+    .lang-opt:hover, .lang-opt.cur { background: rgba(201,162,39,0.12); color: var(--gold); }
+    .lang-flag { font-size: 19px; }
+
+    /* ---- MAP ---- */
+    #map { position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h); }
+
+    /* POI markers */
+    .pm { width: 46px; height: 46px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2.5px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.4); cursor: pointer; }
+    .pm-inner { transform: rotate(45deg); font-size: 20px; }
+    .pm.pulsing { animation: mPulse 1.8s ease-in-out infinite; }
+    @keyframes mPulse {
+      0%,100% { box-shadow: 0 3px 10px rgba(0,0,0,0.4), 0 0 0 0 rgba(201,162,39,0.5); }
+      50% { box-shadow: 0 3px 10px rgba(0,0,0,0.4), 0 0 0 18px rgba(201,162,39,0); }
+    }
+    .user-dot { width: 18px; height: 18px; background: #1976D2; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 6px rgba(25,118,210,0.22); animation: uPulse 2s ease-in-out infinite; }
+    @keyframes uPulse { 0%,100%{box-shadow:0 0 0 6px rgba(25,118,210,0.22)} 50%{box-shadow:0 0 0 14px rgba(25,118,210,0)} }
+
+    /* Route line */
+    .route-line { stroke: var(--terra); stroke-width: 5; stroke-opacity: 0.8; stroke-linecap: round; stroke-linejoin: round; }
+    .route-line-animated { stroke-dasharray: 20, 10; animation: dash 1s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -30; } }
+
+    /* ---- BOTTOM NAV ---- */
+    #bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0; height: var(--nav-h); z-index: 1000;
+      background: var(--brown-dark); display: flex;
+      box-shadow: 0 -2px 14px rgba(0,0,0,0.45);
+    }
+    .nb {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      cursor: pointer; background: transparent; border: none; color: rgba(255,255,255,0.45);
+      font-size: 11px; letter-spacing: 0.08em; transition: color .2s; position: relative; padding-top: 4px;
+    }
+    .nb.on { color: var(--gold); }
+    .nb::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background: var(--gold); border-radius: 0 0 2px 2px; transition: width .2s; }
+    .nb.on::before { width: 38px; }
+    .nb-icon { font-size: 22px; }
+
+    /* ---- PROXIMITY ALERT ---- */
+    #prox-alert {
+      position: absolute; top: calc(var(--topbar-h) + 10px); left: 14px; right: 14px; z-index: 1500;
+      background: var(--brown-dark); border: 1px solid var(--gold); border-radius: 14px;
+      padding: 13px 14px; display: flex; align-items: center; gap: 12px;
+      box-shadow: var(--shadow); animation: sDown .3s ease;
+    }
+    #prox-alert.off { display: none; }
+    @keyframes sDown { from{transform:translateY(-16px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .pa-icon { font-size: 26px; flex-shrink: 0; }
+    .pa-text { flex: 1; color: var(--parchment); font-size: 13px; line-height: 1.4; }
+    .pa-text strong { color: var(--gold); font-family: var(--font-display); font-size: 13px; display: block; margin-bottom: 2px; }
+    .pa-actions { display: flex; flex-direction: column; gap: 5px; }
+    .pa-yes { padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; border: none; background: var(--gold); color: var(--brown-dark); font-weight: 700; font-family: var(--font-body); }
+    .pa-no { padding: 5px 10px; border-radius: 20px; cursor: pointer; font-size: 12px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.5); font-family: var(--font-body); }
+
+    /* ---- DETAIL PANEL ---- */
+    #detail-panel {
+      position: absolute; bottom: var(--nav-h); left: 0; right: 0; height: 70vh;
+      background: var(--parchment); border-radius: var(--radius) var(--radius) 0 0;
+      z-index: 1200; display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      overflow: hidden; box-shadow: 0 -8px 30px rgba(0,0,0,0.45);
+    }
+    #detail-panel.open { transform: translateY(0); }
+
+    .ph { background: var(--brown-dark); padding: 15px 18px 13px; display: flex; align-items: flex-start; gap: 12px; }
+    .ph-icon { font-size: 34px; }
+    .ph-meta { flex: 1; }
+    .ph-name { font-family: var(--font-display); color: var(--gold); font-size: 17px; line-height: 1.2; }
+    .ph-desc { color: var(--parchment-dark); font-size: 11px; margin-top: 3px; opacity: 0.75; }
+    .ph-close { background: rgba(255,255,255,0.1); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 17px; line-height: 30px; text-align: center; flex-shrink: 0; }
+
+    .tab-bar { display: flex; background: var(--parchment-dark); border-bottom: 1px solid rgba(44,24,16,0.1); }
+    .tb {
+      flex: 1; padding: 11px 6px; background: transparent; border: none; cursor: pointer;
+      font-family: var(--font-body); font-size: 11px; color: var(--brown-mid);
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      border-bottom: 2px solid transparent; position: relative; bottom: -1px;
+      transition: color .2s, background .2s;
+    }
+    .tb-icon { font-size: 18px; }
+    .tb.on { color: var(--brown-dark); background: var(--parchment); border-bottom-color: var(--terra); font-weight: 600; }
+
+    .tab-content { flex: 1; overflow-y: auto; padding: 18px; -webkit-overflow-scrolling: touch; }
+    .tp { display: none; }
+    .tp.on { display: block; }
+
+    /* Video container */
+    .video-container {
+      position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; background: var(--brown-dark);
+    }
+    .video-container iframe, .video-container video {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+    }
+
+    /* Audio container */
+    .audio-container {
+      background: var(--brown-dark); border-radius: 12px; padding: 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .audio-container iframe {
+      width: 100%; height: 180px; border: none; border-radius: 8px;
+    }
+    .audio-container audio {
+      width: 100%;
+    }
+
+    /* Text container */
+    .tc h3 { font-family: var(--font-display); color: var(--terra); font-size: 15px; margin-bottom: 10px; border-bottom: 1px solid var(--parchment-dark); padding-bottom: 8px; }
+    .tc p { font-size: 14px; line-height: 1.75; color: var(--brown-dark); margin-bottom: 10px; }
+    .tc p:last-child { margin-bottom: 0; }
+    .kids-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--terra); color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; margin-bottom: 12px; }
+
+    /* Drive embed */
+    .drive-container {
+      background: var(--brown-dark); border-radius: 12px; padding: 20px;
+    }
+    .drive-container iframe {
+      width: 100%; height: 400px; border: none; border-radius: 8px;
+    }
+
+    /* Note text */
+    .note { margin-top: 12px; font-size: 12px; color: var(--brown-mid); text-align: center; font-style: italic; }
+
+    /* Nav btn */
+    .nav-link {
+      margin: 0 16px 16px; padding: 14px; background: var(--terra); color: white;
+      border: none; border-radius: 12px; cursor: pointer; font-family: var(--font-display);
+      font-size: 14px; letter-spacing: 0.04em; display: flex; align-items: center;
+      justify-content: center; gap: 8px; text-decoration: none; transition: background .2s;
+    }
+    .nav-link:active { background: #a33a0b; }
+
+    /* ---- LIST PANEL ---- */
+    #list-panel {
+      position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h);
+      z-index: 1100; background: var(--parchment); overflow-y: auto;
+      transform: translateX(-100%); transition: transform .3s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+    #list-panel.open { transform: translateX(0); }
+    .lh { background: var(--brown-dark); padding: 18px; position: sticky; top: 0; }
+    .lh h2 { font-family: var(--font-display); color: var(--gold); font-size: 17px; }
+    .lh p { color: var(--parchment-dark); font-size: 11px; margin-top: 3px; opacity: 0.65; letter-spacing: 0.06em; }
+    .li {
+      display: flex; align-items: center; gap: 13px; padding: 14px 18px;
+      border-bottom: 1px solid var(--parchment-dark); cursor: pointer; transition: background .15s;
+    }
+    .li:active { background: var(--parchment-dark); }
+    .li-icon { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+    .li-text { flex: 1; }
+    .li-name { font-family: var(--font-display); font-size: 13px; color: var(--brown-dark); }
+    .li-type { font-size: 11px; color: var(--brown-mid); margin-top: 2px; opacity: 0.7; }
+    .li-arrow { font-size: 20px; opacity: 0.4; }
+
+    /* ---- INFO PANEL ---- */
+    #info-panel {
+      position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h);
+      z-index: 1100; background: var(--parchment); overflow-y: auto;
+      transform: translateX(100%); transition: transform .3s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+    #info-panel.open { transform: translateX(0); }
+    .ih { background: var(--brown-dark); padding: 18px; position: sticky; top: 0; }
+    .ih h2 { font-family: var(--font-display); color: var(--gold); font-size: 17px; }
+    #info-body { padding: 20px 18px; }
+    #info-body h2 { font-family: var(--font-display); color: var(--terra); font-size: 19px; margin-bottom: 14px; }
+    #info-body p { font-size: 14px; line-height: 1.7; color: var(--brown-dark); margin-bottom: 12px; }
+    .ibadge { background: var(--brown-dark); border-radius: 12px; padding: 15px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+    .ibadge-icon { font-size: 30px; flex-shrink: 0; }
+    .ibadge-text { color: var(--parchment); font-size: 13px; line-height: 1.55; }
+    .ibadge-text strong { color: var(--gold); display: block; margin-bottom: 3px; font-family: var(--font-display); font-size: 13px; }
+
+    /* ---- ADMIN PANEL ---- */
+    #admin-panel {
+      position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h);
+      z-index: 1100; background: var(--parchment); overflow-y: auto;
+      transform: translateY(100%); transition: transform .3s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+    #admin-panel.open { transform: translateY(0); }
+    .admin-h { background: var(--green); padding: 18px; position: sticky; top: 0; }
+    .admin-h h2 { font-family: var(--font-display); color: white; font-size: 17px; }
+    .admin-h p { color: rgba(255,255,255,0.8); font-size: 11px; margin-top: 3px; }
+    #admin-body { padding: 20px 18px; }
+    .admin-section { margin-bottom: 24px; }
+    .admin-section h3 { font-family: var(--font-display); color: var(--brown-dark); font-size: 15px; margin-bottom: 12px; }
+    .admin-input {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--parchment-dark);
+      border-radius: 10px; font-family: var(--font-body); font-size: 14px;
+      background: white; color: var(--brown-dark); margin-bottom: 10px;
+    }
+    .admin-input:focus { outline: none; border-color: var(--gold); }
+    .admin-select {
+      width: 100%; padding: 12px 14px; border: 1px solid var(--parchment-dark);
+      border-radius: 10px; font-family: var(--font-body); font-size: 14px;
+      background: white; color: var(--brown-dark); margin-bottom: 10px;
+    }
+    .admin-btn {
+      width: 100%; padding: 14px; background: var(--green); color: white;
+      border: none; border-radius: 12px; cursor: pointer; font-family: var(--font-display);
+      font-size: 14px; transition: background .2s;
+    }
+    .admin-btn:active { background: #1b5e20; }
+    .admin-btn-secondary {
+      width: 100%; padding: 12px; background: transparent; color: var(--brown-mid);
+      border: 1px solid var(--parchment-dark); border-radius: 12px; cursor: pointer;
+      font-family: var(--font-body); font-size: 13px; margin-top: 8px;
+    }
+    .login-panel {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 300px; padding: 40px 20px;
+    }
+    .login-panel h3 { font-family: var(--font-display); color: var(--brown-dark); margin-bottom: 20px; }
+    .login-panel input {
+      width: 100%; max-width: 280px; padding: 14px; border: 2px solid var(--parchment-dark);
+      border-radius: 12px; font-size: 16px; text-align: center; margin-bottom: 16px;
+    }
+    .login-panel input:focus { outline: none; border-color: var(--gold); }
+    .login-panel button {
+      width: 100%; max-width: 280px; padding: 14px; background: var(--green);
+      color: white; border: none; border-radius: 12px; font-family: var(--font-display);
+      font-size: 14px; cursor: pointer;
+    }
+    .content-list { margin-top: 16px; }
+    .content-item {
+      background: white; border-radius: 10px; padding: 12px; margin-bottom: 10px;
+      border: 1px solid var(--parchment-dark);
+    }
+    .content-item strong { color: var(--brown-dark); font-size: 13px; }
+    .content-item span { color: var(--brown-mid); font-size: 11px; }
+    .content-item button {
+      float: right; background: var(--terra); color: white; border: none;
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer;
+    }
+
+    /* ---- ROUTE PANEL ---- */
+    #route-panel {
+      position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h);
+      z-index: 1100; background: var(--parchment); overflow-y: auto;
+      transform: translateX(100%); transition: transform .3s ease;
+      -webkit-overflow-scrolling: touch;
+    }
+    #route-panel.open { transform: translateX(0); }
+    .route-h { background: var(--terra); padding: 18px; position: sticky; top: 0; }
+    .route-h h2 { font-family: var(--font-display); color: white; font-size: 17px; }
+    .route-h p { color: rgba(255,255,255,0.8); font-size: 11px; margin-top: 3px; }
+    #route-body { padding: 20px 18px; }
+    .route-option {
+      background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px;
+      border: 2px solid transparent; cursor: pointer; transition: all .2s;
+    }
+    .route-option:hover { border-color: var(--gold); }
+    .route-option.selected { border-color: var(--terra); background: rgba(193,68,14,0.05); }
+    .route-option h4 { font-family: var(--font-display); color: var(--brown-dark); font-size: 14px; margin-bottom: 6px; }
+    .route-option p { color: var(--brown-mid); font-size: 12px; margin: 0; }
+    .route-btn-start {
+      width: 100%; padding: 16px; background: var(--terra); color: white;
+      border: none; border-radius: 12px; cursor: pointer; font-family: var(--font-display);
+      font-size: 15px; margin-top: 16px;
+    }
+    .route-stop {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      background: white; border-radius: 10px; margin-bottom: 8px;
+    }
+    .route-stop-num {
+      width: 28px; height: 28px; background: var(--terra); color: white;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: 12px; font-weight: bold;
+    }
+    .route-stop-info { flex: 1; }
+    .route-stop-info strong { color: var(--brown-dark); font-size: 13px; }
+    .route-stop-info span { color: var(--brown-mid); font-size: 11px; display: block; }
+
+    /* RTL */
+    [dir="rtl"] #list-panel { transform: translateX(100%); }
+    [dir="rtl"] #list-panel.open { transform: translateX(0); }
+    [dir="rtl"] #info-panel { transform: translateX(-100%); }
+    [dir="rtl"] #info-panel.open { transform: translateX(0); }
+    [dir="rtl"] #route-panel { transform: translateX(-100%); }
+    [dir="rtl"] #route-panel.open { transform: translateX(0); }
+    [dir="rtl"] .li-arrow { transform: scaleX(-1); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(44,24,16,0.15); border-radius: 2px; }
+
+    /* Leaflet tweaks */
+    .leaflet-container { font-family: var(--font-body) !important; }
+    .leaflet-control-zoom { border: none !important; box-shadow: var(--shadow) !important; border-radius: 10px !important; overflow: hidden; }
+    .leaflet-control-zoom-in, .leaflet-control-zoom-out { font-size: 18px !important; color: var(--brown-dark) !important; }
+  </style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="crest">⚜️</div>
+  <h1>Santa Fe<br><span style="font-size:.55em;color:var(--parchment-dark);letter-spacing:.18em">HISTÓRICA</span></h1>
+  <p>CEIP Capitulaciones · Ruta Cultural</p>
+  <div class="bar-wrap"><div class="bar"></div></div>
+</div>
+
+<!-- APP -->
+<div id="app" class="gone">
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div id="topbar-brand">
+      <div id="topbar-title">⚜️ <span id="t-name">Santa Fe Histórica</span></div>
+      <div id="topbar-sub">CEIP Capitulaciones · Granada</div>
+    </div>
+    <button id="route-btn" onclick="openRoutePanel()" title="Ruta GPS">🧭</button>
+    <button id="admin-btn" onclick="openAdminPanel()" title="Modo Admin">🔐</button>
+    <button id="lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl">ES</span></button>
+  </div>
+
+  <!-- Lang panel -->
+  <div id="lang-panel" class="off">
+    <button class="lang-opt cur" onclick="setLang('es')"><span class="lang-flag">🇪🇸</span>Español</button>
+    <button class="lang-opt" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span>English</button>
+    <button class="lang-opt" onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span>Français</button>
+    <button class="lang-opt" onclick="setLang('zh')"><span class="lang-flag">🇨🇳</span>中文</button>
+    <button class="lang-opt" onclick="setLang('ar')"><span class="lang-flag">🇸🇦</span>العربية</button>
+  </div>
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <!-- Bottom nav -->
+  <div id="bottom-nav">
+    <button class="nb on" id="nb-map" onclick="goView('map')">
+      <span class="nb-icon">🗺️</span><span id="t-nav-map">Mapa</span>
+    </button>
+    <button class="nb" id="nb-list" onclick="goView('list')">
+      <span class="nb-icon">📍</span><span id="t-nav-list">Lugares</span>
+    </button>
+    <button class="nb" id="nb-info" onclick="goView('info')">
+      <span class="nb-icon">ℹ️</span><span id="t-nav-info">Info</span>
+    </button>
+  </div>
+
+  <!-- Proximity alert -->
+  <div id="prox-alert" class="off">
+    <div class="pa-icon" id="pa-icon">📍</div>
+    <div class="pa-text">
+      <strong id="pa-name"></strong>
+      <span id="pa-msg">Estás a menos de 80 metros. ¿Quieres saber su historia?</span>
+    </div>
+    <div class="pa-actions">
+      <button class="pa-yes" onclick="alertOpen()" id="pa-yes">Ver</button>
+      <button class="pa-no" onclick="alertClose()" id="pa-no">✕</button>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div id="detail-panel">
+    <div class="ph">
+      <div class="ph-icon" id="dp-icon">🏛️</div>
+      <div class="ph-meta">
+        <div class="ph-name" id="dp-name">—</div>
+        <div class="ph-desc" id="dp-desc">—</div>
+      </div>
+      <button class="ph-close" onclick="closeDetail()">×</button>
+    </div>
+    <div class="tab-bar">
+      <button class="tb on" id="tb-video" onclick="switchTab('video')">
+        <span class="tb-icon">🎬</span><span id="t-tab-v">Vídeo</span>
+      </button>
+      <button class="tb" id="tb-audio" onclick="switchTab('audio')">
+        <span class="tb-icon">🎵</span><span id="t-tab-a">Audio</span>
+      </button>
+      <button class="tb" id="tb-text" onclick="switchTab('text')">
+        <span class="tb-icon">📖</span><span id="t-tab-t">Texto</span>
+      </button>
+    </div>
+    <div class="tab-content">
+      <div class="tp on" id="tp-video"></div>
+      <div class="tp" id="tp-audio"></div>
+      <div class="tp" id="tp-text"></div>
+    </div>
+    <a id="nav-link" class="nav-link" target="_blank" rel="noopener">🧭 <span id="t-nav-link">Cómo llegar</span></a>
+  </div>
+
+  <!-- List panel -->
+  <div id="list-panel">
+    <div class="lh">
+      <h2 id="t-list-h">Lugares de interés</h2>
+      <p id="t-list-sub">Santa Fe · Granada · 1491</p>
+    </div>
+    <div id="poi-list"></div>
+  </div>
+
+  <!-- Info panel -->
+  <div id="info-panel">
+    <div class="ih"><h2 id="t-info-h">Sobre esta guía</h2></div>
+    <div id="info-body"></div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="admin-panel">
+    <div class="admin-h">
+      <h2>🔐 Modo Superusuario</h2>
+      <p>CEIP Capitulaciones - Gestión de contenidos</p>
+    </div>
+    <div id="admin-body">
+      <!-- Login -->
+      <div id="admin-login" class="login-panel">
+        <h3>Acceso para profesorado</h3>
+        <input type="password" id="admin-pass" placeholder="Contraseña" onkeypress="if(event.key==='Enter')doLogin()">
+        <button onclick="doLogin()">Acceder</button>
+        <button class="admin-btn-secondary" onclick="closeAdminPanel()">Cancelar</button>
+      </div>
+      <!-- Content Manager -->
+      <div id="admin-content" style="display:none;">
+        <div class="admin-section">
+          <h3>📍 Seleccionar monumento</h3>
+          <select id="admin-poi" class="admin-select" onchange="loadPoiContent()">
+            <option value="">-- Selecciona un monumento --</option>
+          </select>
+        </div>
+        <div class="admin-section">
+          <h3>🎬 Vídeo (YouTube)</h3>
+          <input type="text" id="admin-video" class="admin-input" placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)">
+          <button class="admin-btn" onclick="saveVideo()">Guardar Vídeo</button>
+        </div>
+        <div class="admin-section">
+          <h3>🎵 Audio (iVoox o archivo)</h3>
+          <input type="text" id="admin-audio" class="admin-input" placeholder="URL de iVoox o enlace directo a MP3">
+          <button class="admin-btn" onclick="saveAudio()">Guardar Audio</button>
+        </div>
+        <div class="admin-section">
+          <h3>📄 Texto (Google Drive)</h3>
+          <input type="text" id="admin-text" class="admin-input" placeholder="URL de Google Drive (vista previa/embed)">
+          <button class="admin-btn" onclick="saveText()">Guardar Texto</button>
+        </div>
+        <div class="admin-section">
+          <h3>📋 Contenidos actuales</h3>
+          <div id="admin-content-list" class="content-list"></div>
+        </div>
+        <button class="admin-btn-secondary" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Route Panel -->
+  <div id="route-panel">
+    <div class="route-h">
+      <h2>🧭 Ruta por los Monumentos</h2>
+      <p>Ruta óptima desde tu ubicación</p>
+    </div>
+    <div id="route-body">
+      <div class="route-option" onclick="selectRouteType('all')" id="route-all">
+        <h4>🏛️ Todos los monumentos</h4>
+        <p>Recorrido completo por los 7 lugares de interés</p>
+      </div>
+      <div class="route-option" onclick="selectRouteType('arcos')" id="route-arcos">
+        <h4>🏯 Solo los Arcos</h4>
+        <p>Las 4 puertas históricas de la ciudad</p>
+      </div>
+      <div class="route-option" onclick="selectRouteType('corto')" id="route-corto">
+        <h4>⭐ Ruta corta</h4>
+        <p>Los 3 monumentos más importantes</p>
+      </div>
+      <button class="route-btn-start" onclick="startRoute()">Iniciar Ruta GPS</button>
+      <div id="route-stops" style="margin-top: 20px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ================================================================
+// CONFIGURACIÓN - COORDENADAS DE LOS MONUMENTOS
+// ================================================================
+const POIS = [
+  {
+    id:'plaza', icon:'🏛️', color:'#C9A227', lat:37.18530, lng:-3.71558,
+    video:null, audio:null, text:null,
+    names:{ es:'Plaza de España', en:'Plaza de España', fr:'Place d\'Espagne', zh:'西班牙广场', ar:'ساحة إسبانيا' },
+    types:{ es:'Plaza principal · Centro histórico', en:'Main square · Historic centre', fr:'Place principale · Centre historique', zh:'主广场 · 历史中心', ar:'الميدان الرئيسي · المركز التاريخي' },
+    texts:{
+      es:`<p>¡Bienvenidos a Santa Fe! Esta plaza es el corazón de nuestra ciudad. Fue construida en el año 1491 por los Reyes Católicos, Fernando e Isabel, mientras preparaban la conquista de Granada.</p><p>¿Sabéis algo curioso? ¡Toda la ciudad de Santa Fe tiene forma de cuadrado, como un campamento militar! Las calles van en líneas rectas y hay cuatro puertas, una en cada lado. Es una de las pocas ciudades de España que conserva esta forma original.</p><p>Desde aquí puedes ver la iglesia y, si miras hacia los cuatro lados, encontrarás los arcos que cerraban las antiguas murallas.</p>`,
+      en:`<p>Welcome to Santa Fe! This square is the heart of our city. It was built in 1491 by the Catholic Monarchs, Ferdinand and Isabella, as they prepared for the conquest of Granada.</p><p>Did you know something curious? The whole city of Santa Fe is shaped like a square — just like a military camp! The streets run in straight lines and there are four gates, one on each side. It is one of the few cities in Spain to have kept this original layout.</p><p>From here you can see the church, and looking in all four directions you will find the arches that once sealed the ancient walls.</p>`,
+      fr:`<p>Bienvenue à Santa Fe ! Cette place est le cœur de notre ville. Elle fut construite en 1491 par les Rois Catholiques, Ferdinand et Isabelle, pendant qu'ils préparaient la conquête de Grenade.</p><p>Saviez-vous quelque chose de curieux ? La ville entière de Santa Fe a la forme d'un carré, comme un camp militaire ! Les rues sont tracées en lignes droites et il y a quatre portes, une de chaque côté. C'est l'une des rares villes d'Espagne ayant conservé cette forme originale.</p><p>D'ici vous pouvez voir l'église et, en regardant dans les quatre directions, vous trouverez les arcs qui fermaient les anciennes murailles.</p>`,
+      zh:`<p>欢迎来到圣菲！这个广场是我们城市的心脏。它建于1491年，由天主教双王——费迪南德和伊莎贝拉——在准备征服格拉纳达时建造的。</p><p>你知道一个有趣的事吗？整个圣菲城的形状就像一个正方形，像一个军营！街道笔直，四面各有一扇门。这是西班牙为数不多保留原始布局的城市之一。</p><p>从这里你可以看到教堂，朝四个方向望去，你会找到曾经封闭古城墙的拱门。</p>`,
+      ar:`<p>مرحباً بكم في سانتا في! هذا الميدان هو قلب مدينتنا. بُني عام 1491 على يد الملوك الكاثوليك، فرناندو وإيزابيلا، وهم يستعدون لفتح غرناطة.</p><p>هل تعرفون شيئاً طريفاً؟ مدينة سانتا في كلها على شكل مربع، مثل معسكر عسكري! الشوارع مستقيمة وهناك أربعة أبواب، واحد في كل جانب. إنها من المدن النادرة في إسبانيا التي حافظت على هذا الشكل الأصلي.</p><p>من هنا يمكنك رؤية الكنيسة، وإذا نظرت في الاتجاهات الأربعة ستجد الأقواس التي كانت تغلق الأسوار القديمة.</p>`
+    }
+  },
+  {
+    id:'iglesia', icon:'⛪', color:'#8B6914', lat:37.18497, lng:-3.71463,
+    video:null, audio:null, text:null,
+    names:{ es:'Iglesia Mayor de la Encarnación', en:'Church of the Incarnation', fr:'Église de l\'Incarnation', zh:'化身圣母大教堂', ar:'كنيسة التجسد الكبرى' },
+    types:{ es:'Iglesia · Siglo XV-XVI', en:'Church · 15th–16th century', fr:'Église · XVe–XVIe siècle', zh:'教堂 · 15-16世纪', ar:'كنيسة · القرن الخامس عشر–السادس عشر' },
+    texts:{
+      es:`<p>Esta es la Iglesia Mayor de la Encarnación, el edificio más antiguo de Santa Fe que todavía podemos visitar. Fue mandada construir por los propios Reyes Católicos para su nueva ciudad.</p><p>La iglesia es de estilo renacentista y tiene una preciosa torre. En su interior guarda obras de arte muy valiosas de muchos siglos de historia.</p><p>¿Sabíais que aquí, en Santa Fe, fue donde Cristóbal Colón recibió el permiso de los reyes para viajar y descubrir América en 1492? ¡En esta misma ciudad! La historia que empezó aquí cambió el mundo para siempre.</p>`,
+      en:`<p>This is the Church of the Incarnation, the oldest building in Santa Fe we can still visit. It was ordered by the Catholic Monarchs themselves for their new city.</p><p>The church is Renaissance in style and has a beautiful tower. Inside, it holds precious works of art spanning many centuries.</p><p>Did you know that here in Santa Fe, Christopher Columbus received permission from the monarchs to sail and discover America in 1492? In this very city! The history that began right here changed the world forever.</p>`,
+      fr:`<p>Voici l'Église de l'Incarnation, le plus ancien bâtiment de Santa Fe que nous pouvons encore visiter. Elle fut commandée par les Rois Catholiques eux-mêmes pour leur nouvelle ville.</p><p>L'église est de style Renaissance et possède une belle tour. À l'intérieur, elle abrite de précieuses œuvres d'art couvrant de nombreux siècles.</p><p>Saviez-vous que c'est ici, à Santa Fe, que Christophe Colomb reçut en 1492 la permission de naviguer vers l'Amérique ? Dans cette ville même ! L'histoire qui a commencé ici a changé le monde à jamais.</p>`,
+      zh:`<p>这是化身圣母大教堂，是圣菲现存最古老的建筑。它由天主教双王下令为新城市建造。</p><p>教堂是文艺复兴风格，有一座漂亮的塔楼。内部保存着跨越数个世纪的珍贵艺术品。</p><p>你知道吗？就在圣菲这里，克里斯托弗·哥伦布于1492年获得国王许可，航行发现了美洲！历史从这里改变了世界。</p>`,
+      ar:`<p>هذه كنيسة التجسد الكبرى، أقدم مبنى في سانتا في لا يزال بإمكاننا زيارته. أمر ببنائها الملوك الكاثوليك لمدينتهم الجديدة.</p><p>الكنيسة على الطراز النهضوي ولها برج جميل. في داخلها تُحفظ أعمال فنية ثمينة تمتد لقرون عديدة.</p><p>هل تعلمون أنه هنا في سانتا في حصل كريستوفر كولومبوس عام 1492 على إذن الإبحار نحو أمريكا؟ في هذه المدينة بالذات! التاريخ الذي بدأ هنا غيّر العالم إلى الأبد.</p>`
+    }
+  },
+  {
+    id:'arco-loja', icon:'🏯', color:'#C1440E', lat:37.18530, lng:-3.72010,
+    video:null, audio:null, text:null,
+    names:{ es:'Arco de Loja', en:'Arch of Loja', fr:'Arc de Loja', zh:'洛哈拱门', ar:'قوس لوخا' },
+    types:{ es:'Puerta oeste · Muralla histórica', en:'West gate · Historic wall', fr:'Porte ouest · Mur historique', zh:'西门 · 历史城墙', ar:'البوابة الغربية · الأسوار التاريخية' },
+    texts:{
+      es:`<p>¡Este es el Arco de Loja! Es la puerta que mira hacia el oeste, hacia la ciudad de Loja. Por aquí entraban y salían los soldados y los comerciantes hace más de 500 años.</p><p>Santa Fe tiene cuatro arcos, uno en cada lado, porque fue construida como un campamento militar muy bien organizado. Los arcos servían para controlar quién entraba y salía.</p><p>¡Imagina cuánta gente ha pasado por este mismo arco a lo largo de los siglos! Soldados, reyes, comerciantes... ¡y ahora tú!</p>`,
+      en:`<p>This is the Arch of Loja! It is the gate facing west, towards the city of Loja. Soldiers and merchants passed through here more than 500 years ago.</p><p>Santa Fe has four arches, one on each side, because it was built as a very well-organised military camp. The arches controlled who could enter and leave.</p><p>Imagine how many people have passed through this arch over the centuries — soldiers, kings, merchants… and now you!</p>`,
+      fr:`<p>Voici l'Arc de Loja ! C'est la porte qui regarde vers l'ouest, vers la ville de Loja. Les soldats et les marchands passaient par ici il y a plus de 500 ans.</p><p>Santa Fe a quatre arcs, un de chaque côté, car elle fut construite comme un camp militaire très organisé. Les arcs contrôlaient qui entrait et sortait.</p><p>Imaginez combien de personnes ont franchi cet arc au fil des siècles — soldats, rois, marchands… et maintenant vous !</p>`,
+      zh:`<p>这是洛哈拱门！它面朝西方，指向洛哈城。500多年前，士兵和商人就从这里进出。</p><p>圣菲有四个拱门，每侧各一，因为它是作为一个严密组织的军事营地建造的。拱门用来控制人员进出。</p><p>想想几个世纪以来有多少人穿过这个拱门——士兵、国王、商人……还有现在的你！</p>`,
+      ar:`<p>هذا هو قوس لوخا! إنه البوابة التي تواجه الغرب نحو مدينة لوخا. كان الجنود والتجار يمرون من هنا منذ أكثر من 500 عام.</p><p>لدى سانتا في أربعة أقواس، واحد في كل جانب، لأنها بُنيت كمعسكر عسكري منظم جداً. كانت الأقواس تتحكم في من يدخل ويخرج.</p><p>تخيلوا كم شخصاً مرّ من هذا القوس عبر القرون — جنود وملوك وتجار… والآن أنتم!</p>`
+    }
+  },
+  {
+    id:'arco-granada', icon:'🏯', color:'#C1440E', lat:37.18530, lng:-3.71110,
+    video:null, audio:null, text:null,
+    names:{ es:'Arco de Granada', en:'Arch of Granada', fr:'Arc de Grenade', zh:'格拉纳达拱门', ar:'قوس غرناطة' },
+    types:{ es:'Puerta este · Muralla histórica', en:'East gate · Historic wall', fr:'Porte est · Mur historique', zh:'东门 · 历史城墙', ar:'البوابة الشرقية · الأسوار التاريخية' },
+    texts:{
+      es:`<p>Este arco mira hacia el este, hacia Granada. Por aquí salió el ejército de los Reyes Católicos cuando tomaron Granada en enero de 1492.</p><p>¡Este arco es muy especial! Aquí cerca fue donde Cristóbal Colón esperó pacientemente hasta que los reyes le escucharon. Y fue en Santa Fe donde se firmaron las Capitulaciones —el acuerdo que permitió a Colón viajar a América y cambió la historia del mundo.</p><p>¡Un arco testigo de un momento histórico único!</p>`,
+      en:`<p>This arch faces east, towards Granada. The monarchs' army marched through here when they took Granada in January 1492.</p><p>This arch is very special! Nearby, Christopher Columbus patiently waited until the monarchs listened to him. And it was in Santa Fe that the Capitulations were signed — the agreement that allowed Columbus to sail to America and changed world history.</p><p>An arch that witnessed a truly unique historical moment!</p>`,
+      fr:`<p>Cet arc regarde vers l'est, vers Grenade. L'armée des Rois Catholiques passa par ici quand ils prirent Grenade en janvier 1492.</p><p>Cet arc est très spécial ! Tout près d'ici, Christophe Colomb attendit patiemment que les souverains l'écoutent. Et c'est à Santa Fe que furent signées les Capitulations — l'accord permettant à Colomb de naviguer vers l'Amérique, changeant l'histoire du monde.</p><p>Un arc témoin d'un moment historique unique !</p>`,
+      zh:`<p>这个拱门面朝东方，指向格拉纳达。1492年1月，当国王的军队攻占格拉纳达时就从这里出发。</p><p>这个拱门非常特别！就在附近，克里斯托弗·哥伦布耐心等候国王聆听他的计划。正是在圣菲签署了《圣菲协议》——允许哥伦布航行美洲、改变世界历史的协议。</p><p>一个见证了独特历史时刻的拱门！</p>`,
+      ar:`<p>يواجه هذا القوس الشرق نحو غرناطة. مرّ جيش الملوك الكاثوليك من هنا حين فتحوا غرناطة في يناير 1492.</p><p>هذا القوس مميز جداً! هنا بالقرب انتظر كريستوفر كولومبوس بصبر حتى استمع إليه الملوك. وهنا في سانتا في وُقِّعت معاهدة سانتا في — الاتفاقية التي سمحت لكولومبوس بالإبحار نحو أمريكا وغيّرت تاريخ العالم.</p><p>قوس شهد لحظة تاريخية فريدة من نوعها!</p>`
+    }
+  },
+  {
+    id:'arco-jaen', icon:'🏯', color:'#C1440E', lat:37.18220, lng:-3.71558,
+    video:null, audio:null, text:null,
+    names:{ es:'Arco de Jaén', en:'Arch of Jaén', fr:'Arc de Jaén', zh:'哈恩拱门', ar:'قوس خاين' },
+    types:{ es:'Puerta sur · Muralla histórica', en:'South gate · Historic wall', fr:'Porte sud · Mur historique', zh:'南门 · 历史城墙', ar:'البوابة الجنوبية · الأسوار التاريخية' },
+    texts:{
+      es:`<p>¡Bienvenidos al Arco de Jaén, la puerta del sur! Este arco mira hacia Jaén. Desde aquí salían los viajeros que querían ir hacia el sur de Andalucía.</p><p>Este es uno de los cuatro arcos originales de Santa Fe, construidos en 1491, hace más de 530 años. Fueron diseñados para que la ciudad fuera fácil de defender. Cada arco tenía unas puertas y un rastrillo que se cerraba por la noche.</p><p>Si miras bien el arco, verás cómo fue construido con piedra sólida. ¡Los constructores de aquella época eran muy hábiles!</p>`,
+      en:`<p>Welcome to the Arch of Jaén, the south gate! This arch faces Jaén. Travellers heading to southern Andalusia would leave through here.</p><p>This is one of Santa Fe's four original arches, built in 1491 — over 530 years ago. They were designed to make the city easy to defend. Each arch had doors and a portcullis that closed at night.</p><p>Look closely at the arch and you can see how solidly it was built. The builders of that era were very skilled!</p>`,
+      fr:`<p>Bienvenue à l'Arc de Jaén, la porte sud ! Cet arc regarde vers Jaén. Les voyageurs qui se dirigeaient vers le sud de l'Andalousie partaient par ici.</p><p>C'est l'un des quatre arcs originaux de Santa Fe, construits en 1491 — il y a plus de 530 ans. Ils ont été conçus pour faciliter la défense de la ville. Chaque arc avait des portes et une herse qui se fermaient la nuit.</p><p>Regardez bien l'arc et vous verrez comment il est solidement construit. Les bâtisseurs de l'époque étaient très habiles !</p>`,
+      zh:`<p>欢迎来到哈恩拱门，南门！这个拱门面向哈恩。前往安达卢西亚南部的旅行者就从这里出发。</p><p>这是圣菲四个原始拱门之一，建于1491年——超过530年前。它们的设计便于防守城市，每个拱门夜间关闭。</p><p>仔细看这个拱门，你可以看到它建造得多么坚固。那个时代的建造者非常技艺精湛！</p>`,
+      ar:`<p>مرحباً بكم في قوس خاين، البوابة الجنوبية! يواجه هذا القوس خاين. كان المسافرون نحو جنوب الأندلس يغادرون من هنا.</p><p>هذا أحد الأقواس الأصلية الأربعة لسانتا في، بُنيت عام 1491 — منذ أكثر من 530 عاماً. صُمِّمت لتسهيل الدفاع عن المدينة. كان لكل قوس أبواب وحاجز يُغلق ليلاً.</p><p>انظروا جيداً إلى القوس وستروا كيف بُني بإتقان. كان بناؤو تلك الحقبة بارعين جداً!</p>`
+    }
+  },
+  {
+    id:'arco-real', icon:'👑', color:'#8B4513', lat:37.18840, lng:-3.71558,
+    video:null, audio:null, text:null,
+    names:{ es:'Arco Real', en:'Royal Arch', fr:'Arc Royal', zh:'皇家拱门', ar:'القوس الملكي' },
+    types:{ es:'Puerta norte · Muralla histórica', en:'North gate · Historic wall', fr:'Porte nord · Mur historique', zh:'北门 · 历史城墙', ar:'البوابة الشمالية · الأسوار التاريخية' },
+    texts:{
+      es:`<p>¡Este es el Arco Real, la puerta más importante de Santa Fe! Se llama "Real" porque era la puerta principal que usaban los reyes. Por aquí entraban Fernando e Isabel cuando visitaban la ciudad.</p><p>Imagina la escena: el rey y la reina llegando a caballo con toda su corte, entre banderas y música. ¡Debía ser un espectáculo impresionante!</p><p>Este arco mira al norte, y desde aquí se podían ver las cumbres nevadas de Sierra Nevada —igual que ahora—. ¡Qué paisaje tan bonito debían de tener los soldados!</p>`,
+      en:`<p>This is the Royal Arch, the most important gate of Santa Fe! It is called "Royal" because it was the main gate used by the kings. Ferdinand and Isabella would enter here when visiting the city.</p><p>Imagine the scene: the king and queen arriving on horseback with their whole court, amid flags and music. It must have been an impressive spectacle!</p><p>This arch faces north, and from here you could see the snowy peaks of the Sierra Nevada — just as you can today. What a beautiful view the soldiers must have had!</p>`,
+      fr:`<p>Voici l'Arc Royal, la porte la plus importante de Santa Fe ! Il s'appelle "Royal" parce que c'était la porte principale des rois. Ferdinand et Isabelle entraient ici lors de leurs visites.</p><p>Imaginez la scène : le roi et la reine arrivant à cheval avec toute leur cour, sous les drapeaux et la musique. Ça devait être un spectacle impressionnant !</p><p>Cet arc regarde vers le nord, et d'ici on apercevait les sommets enneigés de la Sierra Nevada — comme maintenant. Quel beau paysage les soldats devaient avoir !</p>`,
+      zh:`<p>这是皇家拱门，圣菲最重要的门！它被称为"皇家"因为它是国王使用的主要门，费迪南德和伊莎贝拉访城时从这里进入。</p><p>想象那个场景：国王和王后骑马而来，带着整个宫廷，在旗帜和音乐中穿过拱门。一定是令人叹为观止的景象！</p><p>这个拱门面朝北方，从这里可以看到内华达山脉的雪峰——就像现在一样。士兵们一定有多美的风景！</p>`,
+      ar:`<p>هذا هو القوس الملكي، أهم بوابة في سانتا في! يُسمى "ملكياً" لأنه كان البوابة الرئيسية للملوك. كان فرناندو وإيزابيلا يدخلان من هنا في زياراتهما.</p><p>تخيلوا المشهد: الملك والملكة على ظهر الخيل مع حاشيتهما كاملة، وسط الأعلام والموسيقى. لا بد أنه كان مشهداً رائعاً!</p><p>يواجه هذا القوس الشمال، ومن هنا كان يُرى جبل سييرا نيفادا بقممه الثلجية — تماماً كما الآن. يا له من منظر جميل كان يراه الجنود!</p>`
+    }
+  },
+  {
+    id:'damian', icon:'🎨', color:'#2E7D32', lat:37.18560, lng:-3.71620,
+    video:null, audio:null, text:null,
+    names:{ es:'Centro Damián Bayón', en:'Damián Bayón Centre', fr:'Centre Damián Bayón', zh:'达米安·巴永中心', ar:'مركز داميان بايون' },
+    types:{ es:'Centro cultural · Santa Fe', en:'Cultural centre · Santa Fe', fr:'Centre culturel · Santa Fe', zh:'文化中心 · 圣菲', ar:'مركز ثقافي · سانتا في' },
+    texts:{
+      es:`<p>Este centro lleva el nombre de Damián Bayón, un gran historiador del arte nacido en Santa Fe. Fue una persona muy importante que estudió y escribió sobre el arte de toda América Latina, y así dio a conocer nuestra cultura en todo el mundo.</p><p>Es bonito que nuestra ciudad recuerde a sus hijos ilustres dando su nombre a edificios importantes. ¡Así no olvidamos quiénes somos ni de dónde venimos!</p><p>En este centro se hacen muchas actividades culturales para toda la familia: exposiciones, talleres, conferencias... ¡Un lugar lleno de vida y cultura en nuestra Santa Fe!</p>`,
+      en:`<p>This centre is named after Damián Bayón, a great art historian born in Santa Fe. He was a very important person who studied and wrote about the art of all Latin America, spreading knowledge of our culture worldwide.</p><p>It is wonderful that our city honours its distinguished children by giving their names to important buildings. This way we do not forget who we are and where we come from!</p><p>The centre hosts many cultural activities for the whole family: exhibitions, workshops, talks... A place full of life and culture in our Santa Fe!</p>`,
+      fr:`<p>Ce centre porte le nom de Damián Bayón, un grand historien de l'art né à Santa Fe. C'était une personne très importante qui a étudié et écrit sur l'art de toute l'Amérique latine, faisant connaître notre culture dans le monde entier.</p><p>Il est beau que notre ville honore ses illustres enfants en donnant leurs noms à des bâtiments importants. Ainsi nous n'oublions pas qui nous sommes ni d'où nous venons !</p><p>Ce centre accueille de nombreuses activités culturelles pour toute la famille : expositions, ateliers, conférences... Un endroit plein de vie et de culture dans notre Santa Fe !</p>`,
+      zh:`<p>这个中心以达米安·巴永的名字命名，他是圣菲出生的伟大艺术史学家。他研究并撰写了关于整个拉丁美洲艺术的著作，将我们的文化传播到全世界。</p><p>我们的城市用重要建筑的名字纪念杰出的儿女，这很美好。这样我们就不会忘记我们是谁，从哪里来！</p><p>中心为全家提供许多文化活动：展览、工作坊、讲座……圣菲充满活力和文化的地方！</p>`,
+      ar:`<p>يحمل هذا المركز اسم داميان بايون، مؤرخ فن عظيم وُلد في سانتا في. درس وكتب عن فن أمريكا اللاتينية بأسرها، ونشر ثقافتنا في أرجاء العالم.</p><p>من الجميل أن تُكرّم مدينتنا أبناءها المتميزين بإعطاء أسمائهم للمباني المهمة. وهكذا لا ننسى من نحن ومن أين جئنا!</p><p>يستضيف المركز أنشطة ثقافية كثيرة لجميع أفراد الأسرة: معارض وورش عمل ومحاضرات... مكان مليء بالحياة والثقافة في سانتا في!</p>`
+    }
+  }
+];
+
+// ================================================================
+// i18n TEXTOS
+// ================================================================
+const T = {
+  es:{ name:'Santa Fe Histórica', sub:'CEIP Capitulaciones · Granada', lbl:'ES',
+    navMap:'Mapa', navList:'Lugares', navInfo:'Info',
+    alertMsg:'Estás a menos de 80 m. ¿Quieres saber su historia?',
+    alertYes:'Ver', alertNo:'✕',
+    tabV:'Vídeo', tabA:'Audio', tabT:'Texto',
+    kidstag:'Contado por los niños del CEIP Capitulaciones',
+    navbtn:'Cómo llegar',
+    listh:'Lugares de interés', listsub:'Santa Fe · Granada · 1491',
+    infoh:'Sobre esta guía',
+    infoBody:`<h2>Santa Fe Histórica</h2><p>Esta guía interactiva ha sido creada por el <strong>CEIP Capitulaciones de Santa Fe</strong> para explorar los monumentos más importantes de nuestra ciudad.</p><div class="ibadge"><div class="ibadge-icon">📍</div><div class="ibadge-text"><strong>Cómo funciona</strong>La app detecta cuando te acercas a menos de 80 metros de un monumento y te avisa automáticamente. ¡Activa el GPS!</div></div><div class="ibadge"><div class="ibadge-icon">🎬</div><div class="ibadge-text"><strong>Contenidos</strong>Los vídeos y audios son narrados por los propios alumnos del CEIP Capitulaciones. ¡Disfruta de su trabajo!</div></div><div class="ibadge"><div class="ibadge-icon">🧭</div><div class="ibadge-text"><strong>Ruta GPS</strong>Usa el botón 🧭 para crear una ruta óptima desde tu ubicación actual por todos los monumentos.</div></div><div class="ibadge"><div class="ibadge-icon">⚜️</div><div class="ibadge-text"><strong>Santa Fe, 1491</strong>Ciudad fundada por los Reyes Católicos durante el asedio a Granada. En ella se firmaron las Capitulaciones que permitieron el viaje de Colón a América.</div></div><div class="ibadge"><div class="ibadge-icon">🌐</div><div class="ibadge-text"><strong>Idiomas</strong>Disponible en español, inglés, francés, chino y árabe. Cambia el idioma con el botón 🌐 arriba a la derecha.</div></div>`
+  },
+  en:{ name:'Historic Santa Fe', sub:'CEIP Capitulaciones · Granada', lbl:'EN',
+    navMap:'Map', navList:'Places', navInfo:'Info',
+    alertMsg:'You\'re within 80 m. Want to learn its history?',
+    alertYes:'See', alertNo:'✕',
+    tabV:'Video', tabA:'Audio', tabT:'Text',
+    kidstag:'Told by the children of CEIP Capitulaciones',
+    navbtn:'Get directions',
+    listh:'Points of interest', listsub:'Santa Fe · Granada · 1491',
+    infoh:'About this guide',
+    infoBody:`<h2>Historic Santa Fe</h2><p>This interactive guide was created by <strong>CEIP Capitulaciones de Santa Fe</strong> to explore the most important monuments of our city.</p><div class="ibadge"><div class="ibadge-icon">📍</div><div class="ibadge-text"><strong>How it works</strong>The app detects when you come within 80 metres of a monument and alerts you automatically. Enable GPS!</div></div><div class="ibadge"><div class="ibadge-icon">🎬</div><div class="ibadge-text"><strong>Content</strong>Videos and audio are narrated by students of CEIP Capitulaciones. Enjoy their work!</div></div><div class="ibadge"><div class="ibadge-icon">🧭</div><div class="ibadge-text"><strong>GPS Route</strong>Use the 🧭 button to create an optimal route from your current location through all monuments.</div></div><div class="ibadge"><div class="ibadge-icon">⚜️</div><div class="ibadge-text"><strong>Santa Fe, 1491</strong>City founded by the Catholic Monarchs during the siege of Granada. The Capitulations signed here enabled Columbus's voyage to America.</div></div><div class="ibadge"><div class="ibadge-icon">🌐</div><div class="ibadge-text"><strong>Languages</strong>Available in Spanish, English, French, Chinese and Arabic. Change language with the 🌐 button top right.</div></div>`
+  },
+  fr:{ name:'Santa Fe Historique', sub:'CEIP Capitulaciones · Grenade', lbl:'FR',
+    navMap:'Carte', navList:'Lieux', navInfo:'Info',
+    alertMsg:'Vous êtes à moins de 80 m. Voulez-vous connaître son histoire ?',
+    alertYes:'Voir', alertNo:'✕',
+    tabV:'Vidéo', tabA:'Audio', tabT:'Texte',
+    kidstag:'Raconté par les enfants du CEIP Capitulaciones',
+    navbtn:'Comment y aller',
+    listh:'Points d\'intérêt', listsub:'Santa Fe · Grenade · 1491',
+    infoh:'À propos de ce guide',
+    infoBody:`<h2>Santa Fe Historique</h2><p>Ce guide interactif a été créé par le <strong>CEIP Capitulaciones de Santa Fe</strong> pour explorer les monuments les plus importants de notre ville.</p><div class="ibadge"><div class="ibadge-icon">📍</div><div class="ibadge-text"><strong>Comment ça marche</strong>L'application détecte quand vous vous approchez à moins de 80 mètres d'un monument et vous alerte automatiquement. Activez le GPS !</div></div><div class="ibadge"><div class="ibadge-icon">🎬</div><div class="ibadge-text"><strong>Contenus</strong>Les vidéos et audios sont narrés par les élèves du CEIP Capitulaciones. Profitez de leur travail !</div></div><div class="ibadge"><div class="ibadge-icon">🧭</div><div class="ibadge-text"><strong>Itinéraire GPS</strong>Utilisez le bouton 🧭 pour créer un itinéraire optimal depuis votre position actuelle.</div></div><div class="ibadge"><div class="ibadge-icon">⚜️</div><div class="ibadge-text"><strong>Santa Fe, 1491</strong>Ville fondée par les Rois Catholiques pendant le siège de Grenade. Les Capitulations signées ici ont permis le voyage de Colomb en Amérique.</div></div><div class="ibadge"><div class="ibadge-icon">🌐</div><div class="ibadge-text"><strong>Langues</strong>Disponible en espagnol, anglais, français, chinois et arabe. Changez de langue avec le bouton 🌐 en haut à droite.</div></div>`
+  },
+  zh:{ name:'历史圣菲', sub:'CEIP Capitulaciones · 格拉纳达', lbl:'中文',
+    navMap:'地图', navList:'景点', navInfo:'信息',
+    alertMsg:'您距离该景点不足80米。想了解它的历史吗？',
+    alertYes:'查看', alertNo:'✕',
+    tabV:'视频', tabA:'音频', tabT:'文字',
+    kidstag:'由卡皮图拉西奥内斯小学的孩子们讲述',
+    navbtn:'如何到达',
+    listh:'兴趣点', listsub:'圣菲 · 格拉纳达 · 1491',
+    infoh:'关于本指南',
+    infoBody:`<h2>历史圣菲</h2><p>本互动指南由<strong>圣菲卡皮图拉西奥内斯小学</strong>创建，带您探索我们城市最重要的古迹。</p><div class="ibadge"><div class="ibadge-icon">📍</div><div class="ibadge-text"><strong>使用方法</strong>当您距离古迹不足80米时，应用程序会自动检测并提醒您。请启用GPS！</div></div><div class="ibadge"><div class="ibadge-icon">🎬</div><div class="ibadge-text"><strong>内容</strong>视频和音频由卡皮图拉西奥内斯小学的学生讲述。享受他们的作品！</div></div><div class="ibadge"><div class="ibadge-icon">🧭</div><div class="ibadge-text"><strong>GPS路线</strong>使用🧭按钮从您当前位置创建最佳路线。</div></div><div class="ibadge"><div class="ibadge-icon">⚜️</div><div class="ibadge-text"><strong>圣菲，1491年</strong>由天主教双王在围攻格拉纳达期间创建。这里签署的《圣菲协议》使哥伦布得以航行前往美洲。</div></div><div class="ibadge"><div class="ibadge-icon">🌐</div><div class="ibadge-text"><strong>语言</strong>提供西班牙语、英语、法语、中文和阿拉伯语。点击右上角🌐按钮切换语言。</div></div>`
+  },
+  ar:{ name:'سانتا في التاريخية', sub:'CEIP Capitulaciones · غرناطة', lbl:'عربي',
+    navMap:'خريطة', navList:'أماكن', navInfo:'معلومات',
+    alertMsg:'أنت على بُعد أقل من 80 متراً. هل تريد معرفة تاريخه؟',
+    alertYes:'عرض', alertNo:'✕',
+    tabV:'فيديو', tabA:'صوت', tabT:'نص',
+    kidstag:'رواه أطفال مدرسة CEIP Capitulaciones',
+    navbtn:'كيف أصل',
+    listh:'نقاط الاهتمام', listsub:'سانتا في · غرناطة · 1491',
+    infoh:'حول هذا الدليل',
+    infoBody:`<h2>سانتا في التاريخية</h2><p>تم إنشاء هذا الدليل التفاعلي من قِبَل <strong>مدرسة CEIP Capitulaciones في سانتا في</strong> لاستكشاف أهم المعالم الأثرية في مدينتنا.</p><div class="ibadge"><div class="ibadge-icon">📍</div><div class="ibadge-text"><strong>كيف يعمل</strong>يكتشف التطبيق تلقائياً عندما تقترب من معلم أثري بأقل من 80 متراً ويُنبّهك. فعّل GPS!</div></div><div class="ibadge"><div class="ibadge-icon">🎬</div><div class="ibadge-text"><strong>المحتوى</strong>تُروى الفيديوهات والصوتيات بواسطة طلاب CEIP Capitulaciones. استمتع بعملهم!</div></div><div class="ibadge"><div class="ibadge-icon">🧭</div><div class="ibadge-text"><strong>مسار GPS</strong>استخدم زر 🧭 لإنشاء مسار مثالي من موقعك الحالي.</div></div><div class="ibadge"><div class="ibadge-icon">⚜️</div><div class="ibadge-text"><strong>سانتا في، 1491</strong>مدينة أسسها الملوك الكاثوليك خلال حصار غرناطة. هنا وُقِّعت معاهدة سانتا في التي مكّنت كولومبوس من الإبحار نحو أمريكا.</div></div><div class="ibadge"><div class="ibadge-icon">🌐</div><div class="ibadge-text"><strong>اللغات</strong>متاح بالإسبانية والإنجليزية والفرنسية والصينية والعربية. غيّر اللغة بزر 🌐 أعلى اليمين.</div></div>`
+  }
+};
+
+// ================================================================
+// ESTADO GLOBAL
+// ================================================================
+let lang = 'es';
+let activePOI = null;
+let nearbyPOI = null;
+let alertedSet = new Set();
+let userLat = null, userLng = null;
+let map = null;
+let userMark = null;
+let poiMarks = {};
+let view = 'map';
+let langOpen = false;
+let curTab = 'video';
+let isAdmin = false;
+let routeLine = null;
+let selectedRouteType = 'all';
+let routeOrder = [];
+
+// ================================================================
+// INICIALIZACIÓN
+// ================================================================
+window.addEventListener('load', () => {
+  loadDataFromStorage();
+  registerPWA();
+  setTimeout(startApp, 2200);
+});
+
+function startApp() {
+  const s = document.getElementById('splash');
+  s.style.transition = 'opacity .5s';
+  s.style.opacity = '0';
+  setTimeout(() => s.style.display = 'none', 500);
+  const app = document.getElementById('app');
+  app.classList.remove('gone');
+  requestAnimationFrame(() => setTimeout(() => app.classList.add('ready'), 50));
+  initMap();
+  applyT();
+  startGPS();
+  initAdminSelect();
+}
+
+// ================================================================
+// MAPA
+// ================================================================
+function initMap() {
+  map = L.map('map', { center:[37.18530,-3.71558], zoom:16, zoomControl:true, attributionControl:false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(map);
+
+  POIS.forEach(poi => {
+    // Anillo de proximidad
+    L.circle([poi.lat, poi.lng], { radius:80, color:poi.color, fillColor:poi.color, fillOpacity:.06, weight:1, opacity:.3, dashArray:'5,7' }).addTo(map);
+    // Marcador
+    const icon = L.divIcon({
+      html: `<div class="pm" id="pm-${poi.id}" style="background:${poi.color}"><div class="pm-inner">${poi.icon}</div></div>`,
+      iconSize:[46,46], iconAnchor:[23,46], className:''
+    });
+    poiMarks[poi.id] = L.marker([poi.lat, poi.lng], { icon }).addTo(map).on('click', () => openPOI(poi.id));
+  });
+}
+
+// ================================================================
+// GPS Y PROXIMIDAD
+// ================================================================
+function startGPS() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.watchPosition(onGPS, onGPSErr, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
+}
+
+function onGPS(pos) {
+  userLat = pos.coords.latitude;
+  userLng = pos.coords.longitude;
+  const ll = [userLat, userLng];
+  if (!userMark) {
+    userMark = L.marker(ll, { icon: L.divIcon({ html:'<div class="user-dot"></div>', iconSize:[18,18], iconAnchor:[9,9], className:'' }), zIndexOffset:1000 }).addTo(map);
+  } else userMark.setLatLng(ll);
+  checkProx();
+}
+
+function onGPSErr(e) { console.warn('GPS:', e.message); }
+
+function haversine(a,b,c,d) {
+  const R=6371000, dA=(c-a)*Math.PI/180, dB=(d-b)*Math.PI/180;
+  const x=Math.sin(dA/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dB/2)**2;
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+function checkProx() {
+  if (userLat===null) return;
+  POIS.forEach(poi => {
+    const d = haversine(userLat, userLng, poi.lat, poi.lng);
+    if (d < 80 && !alertedSet.has(poi.id)) {
+      alertedSet.add(poi.id);
+      showAlert(poi);
+      const el = document.getElementById('pm-'+poi.id);
+      if (el) el.classList.add('pulsing');
+    }
+    if (d >= 80) alertedSet.delete(poi.id);
+  });
+}
+
+// ================================================================
+// ALERTA DE PROXIMIDAD
+// ================================================================
+function showAlert(poi) {
+  nearbyPOI = poi;
+  const t = T[lang];
+  document.getElementById('pa-icon').textContent = poi.icon;
+  document.getElementById('pa-name').textContent = poi.names[lang];
+  document.getElementById('pa-msg').textContent = t.alertMsg;
+  document.getElementById('pa-yes').textContent = t.alertYes;
+  document.getElementById('pa-no').textContent = t.alertNo;
+  document.getElementById('prox-alert').classList.remove('off');
+  setTimeout(alertClose, 8000);
+}
+
+function alertClose() { document.getElementById('prox-alert').classList.add('off'); }
+function alertOpen() { alertClose(); if (nearbyPOI) openPOI(nearbyPOI.id); }
+
+// ================================================================
+// PANEL DE DETALLE
+// ================================================================
+function openPOI(id) {
+  const poi = POIS.find(p=>p.id===id);
+  if (!poi) return;
+  activePOI = poi;
+  const t = T[lang];
+
+  document.getElementById('list-panel').classList.remove('open');
+  document.getElementById('info-panel').classList.remove('open');
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('route-panel').classList.remove('open');
+  setActiveNav('map');
+
+  document.getElementById('dp-icon').textContent = poi.icon;
+  document.getElementById('dp-name').textContent = poi.names[lang];
+  document.getElementById('dp-desc').textContent = poi.types[lang];
+
+  // Texto
+  document.getElementById('tp-text').innerHTML = `
+    <div class="tc">
+      <div class="kids-tag">⭐ ${t.kidstag}</div>
+      ${poi.texts[lang]}
+    </div>`;
+
+  // Vídeo (YouTube)
+  if (poi.video) {
+    const videoId = extractYouTubeId(poi.video);
+    if (videoId) {
+      document.getElementById('tp-video').innerHTML = `
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
+        </div>`;
+    } else {
+      document.getElementById('tp-video').innerHTML = `
+        <div class="video-container">
+          <video controls style="width:100%;height:100%" src="${poi.video}"></video>
+        </div>`;
+    }
+  } else {
+    document.getElementById('tp-video').innerHTML = `
+      <div class="video-container" style="display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--brown-dark);color:var(--parchment);">
+        <div style="font-size:48px;opacity:0.5;">🎬</div>
+        <strong style="color:var(--gold);font-family:var(--font-display);margin-top:10px;">Próximamente</strong>
+        <p style="font-size:12px;opacity:0.5;text-align:center;padding:0 20px;">Vídeo narrado por los alumnos del CEIP Capitulaciones</p>
+      </div>
+      <p class="note">Los vídeos serán añadidos por el profesorado</p>`;
+  }
+
+  // Audio (iVoox o directo)
+  if (poi.audio) {
+    if (poi.audio.includes('ivoox')) {
+      document.getElementById('tp-audio').innerHTML = `
+        <div class="audio-container">
+          <iframe src="${poi.audio}" scrolling="no"></iframe>
+        </div>`;
+    } else {
+      document.getElementById('tp-audio').innerHTML = `
+        <div class="audio-container">
+          <audio controls src="${poi.audio}"></audio>
+        </div>`;
+    }
+  } else {
+    document.getElementById('tp-audio').innerHTML = `
+      <div class="audio-container" style="align-items:center;justify-content:center;min-height:150px;">
+        <div style="font-size:44px;">🎙️</div>
+        <div style="display:flex;gap:4px;align-items:center;height:36px;">
+          <span style="width:4px;background:var(--gold);border-radius:2px;height:8px;animation:wv 1.3s ease-in-out infinite;"></span>
+          <span style="width:4px;background:var(--gold);border-radius:2px;height:18px;animation:wv 1.3s ease-in-out infinite .1s;"></span>
+          <span style="width:4px;background:var(--gold);border-radius:2px;height:30px;animation:wv 1.3s ease-in-out infinite .2s;"></span>
+          <span style="width:4px;background:var(--gold);border-radius:2px;height:14px;animation:wv 1.3s ease-in-out infinite .3s;"></span>
+          <span style="width:4px;background:var(--gold);border-radius:2px;height:6px;animation:wv 1.3s ease-in-out infinite .4s;"></span>
+        </div>
+        <p style="font-size:12px;opacity:0.5;text-align:center;">Audio próximamente<br>Narrado por los alumnos del CEIP</p>
+      </div>
+      <p class="note">Los audios serán añadidos por el profesorado</p>`;
+  }
+
+  // Navegación
+  const nl = document.getElementById('nav-link');
+  nl.href = `https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}&travelmode=walking`;
+  document.getElementById('t-nav-link').textContent = t.navbtn;
+
+  switchTab('video');
+  document.getElementById('detail-panel').classList.add('open');
+  if (map) map.setView([poi.lat, poi.lng], 17, { animate:true });
+}
+
+function extractYouTubeId(url) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('open');
+  activePOI = null;
+}
+
+function switchTab(tab) {
+  curTab = tab;
+  ['video','audio','text'].forEach(t => {
+    document.getElementById('tp-'+t).classList.toggle('on', t===tab);
+    document.getElementById('tb-'+t).classList.toggle('on', t===tab);
+  });
+}
+
+// ================================================================
+// VISTAS (Mapa, Lista, Info)
+// ================================================================
+function goView(v) {
+  view = v;
+  if (v !== 'map') closeDetail();
+  document.getElementById('list-panel').classList.toggle('open', v==='list');
+  document.getElementById('info-panel').classList.toggle('open', v==='info');
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('route-panel').classList.remove('open');
+  if (v==='list') buildList();
+  if (v==='info') document.getElementById('info-body').innerHTML = T[lang].infoBody;
+  if (v==='map' && map) {
+    const c = userLat ? [userLat,userLng] : [37.18530,-3.71558];
+    map.setView(c, 16, {animate:true});
+  }
+  setActiveNav(v);
+}
+
+function setActiveNav(v) {
+  ['map','list','info'].forEach(x => document.getElementById('nb-'+x).classList.toggle('on', x===v));
+}
+
+function buildList() {
+  document.getElementById('poi-list').innerHTML = POIS.map(poi=>`
+    <div class="li" onclick="openPOI('${poi.id}')">
+      <div class="li-icon" style="background:${poi.color}22;color:${poi.color}">${poi.icon}</div>
+      <div class="li-text">
+        <div class="li-name">${poi.names[lang]}</div>
+        <div class="li-type">${poi.types[lang]}</div>
+      </div>
+      <div class="li-arrow" style="color:${poi.color}">›</div>
+    </div>`).join('');
+}
+
+// ================================================================
+// IDIOMA
+// ================================================================
+function toggleLang() {
+  langOpen = !langOpen;
+  document.getElementById('lang-panel').classList.toggle('off', !langOpen);
+}
+
+function setLang(l) {
+  lang = l;
+  langOpen = false;
+  document.getElementById('lang-panel').classList.add('off');
+  document.documentElement.lang = l;
+  document.documentElement.dir = l==='ar' ? 'rtl' : 'ltr';
+  applyT();
+  document.querySelectorAll('.lang-opt').forEach(b => {
+    b.classList.toggle('cur', b.getAttribute('onclick')===`setLang('${l}')`);
+  });
+  if (activePOI) openPOI(activePOI.id);
+  if (view==='list') buildList();
+  if (view==='info') document.getElementById('info-body').innerHTML = T[l].infoBody;
+}
+
+function applyT() {
+  const t = T[lang];
+  document.getElementById('t-name').textContent = t.name;
+  document.getElementById('topbar-sub').textContent = t.sub;
+  document.getElementById('t-lang-lbl').textContent = t.lbl;
+  document.getElementById('t-nav-map').textContent = t.navMap;
+  document.getElementById('t-nav-list').textContent = t.navList;
+  document.getElementById('t-nav-info').textContent = t.navInfo;
+  document.getElementById('t-tab-v').textContent = t.tabV;
+  document.getElementById('t-tab-a').textContent = t.tabA;
+  document.getElementById('t-tab-t').textContent = t.tabT;
+  document.getElementById('t-list-h').textContent = t.listh;
+  document.getElementById('t-list-sub').textContent = t.listsub;
+  document.getElementById('t-info-h').textContent = t.infoh;
+}
+
+// ================================================================
+// PANEL ADMIN - MODO SUPERUSUARIO
+// ================================================================
+const ADMIN_PASSWORD = 'claustro26';
+
+function openAdminPanel() {
+  closeDetail();
+  document.getElementById('list-panel').classList.remove('open');
+  document.getElementById('info-panel').classList.remove('open');
+  document.getElementById('route-panel').classList.remove('open');
+  document.getElementById('admin-panel').classList.add('open');
+  if (isAdmin) {
+    document.getElementById('admin-login').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+    loadPoiContent();
+  } else {
+    document.getElementById('admin-login').style.display = 'flex';
+    document.getElementById('admin-content').style.display = 'none';
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('admin-pass').focus();
+  }
+}
+
+function closeAdminPanel() {
+  document.getElementById('admin-panel').classList.remove('open');
+}
+
+function doLogin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (pass === ADMIN_PASSWORD) {
+    isAdmin = true;
+    document.getElementById('admin-login').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+    loadPoiContent();
+  } else {
+    alert('Contraseña incorrecta');
+  }
+}
+
+function doLogout() {
+  isAdmin = false;
+  closeAdminPanel();
+}
+
+function initAdminSelect() {
+  const select = document.getElementById('admin-poi');
+  select.innerHTML = '<option value="">-- Selecciona un monumento --</option>' +
+    POIS.map(p => `<option value="${p.id}">${p.names.es}</option>`).join('');
+}
+
+function loadPoiContent() {
+  const poiId = document.getElementById('admin-poi').value;
+  if (!poiId) {
+    document.getElementById('admin-video').value = '';
+    document.getElementById('admin-audio').value = '';
+    document.getElementById('admin-text').value = '';
+    updateContentList();
+    return;
+  }
+  const poi = POIS.find(p => p.id === poiId);
+  document.getElementById('admin-video').value = poi.video || '';
+  document.getElementById('admin-audio').value = poi.audio || '';
+  document.getElementById('admin-text').value = poi.text || '';
+  updateContentList();
+}
+
+function saveVideo() {
+  const poiId = document.getElementById('admin-poi').value;
+  if (!poiId) { alert('Selecciona un monumento primero'); return; }
+  const url = document.getElementById('admin-video').value.trim();
+  const poi = POIS.find(p => p.id === poiId);
+  poi.video = url || null;
+  saveDataToStorage();
+  alert('Vídeo guardado correctamente');
+  updateContentList();
+}
+
+function saveAudio() {
+  const poiId = document.getElementById('admin-poi').value;
+  if (!poiId) { alert('Selecciona un monumento primero'); return; }
+  const url = document.getElementById('admin-audio').value.trim();
+  const poi = POIS.find(p => p.id === poiId);
+  poi.audio = url || null;
+  saveDataToStorage();
+  alert('Audio guardado correctamente');
+  updateContentList();
+}
+
+function saveText() {
+  const poiId = document.getElementById('admin-poi').value;
+  if (!poiId) { alert('Selecciona un monumento primero'); return; }
+  const url = document.getElementById('admin-text').value.trim();
+  const poi = POIS.find(p => p.id === poiId);
+  poi.text = url || null;
+  saveDataToStorage();
+  alert('Texto guardado correctamente');
+  updateContentList();
+}
+
+function updateContentList() {
+  const list = document.getElementById('admin-content-list');
+  let html = '';
+  POIS.forEach(poi => {
+    const hasVideo = poi.video ? '✅' : '❌';
+    const hasAudio = poi.audio ? '✅' : '❌';
+    const hasText = poi.text ? '✅' : '❌';
+    html += `
+      <div class="content-item">
+        <strong>${poi.names.es}</strong>
+        <span>🎬${hasVideo} 🎵${hasAudio} 📄${hasText}</span>
+        ${isAdmin ? `<button onclick="deletePoiContent('${poi.id}')">Borrar</button>` : ''}
+      </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function deletePoiContent(poiId) {
+  if (!confirm('¿Borrar todo el contenido de este monumento?')) return;
+  const poi = POIS.find(p => p.id === poiId);
+  poi.video = null;
+  poi.audio = null;
+  poi.text = null;
+  saveDataToStorage();
+  if (document.getElementById('admin-poi').value === poiId) {
+    loadPoiContent();
+  }
+  updateContentList();
+}
+
+// ================================================================
+// ALMACENAMIENTO LOCAL
+// ================================================================
+function saveDataToStorage() {
+  const data = {};
+  POIS.forEach(p => {
+    data[p.id] = { video: p.video, audio: p.audio, text: p.text };
+  });
+  localStorage.setItem('santafe_historica_data', JSON.stringify(data));
+}
+
+function loadDataFromStorage() {
+  const saved = localStorage.getItem('santafe_historica_data');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      POIS.forEach(p => {
+        if (data[p.id]) {
+          p.video = data[p.id].video || null;
+          p.audio = data[p.id].audio || null;
+          p.text = data[p.id].text || null;
+        }
+      });
+    } catch(e) { console.warn('Error loading saved data:', e); }
+  }
+}
+
+// ================================================================
+// RUTA GPS ÓPTIMA
+// ================================================================
+function openRoutePanel() {
+  closeDetail();
+  document.getElementById('list-panel').classList.remove('open');
+  document.getElementById('info-panel').classList.remove('open');
+  document.getElementById('admin-panel').classList.remove('open');
+  document.getElementById('route-panel').classList.add('open');
+  selectRouteType('all');
+}
+
+function selectRouteType(type) {
+  selectedRouteType = type;
+  document.querySelectorAll('.route-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('route-' + type).classList.add('selected');
+  
+  let poiIds = [];
+  if (type === 'all') {
+    poiIds = ['plaza', 'iglesia', 'arco-loja', 'arco-granada', 'arco-jaen', 'arco-real', 'damian'];
+  } else if (type === 'arcos') {
+    poiIds = ['arco-loja', 'arco-granada', 'arco-jaen', 'arco-real'];
+  } else if (type === 'corto') {
+    poiIds = ['plaza', 'iglesia', 'arco-granada'];
+  }
+  
+  // Calcular ruta óptima desde posición actual
+  if (userLat && userLng) {
+    routeOrder = calculateOptimalRoute(userLat, userLng, poiIds);
+  } else {
+    routeOrder = poiIds.map(id => POIS.find(p => p.id === id));
+  }
+  
+  // Mostrar paradas
+  const stopsDiv = document.getElementById('route-stops');
+  stopsDiv.innerHTML = '<h3 style="font-family:var(--font-display);color:var(--brown-dark);font-size:14px;margin-bottom:12px;">Orden de visita:</h3>' +
+    routeOrder.map((poi, i) => `
+      <div class="route-stop">
+        <div class="route-stop-num">${i+1}</div>
+        <div class="route-stop-info">
+          <strong>${poi.names[lang]}</strong>
+          <span>${poi.types[lang]}</span>
+        </div>
+      </div>
+    `).join('');
+}
+
+function calculateOptimalRoute(startLat, startLng, poiIds) {
+  const pois = poiIds.map(id => POIS.find(p => p.id === id));
+  const unvisited = [...pois];
+  const route = [];
+  let currentLat = startLat;
+  let currentLng = startLng;
+  
+  while (unvisited.length > 0) {
+    let nearest = null;
+    let nearestDist = Infinity;
+    let nearestIndex = -1;
+    
+    unvisited.forEach((poi, i) => {
+      const dist = haversine(currentLat, currentLng, poi.lat, poi.lng);
+      if (dist < nearestDist) {
+        nearestDist = dist;
+        nearest = poi;
+        nearestIndex = i;
+      }
+    });
+    
+    route.push(nearest);
+    currentLat = nearest.lat;
+    currentLng = nearest.lng;
+    unvisited.splice(nearestIndex, 1);
+  }
+  
+  return route;
+}
+
+function startRoute() {
+  if (!userLat || !userLng) {
+    alert('Esperando señal GPS... Por favor, activa la ubicación y espera un momento.');
+    return;
+  }
+  
+  // Dibujar línea de ruta
+  if (routeLine) map.removeLayer(routeLine);
+  
+  const latlngs = [[userLat, userLng], ...routeOrder.map(p => [p.lat, p.lng])];
+  routeLine = L.polyline(latlngs, { 
+    color: '#C1440E', 
+    weight: 5, 
+    opacity: 0.8,
+    dashArray: '20, 10',
+    className: 'route-line-animated'
+  }).addTo(map);
+  
+  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+  
+  // Abrir Google Maps con la ruta
+  const destination = routeOrder[0];
+  const waypoints = routeOrder.slice(1).map(p => `${p.lat},${p.lng}`).join('|');
+  const url = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destination.lat},${destination.lng}&waypoints=${waypoints}&travelmode=walking`;
+  
+  document.getElementById('route-panel').classList.remove('open');
+  
+  // Preguntar si abrir Google Maps
+  if (confirm('¿Abrir Google Maps para navegar la ruta?')) {
+    window.open(url, '_blank');
+  }
+}
+
+// ================================================================
+// PWA REGISTRO
+// ================================================================
+function registerPWA() {
+  const mf = { 
+    name:'Santa Fe Histórica - CEIP Capitulaciones', 
+    short_name:'Santa Fe', 
+    start_url:'./', 
+    display:'standalone', 
+    background_color:'#2C1810', 
+    theme_color:'#2C1810', 
+    orientation:'portrait-primary', 
+    icons:[
+      {src:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚜️</text></svg>',sizes:'192x192',type:'image/svg+xml'},
+      {src:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚜️</text></svg>',sizes:'512x512',type:'image/svg+xml'}
+    ] 
+  };
+  const blob = new Blob([JSON.stringify(mf)],{type:'application/json'});
+  document.getElementById('manifest-link').href = URL.createObjectURL(blob);
+
+  if ('serviceWorker' in navigator) {
+    const sw = `const C='sf-v2',A=[location.href];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>new Response('<h1>Sin conexión</h1>',{headers:{'Content-Type':'text/html'}}))));});`;
+    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+  }
+}
+
+// Cerrar paneles al hacer clic fuera
+document.addEventListener('click', e => {
+  if (langOpen && !e.target.closest('#lang-panel') && !e.target.closest('#lang-btn')) {
+    langOpen = false;
+    document.getElementById('lang-panel').classList.add('off');
+  }
+});
+</script>
+</body>
+</html>
