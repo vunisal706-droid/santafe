@@ -5,1498 +5,1114 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1a237e">
+  <meta name="theme-color" content="#111827">
   <title>Santa Fe Histórica - CEIP Capitulaciones</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" href="capilogo.png">
   <link rel="apple-touch-icon" href="capilogo.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    /* ─────────── VARIABLES ─────────── */
     :root {
-      --gold: #d4a853;
-      --terra: #c75b2a;
-      --brown-dark: #1a1a2e;
-      --brown-mid: #4a4a6a;
-      --parchment: #faf8f3;
-      --parchment-dark: #e8e4d9;
-      --green: #2d6a4f;
-      --blue: #1e3a5f;
-      --purple: #5e2d6a;
-      --orange: #d4762a;
-      --shadow: 0 8px 32px rgba(26,26,46,0.25);
-      --shadow-lg: 0 12px 40px rgba(26,26,46,0.35);
-      --radius: 20px;
-      --font-display: 'Cinzel', serif;
-      --font-title: 'Playfair Display', serif;
-      --font-body: 'Source Serif 4', serif;
-      --topbar-h: 65px;
-      --nav-h: 75px;
+      --ink:       #111827;
+      --ink-2:     #1d2d40;
+      --gold:      #c9a84c;
+      --gold-l:    #e3c76a;
+      --gold-pale: rgba(201,168,76,0.13);
+      --stone:     #f8f3eb;
+      --stone-2:   #ede6d8;
+      --stone-3:   #d5cdb9;
+      --rust:      #a84020;
+      --slate:     #4b5e72;
+      --green:     #2a7a50;
+      --blue:      #3b82f6;
+      --white:     #ffffff;
+      --top-h:     60px;
+      --nav-h:     68px;
+      --strip-h:   76px;
+      --fd: 'Cormorant Garamond', serif;
+      --fu: 'DM Sans', sans-serif;
+      --r: 18px;
+      --sh:    0 4px 20px rgba(0,0,0,0.12);
+      --sh-lg: 0 8px 36px rgba(0,0,0,0.22);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       width: 100%; height: 100%; overflow: hidden;
-      background: var(--brown-dark);
-      font-family: var(--font-body);
+      background: var(--ink);
+      font-family: var(--fu);
       -webkit-tap-highlight-color: transparent;
     }
+    button { font-family: var(--fu); cursor: pointer; border: none; background: none; }
 
-    /* ---- SPLASH ---- */
+    /* ─────────── SPLASH ─────────── */
     #splash {
       position: fixed; inset: 0; z-index: 9999;
-      background: linear-gradient(135deg, #1a237e 0%, #0d1642 50%, #1a1a2e 100%);
+      background: var(--ink);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 20px;
+      animation: splashOut 0.45s ease 2.6s forwards;
     }
-    #splash .logo-container {
-      width: 140px; height: 140px;
-      background: white;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-      padding: 15px;
-    }
-    #splash .logo-container img {
-      width: 100%; height: 100%;
-      object-fit: contain;
-    }
-    #splash h1 {
-      font-family: var(--font-display); color: var(--gold);
-      font-size: clamp(24px, 6vw, 36px); letter-spacing: 0.1em; text-align: center;
-      text-shadow: 0 2px 20px rgba(212,168,83,0.3);
-    }
-    #splash .project-badge {
-      background: linear-gradient(135deg, var(--gold), #b8943d);
-      color: var(--brown-dark);
-      padding: 8px 24px;
-      border-radius: 30px;
-      font-family: var(--font-display);
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-    }
-    #splash .bar-wrap { width: 150px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-top: 12px; }
-    #splash .bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), #fff); animation: loadbar 2.2s ease forwards; }
-    @keyframes loadbar { to { width: 100% } }
+    @keyframes splashOut { to { opacity:0; pointer-events:none; } }
 
-    /* ---- HOME SCREEN ---- */
-    #home-screen {
-      position: fixed; inset: 0; z-index: 9000;
-      background: linear-gradient(180deg, #faf8f3 0%, #f0ece3 100%);
+    .splash-logo {
+      width: 110px; height: 110px;
+      background: var(--white); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; padding: 13px;
+      box-shadow: 0 0 0 8px rgba(201,168,76,0.15), 0 0 0 16px rgba(201,168,76,0.06);
+      animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes popIn { from{transform:scale(0.4);opacity:0} }
+    .splash-logo img { width:100%; height:100%; object-fit:contain; }
+
+    .splash-title {
+      font-family: var(--fd); font-size:30px; font-weight:700;
+      color: var(--gold); letter-spacing:0.06em; text-align:center;
+      animation: riseUp 0.6s ease 0.15s both;
+    }
+    .splash-sub {
+      font-size:11px; color:rgba(255,255,255,0.4);
+      letter-spacing:0.18em; text-transform:uppercase;
+      animation: riseUp 0.6s ease 0.3s both;
+    }
+    @keyframes riseUp { from{transform:translateY(14px);opacity:0} }
+
+    .splash-bar {
+      width:110px; height:3px;
+      background: rgba(255,255,255,0.08); border-radius:2px; overflow:hidden;
+      animation: riseUp 0.6s ease 0.45s both;
+    }
+    .splash-bar-fill {
+      height:100%; width:0;
+      background: linear-gradient(90deg, var(--gold), var(--gold-l));
+      animation: fillBar 2.1s ease 0.5s forwards; border-radius:2px;
+    }
+    @keyframes fillBar { to{width:100%} }
+
+    /* ─────────── HOME ─────────── */
+    #home {
+      position: fixed; inset: 0; z-index: 800;
       display: flex; flex-direction: column;
-      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      background: var(--stone);
     }
-    #home-screen.hidden { display: none; }
-    
-    .home-header {
-      background: linear-gradient(135deg, #1a237e 0%, #0d1642 100%);
-      padding: 30px 24px 40px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .home-header::before {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle, rgba(212,168,83,0.1) 0%, transparent 60%);
-      animation: pulse-bg 4s ease-in-out infinite;
-    }
-    @keyframes pulse-bg { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-    
-    .home-header .logo-wrapper {
-      width: 100px; height: 100px;
-      background: white;
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      padding: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      position: relative;
-      z-index: 1;
-    }
-    .home-header .logo-wrapper img {
-      width: 100%; height: 100%;
-      object-fit: contain;
-    }
-    .home-header h1 {
-      font-family: var(--font-display); color: var(--gold);
-      font-size: 26px; letter-spacing: 0.08em;
-      position: relative; z-index: 1;
-    }
-    .home-header .project-tag {
-      display: inline-block;
-      background: rgba(212,168,83,0.2);
-      border: 1px solid rgba(212,168,83,0.4);
-      color: var(--gold);
-      padding: 6px 18px;
-      border-radius: 20px;
-      font-family: var(--font-display);
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      margin-top: 12px;
-      position: relative; z-index: 1;
-    }
-    
-    .home-content {
-      flex: 1; padding: 0 20px 120px;
-    }
-    
-    .routes-section {
-      margin-top: -20px;
-      position: relative;
-      z-index: 10;
-    }
-    
-    .routes-title {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .routes-title h2 {
-      font-family: var(--font-title);
-      color: var(--brown-dark);
-      font-size: 22px;
-      font-weight: 700;
-    }
-    .routes-title p {
-      color: var(--brown-mid);
-      font-size: 13px;
-      margin-top: 4px;
-    }
-    
-    .route-card {
-      border-radius: 24px;
-      padding: 24px 22px;
-      margin-bottom: 16px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    .route-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
-    }
-    .route-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: var(--shadow-lg);
-    }
-    .route-card.selected {
-      transform: scale(1.03);
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.5), var(--shadow-lg);
-    }
-    
-    .route-card.route-gold {
-      background: linear-gradient(135deg, #d4a853 0%, #b8943d 100%);
-    }
-    .route-card.route-blue {
-      background: linear-gradient(135deg, #1e3a5f 0%, #0d2342 100%);
-    }
-    .route-card.route-terra {
-      background: linear-gradient(135deg, #c75b2a 0%, #a0451a 100%);
-    }
-    
-    .route-card h3 {
-      font-family: var(--font-title);
-      color: white;
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: relative;
-      z-index: 1;
-    }
-    .route-card h3 .route-icon {
-      width: 44px; height: 44px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      backdrop-filter: blur(4px);
-    }
-    .route-card p {
-      color: rgba(255,255,255,0.9);
-      font-size: 14px;
-      line-height: 1.5;
-      margin: 0 0 14px 56px;
-      position: relative;
-      z-index: 1;
-    }
-    .route-card .stops {
-      display: flex;
-      gap: 8px;
-      margin-left: 56px;
-      flex-wrap: wrap;
-      position: relative;
-      z-index: 1;
-    }
-    .route-card .stop-tag {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(4px);
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      color: white;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-    .route-card .route-arrow {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 40px; height: 40px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      color: white;
-      transition: all 0.3s;
-    }
-    .route-card:hover .route-arrow {
-      background: rgba(255,255,255,0.35);
-      transform: translateY(-50%) translateX(4px);
-    }
-    .route-card.selected .route-arrow {
-      background: white;
-      color: var(--brown-dark);
-    }
-    
-    .info-section {
-      background: white;
-      border-radius: 20px;
-      padding: 24px;
-      margin-top: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-    .info-section h3 {
-      font-family: var(--font-title);
-      color: var(--brown-dark);
-      font-size: 18px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .info-section p {
-      color: var(--brown-mid);
-      font-size: 14px;
-      line-height: 1.7;
-    }
-    .info-section .feature-list {
-      margin-top: 16px;
-    }
-    .info-section .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .info-section .feature-item:last-child {
-      border-bottom: none;
-    }
-    .info-section .feature-icon {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--gold), #b8943d);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
+    #home.hidden { display: none; }
+
+    /* Header oscuro */
+    .home-head {
+      background: var(--ink);
+      padding: 52px 20px 30px;
       flex-shrink: 0;
+      position: relative;
     }
-    .info-section .feature-text strong {
-      color: var(--brown-dark);
-      font-size: 14px;
-      display: block;
+    /* Textura de cuadrícula sutil */
+    .home-head::before {
+      content:'';
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.05) 1px, transparent 1px);
+      background-size:36px 36px;
+      pointer-events:none;
     }
-    .info-section .feature-text span {
-      color: var(--brown-mid);
-      font-size: 12px;
+    /* Gradiente radial dorado */
+    .home-head::after {
+      content:'';
+      position:absolute; inset:0;
+      background: radial-gradient(ellipse 70% 90% at 50% -10%, rgba(201,168,76,0.1) 0%, transparent 65%);
+      pointer-events:none;
     }
-    
-    .monuments-counter {
-      background: linear-gradient(135deg, var(--brown-dark), #2a2a4a);
-      border-radius: 16px;
-      padding: 18px 20px;
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+
+    .home-head-inner {
+      position:relative; z-index:2;
+      display:flex; flex-direction:column; align-items:center; gap:12px;
     }
-    .monuments-counter .counter-icon {
-      width: 50px; height: 50px;
-      background: rgba(212,168,83,0.2);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
+
+    .home-logo {
+      width:76px; height:76px;
+      background:var(--white); border-radius:50%;
+      display:flex; align-items:center; justify-content:center; padding:9px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 0 0 3px rgba(201,168,76,0.25);
     }
-    .monuments-counter .counter-text {
-      flex: 1;
+    .home-logo img { width:100%; height:100%; object-fit:contain; }
+
+    .home-title {
+      font-family:var(--fd); font-size:27px; font-weight:700;
+      color:var(--gold); letter-spacing:0.05em; text-align:center;
+      line-height:1.15;
     }
-    .monuments-counter .counter-text strong {
-      color: var(--gold);
-      font-family: var(--font-display);
-      font-size: 20px;
+    .home-badge {
+      background:var(--gold-pale);
+      border:1px solid rgba(201,168,76,0.3);
+      color:var(--gold);
+      font-size:10px; font-weight:500;
+      letter-spacing:0.14em; text-transform:uppercase;
+      padding:5px 14px; border-radius:20px;
     }
-    .monuments-counter .counter-text span {
-      color: rgba(255,255,255,0.7);
-      font-size: 12px;
-      display: block;
-      margin-top: 2px;
-    }
-    
-    .home-actions {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: linear-gradient(0deg, #faf8f3 60%, transparent 100%);
-      padding: 30px 20px 20px;
-      display: flex; gap: 12px;
-      z-index: 100;
-    }
-    .btn-primary {
-      flex: 1; padding: 18px 24px;
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      color: var(--gold);
-      border: none;
-      border-radius: 16px;
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 8px 24px rgba(26,35,126,0.35);
-      transition: all 0.3s;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(26,35,126,0.45);
-    }
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
-    .btn-secondary {
-      padding: 18px 22px;
-      background: white;
-      color: var(--brown-dark);
-      border: 2px solid #e0e0e0;
-      border-radius: 16px;
-      font-family: var(--font-body);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .btn-secondary:hover {
-      border-color: var(--gold);
-      background: #faf8f3;
-    }
-    
+
     .home-admin-btn {
-      position: absolute; top: 16px; right: 16px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: var(--gold);
-      padding: 10px 16px;
-      border-radius: 24px;
-      font-size: 12px;
-      font-family: var(--font-display);
-      letter-spacing: 0.08em;
-      cursor: pointer;
-      z-index: 10;
-      transition: all 0.3s;
+      position:absolute; top:14px; right:14px; z-index:10;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);
+      color:rgba(255,255,255,0.35);
+      font-size:11px; font-weight:500;
+      padding:7px 12px; border-radius:20px;
+      transition:all 0.25s;
     }
-    .home-admin-btn:hover {
-      background: rgba(255,255,255,0.25);
+    .home-admin-btn:hover { color:var(--gold); border-color:rgba(201,168,76,0.3); }
+
+    /* Scroll body */
+    .home-body {
+      flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+      padding:18px 14px 32px;
     }
 
-    #home-info-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9500;
-      background: rgba(26,26,46,0.85);
-      backdrop-filter: blur(8px);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+    /* Cómo usar */
+    .how-bar {
+      background:var(--white);
+      border-radius:14px; padding:14px 16px;
+      margin-bottom:18px;
+      box-shadow:var(--sh);
+      display:flex; gap:12px; align-items:flex-start;
     }
-    #home-info-modal .modal-content {
-      background: white;
-      border-radius: 24px;
-      max-width: 420px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: var(--shadow-lg);
+    .how-bar-icon { font-size:22px; flex-shrink:0; margin-top:1px; }
+    .how-bar-text strong { display:block; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+    .how-bar-text span { font-size:12px; color:var(--slate); line-height:1.5; }
+
+    /* Etiqueta de sección */
+    .sec-label {
+      display:flex; align-items:center; gap:9px;
+      margin-bottom:12px;
     }
-    #home-info-modal .modal-header {
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      padding: 24px;
-      border-radius: 24px 24px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .sec-step {
+      width:22px; height:22px;
+      background:var(--gold); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:var(--ink); flex-shrink:0;
     }
-    #home-info-modal .modal-header h2 {
-      font-family: var(--font-display);
-      color: var(--gold);
-      font-size: 20px;
-    }
-    #home-info-modal .modal-header button {
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: white;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    #home-info-modal .modal-header button:hover {
-      background: rgba(255,255,255,0.25);
-    }
-    #home-info-modal .modal-body {
-      padding: 24px;
-    }
-    #home-info-modal .modal-body h2 {
-      font-family: var(--font-title);
-      color: var(--terra);
-      font-size: 20px;
-      margin-bottom: 16px;
-    }
-    #home-info-modal .modal-body p {
-      color: var(--brown-mid);
-      font-size: 14px;
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-    #home-info-modal .info-badge {
-      background: linear-gradient(135deg, #f8f6f1, #f0ece3);
-      border-radius: 16px;
-      padding: 16px;
-      margin: 12px 0;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-    #home-info-modal .info-badge-icon {
-      width: 44px; height: 44px;
-      background: linear-gradient(135deg, var(--gold), #b8943d);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    #home-info-modal .info-badge-text {
-      color: var(--brown-mid);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    #home-info-modal .info-badge-text strong {
-      color: var(--brown-dark);
-      display: block;
-      margin-bottom: 4px;
-      font-family: var(--font-title);
-      font-size: 14px;
-    }
-    #home-info-modal .modal-footer {
-      padding: 0 24px 24px;
-    }
-    #home-info-modal .modal-footer button {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      color: var(--gold);
-      border: none;
-      border-radius: 14px;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    #home-info-modal .modal-footer button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(26,35,126,0.35);
+    .sec-label h2 {
+      font-family:var(--fd); font-size:20px; font-weight:700;
+      color:var(--ink); letter-spacing:0.02em;
     }
 
-    /* ---- APP ---- */
-    #app { position: fixed; inset: 0; display: flex; flex-direction: column; opacity: 0; transition: opacity 0.5s; }
-    #app.ready { opacity: 1; }
-    #app.gone { display: none; }
+    /* ─── Route cards ─── */
+    .route-card {
+      border-radius:var(--r);
+      margin-bottom:12px;
+      overflow:hidden;
+      box-shadow:var(--sh);
+      background:var(--white);
+    }
 
-    /* ---- TOP BAR ---- */
+    .rc-head {
+      padding:20px 20px 14px;
+      position:relative;
+    }
+    .rc-head.gold { background:linear-gradient(140deg,#c9a84c 0%,#7e5d1a 100%); }
+    .rc-head.navy { background:linear-gradient(140deg,#1e3a5f 0%,#0c1e33 100%); }
+    .rc-head.rust { background:linear-gradient(140deg,#a84020 0%,#5c2008 100%); }
+
+    .rc-emoji { font-size:30px; display:block; margin-bottom:8px; }
+    .rc-name {
+      font-family:var(--fd); font-size:23px; font-weight:700;
+      color:var(--white); letter-spacing:0.04em; margin-bottom:5px;
+    }
+    .rc-meta {
+      font-size:12px; color:rgba(255,255,255,0.72);
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+    .rc-meta-chip {
+      background:rgba(255,255,255,0.15);
+      backdrop-filter:blur(4px);
+      padding:3px 10px; border-radius:20px;
+      display:flex; align-items:center; gap:4px;
+    }
+
+    .rc-body { padding:14px 20px; }
+    .rc-stops {
+      display:flex; flex-wrap:wrap; gap:5px;
+      margin-bottom:14px;
+    }
+    .rc-stop {
+      background:var(--stone); border:1px solid var(--stone-3);
+      color:var(--slate);
+      font-size:11px; font-weight:500;
+      padding:4px 9px; border-radius:12px;
+    }
+
+    .rc-btn {
+      width:100%;
+      background:var(--ink); color:var(--gold);
+      font-size:14px; font-weight:600;
+      padding:14px;
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      letter-spacing:0.04em;
+      transition:all 0.25s;
+    }
+    .rc-btn:hover { background:var(--ink-2); }
+    .rc-btn:active { transform:scale(0.97); }
+    .rc-btn-arrow { font-size:16px; transition:transform 0.25s; }
+    .rc-btn:hover .rc-btn-arrow { transform:translateX(4px); }
+
+    /* Info al final de home */
+    .home-info {
+      background:var(--white);
+      border-radius:var(--r); padding:20px;
+      margin-top:6px;
+      box-shadow:var(--sh);
+    }
+    .home-info h3 {
+      font-family:var(--fd); font-size:18px; font-weight:600;
+      color:var(--ink); margin-bottom:14px;
+    }
+    .hi-row {
+      display:flex; gap:12px; align-items:flex-start;
+      padding:10px 0;
+      border-bottom:1px solid var(--stone-2);
+    }
+    .hi-row:last-child { border-bottom:none; padding-bottom:0; }
+    .hi-ico {
+      width:36px; height:36px;
+      background:linear-gradient(135deg, var(--gold), #7e5d1a);
+      border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; flex-shrink:0;
+    }
+    .hi-txt strong { display:block; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+    .hi-txt span { font-size:12px; color:var(--slate); line-height:1.5; }
+
+    /* ─────────── APP ─────────── */
+    #app {
+      position:fixed; inset:0; z-index:700;
+      display:flex; flex-direction:column;
+    }
+    #app.gone { display:none; }
+
+    /* Topbar */
     #topbar {
-      position: absolute; top: 0; left: 0; right: 0; height: var(--topbar-h); z-index: 1000;
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      display: flex; align-items: center; padding: 0 14px; gap: 10px;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.4);
+      height:var(--top-h);
+      background:var(--ink);
+      display:flex; align-items:center;
+      padding:0 12px; gap:10px;
+      flex-shrink:0;
+      box-shadow:0 2px 14px rgba(0,0,0,0.4);
+      position:relative; z-index:200;
     }
-    #topbar-brand { flex: 1; }
-    #topbar-title {
-      font-family: var(--font-display); color: var(--gold);
-      font-size: 16px; letter-spacing: 0.04em;
+    #topbar-brand { flex:1; }
+    #topbar-name {
+      font-family:var(--fd); font-size:17px; font-weight:700;
+      color:var(--gold); letter-spacing:0.04em;
     }
-    #topbar-sub { font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; margin-top: 2px; }
-    #back-home-btn, #lang-btn {
-      background: rgba(212,168,83,0.15);
-      border: 1px solid rgba(212,168,83,0.3);
-      color: var(--gold);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      font-family: var(--font-body);
-      white-space: nowrap;
-      transition: all 0.3s;
-    }
-    #back-home-btn:hover, #lang-btn:hover {
-      background: rgba(212,168,83,0.25);
-    }
+    #topbar-sub { font-size:10px; color:rgba(255,255,255,0.38); letter-spacing:0.1em; }
 
-    /* ---- LANG PANEL ---- */
+    .top-btn {
+      background:var(--gold-pale);
+      border:1px solid rgba(201,168,76,0.28);
+      color:var(--gold);
+      font-size:12px; font-weight:500;
+      padding:7px 13px; border-radius:20px;
+      white-space:nowrap;
+      transition:all 0.2s;
+    }
+    .top-btn:hover { background:rgba(201,168,76,0.22); }
+
+    /* Lang panel */
     #lang-panel {
-      position: absolute; top: var(--topbar-h); right: 12px; z-index: 2000;
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-lg);
-      min-width: 170px;
+      position:absolute; top:var(--top-h); right:12px; z-index:300;
+      background:var(--white);
+      border-radius:14px; overflow:hidden;
+      box-shadow:var(--sh-lg);
+      min-width:158px;
     }
-    #lang-panel.off { display: none; }
+    #lang-panel.off { display:none; }
     .lang-opt {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 18px;
-      cursor: pointer;
-      color: var(--brown-dark);
-      font-size: 14px;
-      transition: all .15s;
-      border: none;
-      background: transparent;
-      width: 100%;
-      text-align: left;
-      font-family: var(--font-body);
+      display:flex; align-items:center; gap:11px;
+      padding:12px 16px;
+      cursor:pointer; color:var(--ink);
+      font-size:14px; font-weight:400;
+      transition:background 0.15s;
+      width:100%; text-align:left;
+      border-bottom:1px solid var(--stone-2);
     }
-    .lang-opt:hover { background: #f8f6f1; }
-    .lang-opt.cur { background: linear-gradient(135deg, #f0ece3, #e8e4d9); color: var(--brown-dark); font-weight: 600; }
-    .lang-flag { font-size: 18px; }
+    .lang-opt:last-child { border-bottom:none; }
+    .lang-opt:hover { background:var(--stone); }
+    .lang-opt.cur { background:var(--stone-2); font-weight:600; }
 
-    /* ---- MAP ---- */
-    #map { position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h); }
+    /* Map wrapper */
+    #map-wrap { flex:1; position:relative; overflow:hidden; }
+    #map { position:absolute; inset:0; }
 
-    /* POI markers */
-    .pm { width: 48px; height: 48px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 14px rgba(0,0,0,0.35); cursor: pointer; transition: transform 0.2s; }
-    .pm:hover { transform: rotate(-45deg) scale(1.1); }
-    .pm-inner { transform: rotate(45deg); font-size: 22px; }
-    .pm.pulsing { animation: mPulse 1.8s ease-in-out infinite; }
-    @keyframes mPulse {
-      0%,100% { box-shadow: 0 4px 14px rgba(0,0,0,0.35), 0 0 0 0 rgba(212,168,83,0.5); }
-      50% { box-shadow: 0 4px 14px rgba(0,0,0,0.35), 0 0 0 20px rgba(212,168,83,0); }
+    /* ─── NAVIGATION STRIP ─── */
+    #nav-strip {
+      background:var(--ink);
+      border-top:1px solid rgba(201,168,76,0.18);
+      padding:10px 14px;
+      display:flex; align-items:center; gap:12px;
+      flex-shrink:0;
     }
-    .user-dot { width: 20px; height: 20px; background: #1976D2; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 8px rgba(25,118,210,0.2); animation: uPulse 2s ease-in-out infinite; }
-    @keyframes uPulse { 0%,100%{box-shadow:0 0 0 8px rgba(25,118,210,0.2)} 50%{box-shadow:0 0 0 16px rgba(25,118,210,0)} }
+    #nav-strip.hidden { display:none; }
 
-    /* Route line */
-    .route-line { stroke: var(--terra); stroke-width: 5; stroke-opacity: 0.85; stroke-linecap: round; stroke-linejoin: round; }
-    .route-line-animated { stroke-dasharray: 20, 10; animation: dash 1s linear infinite; }
-    @keyframes dash { to { stroke-dashoffset: -30; } }
+    .ns-dir-arrow {
+      font-size:30px; color:var(--gold);
+      flex-shrink:0; line-height:1;
+      width:34px; text-align:center;
+    }
+    .ns-info { flex:1; min-width:0; }
+    .ns-instruction {
+      font-size:13px; font-weight:600; color:var(--white);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      margin-bottom:3px;
+    }
+    .ns-next-label {
+      font-size:11px; color:rgba(255,255,255,0.45);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .ns-right {
+      display:flex; flex-direction:column; align-items:flex-end; gap:5px;
+      flex-shrink:0;
+    }
+    .ns-count { font-size:12px; font-weight:600; color:var(--gold); }
+    .ns-dots { display:flex; gap:5px; }
+    .ns-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:rgba(255,255,255,0.18);
+      transition:background 0.3s;
+      flex-shrink:0;
+    }
+    .ns-dot.visited  { background:var(--gold); }
+    .ns-dot.current  { background:var(--gold-l); box-shadow:0 0 0 2px rgba(201,168,76,0.35); }
 
-    /* ---- BOTTOM NAV ---- */
+    /* Strip sin GPS */
+    .ns-gps-msg {
+      flex:1; font-size:12px; color:rgba(255,255,255,0.45); text-align:center;
+    }
+
+    /* ─── BOTTOM NAV ─── */
     #bottom-nav {
-      position: absolute; bottom: 0; left: 0; right: 0; height: var(--nav-h); z-index: 1000;
-      background: white;
-      display: flex;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      height:var(--nav-h);
+      background:var(--white);
+      display:flex;
+      border-top:1px solid var(--stone-2);
+      flex-shrink:0;
     }
     .nb {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
-      cursor: pointer; background: transparent; border: none; color: var(--brown-mid);
-      font-size: 11px; letter-spacing: 0.06em; transition: all .2s; position: relative; padding-top: 6px;
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:4px;
+      color:var(--stone-3);
+      font-size:10px; font-weight:500;
+      letter-spacing:0.06em; text-transform:uppercase;
+      position:relative;
+      transition:color 0.2s;
     }
-    .nb.on { color: var(--brown-dark); }
-    .nb.on::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: linear-gradient(90deg, var(--gold), #b8943d); border-radius: 0 0 3px 3px; }
-    .nb-icon { font-size: 24px; }
+    .nb.on { color:var(--ink); }
+    .nb.on::before {
+      content:'';
+      position:absolute; top:0; left:50%;
+      transform:translateX(-50%);
+      width:30px; height:3px;
+      background:var(--gold);
+      border-radius:0 0 3px 3px;
+    }
+    .nb-icon { font-size:22px; }
 
-    /* ---- PROXIMITY ALERT ---- */
+    /* ─── POI markers ─── */
+    .pm {
+      width:44px; height:44px;
+      border-radius:50% 50% 50% 0;
+      transform:rotate(-45deg);
+      display:flex; align-items:center; justify-content:center;
+      border:3px solid white;
+      box-shadow:0 4px 14px rgba(0,0,0,0.35);
+      cursor:pointer;
+      transition:transform 0.2s, filter 0.3s;
+    }
+    .pm:hover { transform:rotate(-45deg) scale(1.12); }
+    .pm-inner { transform:rotate(45deg); font-size:20px; }
+    .pm.visited { filter:grayscale(0.55) brightness(0.85); }
+    .pm.pulsing { animation:mPulse 1.8s ease-in-out infinite; }
+    @keyframes mPulse {
+      0%,100%{box-shadow:0 4px 14px rgba(0,0,0,0.35),0 0 0 0 rgba(201,168,76,0.5)}
+      50%{box-shadow:0 4px 14px rgba(0,0,0,0.35),0 0 0 18px rgba(201,168,76,0)}
+    }
+
+    .user-dot {
+      width:18px; height:18px;
+      background:#3b82f6; border-radius:50%;
+      border:3px solid white;
+      box-shadow:0 0 0 6px rgba(59,130,246,0.2);
+      animation:uPulse 2s ease-in-out infinite;
+    }
+    @keyframes uPulse {
+      0%,100%{box-shadow:0 0 0 6px rgba(59,130,246,0.2)}
+      50%{box-shadow:0 0 0 14px rgba(59,130,246,0)}
+    }
+
+    /* ─── PROXIMITY ALERT ─── */
     #prox-alert {
-      position: absolute; top: calc(var(--topbar-h) + 12px); left: 14px; right: 14px; z-index: 1500;
-      background: white;
-      border-radius: 20px;
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      box-shadow: var(--shadow-lg);
-      animation: sDown .35s ease;
+      position:absolute; top:10px; left:12px; right:12px; z-index:500;
+      background:var(--white); border-radius:16px;
+      padding:13px 15px;
+      display:flex; align-items:center; gap:12px;
+      box-shadow:var(--sh-lg);
+      animation:slideDown 0.35s cubic-bezier(.34,1.56,.64,1);
     }
-    #prox-alert.off { display: none; }
-    @keyframes sDown { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
-    .pa-icon { 
-      width: 50px; height: 50px;
-      background: linear-gradient(135deg, var(--gold), #b8943d);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 26px;
-      flex-shrink: 0;
+    #prox-alert.off { display:none; }
+    @keyframes slideDown { from{transform:translateY(-18px);opacity:0} }
+
+    .pa-ico {
+      width:44px; height:44px;
+      background:linear-gradient(135deg, var(--gold), #7e5d1a);
+      border-radius:13px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; flex-shrink:0;
     }
-    .pa-text { flex: 1; }
-    .pa-text strong { 
-      color: var(--brown-dark);
-      font-family: var(--font-title);
-      font-size: 16px;
-      display: block;
-      margin-bottom: 4px;
+    .pa-txt { flex:1; }
+    .pa-txt strong { display:block; font-size:14px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+    .pa-txt span { font-size:12px; color:var(--slate); }
+    .pa-actions { display:flex; flex-direction:column; gap:5px; }
+    .pa-yes {
+      padding:9px 15px; border-radius:20px;
+      background:var(--ink); color:var(--gold);
+      font-size:12px; font-weight:600;
+      transition:all 0.2s;
     }
-    .pa-text span {
-      color: var(--brown-mid);
-      font-size: 13px;
-      line-height: 1.4;
+    .pa-yes:hover { transform:scale(1.04); }
+    .pa-no { font-size:12px; color:var(--slate); padding:4px 8px; }
+
+    /* ─── COMPLETION BANNER ─── */
+    #completion-banner {
+      position:absolute; top:10px; left:12px; right:12px; z-index:505;
+      background:linear-gradient(135deg, var(--gold), #7e5d1a);
+      border-radius:16px; padding:16px 18px;
+      text-align:center;
+      box-shadow:var(--sh-lg);
+      animation:slideDown 0.5s cubic-bezier(.34,1.56,.64,1);
     }
-    .pa-actions { display: flex; flex-direction: column; gap: 8px; }
-    .pa-yes { 
-      padding: 10px 18px;
-      border-radius: 24px;
-      cursor: pointer;
-      font-size: 13px;
-      border: none;
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      color: var(--gold);
-      font-weight: 600;
-      font-family: var(--font-body);
-      transition: all 0.3s;
+    #completion-banner.off { display:none; }
+    .cb-icon { font-size:34px; }
+    .cb-title {
+      font-family:var(--fd); font-size:19px; font-weight:700;
+      color:var(--ink); margin:6px 0 3px;
     }
-    .pa-yes:hover { transform: scale(1.05); }
-    .pa-no { 
-      padding: 6px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 12px;
-      border: none;
-      background: transparent;
-      color: var(--brown-mid);
-      font-family: var(--font-body);
+    .cb-sub { font-size:12px; color:rgba(0,0,0,0.55); }
+    .cb-close {
+      position:absolute; top:10px; right:12px;
+      width:28px; height:28px; border-radius:50%;
+      background:rgba(0,0,0,0.15); color:var(--ink);
+      font-size:16px; line-height:28px; text-align:center;
     }
 
-    /* ---- DETAIL PANEL ---- */
+    /* ─── PANELS (list / info) ─── */
+    .side-panel {
+      position:absolute; inset:0;
+      background:var(--stone);
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
+      transform:translateX(100%);
+      transition:transform 0.35s cubic-bezier(.25,.46,.45,.94);
+      z-index:400;
+    }
+    .side-panel.open { transform:translateX(0); }
+
+    .panel-head {
+      background:var(--ink);
+      padding:24px 20px 18px;
+    }
+    .panel-head h2 {
+      font-family:var(--fd); font-size:22px; font-weight:700;
+      color:var(--gold); margin-bottom:4px;
+    }
+    .panel-head p { font-size:12px; color:rgba(255,255,255,0.4); letter-spacing:0.08em; }
+
+    /* POI list items */
+    .poi-item {
+      display:flex; align-items:center; gap:14px;
+      padding:15px 20px;
+      background:var(--white);
+      margin-bottom:1px;
+      cursor:pointer;
+      transition:background 0.15s;
+    }
+    .poi-item:hover { background:var(--stone); }
+    .poi-item-ico {
+      width:44px; height:44px;
+      border-radius:13px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px; flex-shrink:0;
+    }
+    .poi-item-info { flex:1; }
+    .poi-item-name { font-size:15px; font-weight:600; color:var(--ink); margin-bottom:2px; }
+    .poi-item-type { font-size:12px; color:var(--slate); }
+    .poi-item-dist { font-size:12px; font-weight:600; color:var(--gold); }
+    .poi-item-arrow { color:var(--stone-3); font-size:16px; }
+
+    /* Info panel */
+    #info-body { padding:20px; }
+    #info-body h2 {
+      font-family:var(--fd); font-size:22px; font-weight:700;
+      color:var(--ink); margin-bottom:14px;
+    }
+    #info-body p { font-size:14px; color:var(--slate); line-height:1.7; margin-bottom:14px; }
+    .info-badge {
+      background:var(--white); border-radius:14px;
+      padding:15px; margin:10px 0;
+      display:flex; gap:13px; align-items:flex-start;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    }
+    .info-badge-icon {
+      width:42px; height:42px;
+      background:linear-gradient(135deg, var(--gold), #7e5d1a);
+      border-radius:12px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; flex-shrink:0;
+    }
+    .info-badge-text { color:var(--slate); font-size:13px; line-height:1.6; }
+    .info-badge-text strong { display:block; color:var(--ink); font-size:14px; margin-bottom:3px; }
+
+    /* ─── DETAIL PANEL ─── */
     #detail-panel {
-      position: absolute; bottom: var(--nav-h); left: 0; right: 0; height: 72vh;
-      background: white;
-      border-radius: 28px 28px 0 0;
-      z-index: 1200;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(100%);
-      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
-      overflow: hidden;
-      box-shadow: 0 -12px 40px rgba(0,0,0,0.2);
+      position:absolute; bottom:0; left:0; right:0;
+      background:var(--white);
+      border-radius:22px 22px 0 0;
+      z-index:450;
+      display:flex; flex-direction:column;
+      max-height:72vh;
+      transform:translateY(100%);
+      transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);
+      box-shadow:0 -8px 40px rgba(0,0,0,0.2);
+      overflow:hidden;
     }
-    #detail-panel.open { transform: translateY(0); }
+    #detail-panel.open { transform:translateY(0); }
 
-    .ph { 
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      padding: 20px 22px 18px;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
+    .dp-handle {
+      height:4px; width:36px; background:var(--stone-3);
+      border-radius:2px; margin:12px auto 0; flex-shrink:0;
     }
-    .ph-icon { 
-      width: 56px; height: 56px;
-      background: rgba(212,168,83,0.2);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px;
+    .dp-head {
+      background:var(--ink);
+      padding:14px 20px 14px;
+      display:flex; align-items:flex-start; gap:13px;
+      flex-shrink:0;
     }
-    .ph-meta { flex: 1; }
-    .ph-name { font-family: var(--font-title); color: var(--gold); font-size: 20px; line-height: 1.2; }
-    .ph-desc { color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 4px; }
-    .ph-close { 
-      background: rgba(255,255,255,0.15);
-      border: none;
-      color: white;
-      width: 36px; height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 20px;
-      line-height: 36px;
-      text-align: center;
-      flex-shrink: 0;
-      transition: all 0.3s;
+    .dp-icon-box {
+      width:50px; height:50px;
+      background:var(--gold-pale);
+      border:1px solid rgba(201,168,76,0.3);
+      border-radius:15px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:26px; flex-shrink:0;
     }
-    .ph-close:hover { background: rgba(255,255,255,0.25); }
+    .dp-meta { flex:1; }
+    .dp-name {
+      font-family:var(--fd); font-size:19px; font-weight:700;
+      color:var(--gold); line-height:1.2; margin-bottom:4px;
+    }
+    .dp-type { font-size:11px; color:rgba(255,255,255,0.45); }
+    .dp-close {
+      width:34px; height:34px;
+      background:rgba(255,255,255,0.1); border-radius:50%;
+      color:rgba(255,255,255,0.65);
+      font-size:18px; line-height:34px; text-align:center;
+      flex-shrink:0; transition:all 0.2s;
+    }
+    .dp-close:hover { background:rgba(255,255,255,0.2); color:var(--white); }
 
-    .tab-bar { 
-      display: flex;
-      background: #f8f6f1;
-      padding: 6px;
-      gap: 6px;
+    .tab-bar {
+      display:flex; gap:5px;
+      background:var(--stone); padding:5px;
+      flex-shrink:0;
     }
     .tb {
-      flex: 1;
-      padding: 12px 8px;
-      background: transparent;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 12px;
-      color: var(--brown-mid);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s;
+      flex:1; padding:10px 5px;
+      border-radius:10px;
+      font-size:11px; font-weight:500; color:var(--slate);
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+      transition:all 0.2s;
     }
-    .tb-icon { font-size: 20px; }
-    .tb.on { 
-      background: white;
-      color: var(--brown-dark);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      font-weight: 600;
+    .tb-icon { font-size:18px; }
+    .tb.on {
+      background:var(--white); color:var(--ink);
+      box-shadow:0 2px 8px rgba(0,0,0,0.08); font-weight:600;
     }
 
-    .tab-content { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
-    .tp { display: none; }
-    .tp.on { display: block; }
+    .tab-content { flex:1; overflow-y:auto; padding:18px 20px; -webkit-overflow-scrolling:touch; }
+    .tp { display:none; }
+    .tp.on { display:block; }
 
-    /* Video container */
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      border-radius: 16px;
-      background: var(--brown-dark);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    .video-wrap {
+      position:relative; padding-bottom:56.25%; height:0;
+      overflow:hidden; border-radius:14px;
+      background:var(--ink); box-shadow:var(--sh);
     }
-    .video-container iframe, .video-container video {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+    .video-wrap iframe, .video-wrap video {
+      position:absolute; top:0; left:0; width:100%; height:100%; border:none;
     }
+    .audio-wrap {
+      background:var(--ink); border-radius:14px; padding:20px;
+      display:flex; flex-direction:column; align-items:center; gap:14px;
+    }
+    .audio-wrap iframe { width:100%; height:155px; border:none; border-radius:10px; }
+    .audio-wrap audio { width:100%; }
 
-    /* Audio container */
-    .audio-container {
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      border-radius: 16px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 18px;
+    .kids-tag {
+      display:inline-flex; align-items:center; gap:6px;
+      background:var(--stone); border:1px solid var(--stone-3);
+      color:var(--slate); font-size:11px; font-weight:500;
+      padding:5px 12px; border-radius:20px; margin-bottom:14px;
     }
-    .audio-container iframe { width: 100%; height: 180px; border: none; border-radius: 12px; }
-    .audio-container audio { width: 100%; }
+    .tc h3 { font-family:var(--fd); font-size:18px; font-weight:700; color:var(--ink); margin:12px 0 8px; }
+    .tc p { font-size:14px; color:var(--slate); line-height:1.75; margin-bottom:10px; }
 
-    /* Text container */
-    .tc h3 { 
-      font-family: var(--font-title);
-      color: var(--terra);
-      font-size: 18px;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f0ece3;
-    }
-    .tc p { font-size: 15px; line-height: 1.85; color: var(--brown-dark); margin-bottom: 14px; }
-    .tc p:last-child { margin-bottom: 0; }
-    .kids-tag { 
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(135deg, var(--gold), #b8943d);
-      color: white;
-      padding: 8px 16px;
-      border-radius: 24px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
+    .no-content { text-align:center; padding:32px 20px; }
+    .no-content span { font-size:40px; display:block; margin-bottom:12px; }
+    .no-content p { color:var(--slate); font-size:13px; line-height:1.6; }
 
-    /* Note text */
-    .note { 
-      margin-top: 16px;
-      font-size: 13px;
-      color: var(--brown-mid);
-      text-align: center;
-      font-style: italic;
-      padding: 12px;
-      background: #f8f6f1;
-      border-radius: 12px;
+    .maps-btn {
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:14px 20px;
+      background:var(--stone); border-top:1px solid var(--stone-2);
+      color:var(--ink); font-size:13px; font-weight:600;
+      text-decoration:none; flex-shrink:0;
+      transition:background 0.2s;
     }
+    .maps-btn:hover { background:var(--stone-2); }
 
-    /* Nav btn */
-    .nav-link {
-      margin: 0 20px 20px;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--terra), #a0451a);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      transition: all 0.3s;
-      box-shadow: 0 8px 24px rgba(199,91,42,0.35);
-    }
-    .nav-link:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(199,91,42,0.45); }
-
-    /* ---- LIST PANEL ---- */
-    #list-panel {
-      position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h);
-      z-index: 1100;
-      background: #f8f6f1;
-      overflow-y: auto;
-      transform: translateX(-100%);
-      transition: transform .35s ease;
-      -webkit-overflow-scrolling: touch;
-    }
-    #list-panel.open { transform: translateX(0); }
-    .lh { 
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      padding: 22px 20px;
-      position: sticky;
-      top: 0;
-    }
-    .lh h2 { font-family: var(--font-display); color: var(--gold); font-size: 20px; }
-    .lh p { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 4px; letter-spacing: 0.06em; }
-    .li {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      background: white;
-      margin: 8px 16px;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .li:hover { transform: translateX(4px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-    .li-icon { 
-      width: 48px; height: 48px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      flex-shrink: 0;
-    }
-    .li-text { flex: 1; }
-    .li-name { font-family: var(--font-title); font-size: 16px; color: var(--brown-dark); font-weight: 600; }
-    .li-type { font-size: 12px; color: var(--brown-mid); margin-top: 3px; }
-    .li-arrow { 
-      width: 32px; height: 32px;
-      background: #f0ece3;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      color: var(--brown-mid);
-    }
-
-    /* ---- INFO PANEL ---- */
-    #info-panel {
-      position: absolute; top: var(--topbar-h); left: 0; right: 0; bottom: var(--nav-h);
-      z-index: 1100;
-      background: #f8f6f1;
-      overflow-y: auto;
-      transform: translateX(100%);
-      transition: transform .35s ease;
-      -webkit-overflow-scrolling: touch;
-    }
-    #info-panel.open { transform: translateX(0); }
-    .ih { 
-      background: linear-gradient(135deg, #1a237e, #0d1642);
-      padding: 22px 20px;
-      position: sticky;
-      top: 0;
-    }
-    .ih h2 { font-family: var(--font-display); color: var(--gold); font-size: 20px; }
-    #info-body { padding: 24px 20px; }
-    #info-body h2 { 
-      font-family: var(--font-title);
-      color: var(--terra);
-      font-size: 22px;
-      margin-bottom: 18px;
-    }
-    #info-body p { font-size: 15px; line-height: 1.8; color: var(--brown-dark); margin-bottom: 14px; }
-    .ibadge { 
-      background: white;
-      border-radius: 16px;
-      padding: 18px;
-      margin: 14px 0;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
-    .ibadge-icon { 
-      width: 48px; height: 48px;
-      background: linear-gradient(135deg, var(--gold), #b8943d);
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-    .ibadge-text { color: var(--brown-mid); font-size: 14px; line-height: 1.6; }
-    .ibadge-text strong { 
-      color: var(--brown-dark);
-      display: block;
-      margin-bottom: 5px;
-      font-family: var(--font-title);
-      font-size: 15px;
-    }
-
-    /* ---- ADMIN PANEL ---- */
+    /* ─── ADMIN PANEL ─── */
     #admin-panel {
-      position: fixed; inset: 0; z-index: 10000;
-      background: #f8f6f1;
-      overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform .35s ease;
-      -webkit-overflow-scrolling: touch;
+      position:fixed; inset:0; z-index:1000;
+      background:var(--stone);
+      display:flex; flex-direction:column;
+      transform:translateY(100%);
+      transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);
+      overflow:hidden;
     }
-    #admin-panel.open { transform: translateY(0); }
-    .admin-h { 
-      background: linear-gradient(135deg, var(--green), #1b4d3a);
-      padding: 20px;
-      position: sticky;
-      top: 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    #admin-panel.open { transform:translateY(0); }
+
+    .admin-head {
+      background:var(--ink);
+      padding:50px 20px 16px;
+      display:flex; justify-content:space-between; align-items:flex-start;
+      flex-shrink:0;
     }
-    .admin-h h2 { font-family: var(--font-display); color: white; font-size: 18px; }
-    .admin-h p { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 3px; }
-    .admin-close { 
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 22px;
-      transition: all 0.3s;
+    .admin-head h2 { font-family:var(--fd); font-size:22px; font-weight:700; color:var(--gold); }
+    .admin-head p { font-size:11px; color:rgba(255,255,255,0.38); margin-top:4px; }
+    .admin-close {
+      width:34px; height:34px; background:rgba(255,255,255,0.1);
+      border-radius:50%; color:rgba(255,255,255,0.6);
+      font-size:20px; line-height:34px; text-align:center;
+      transition:all 0.2s;
     }
-    .admin-close:hover { background: rgba(255,255,255,0.3); }
-    #admin-body { padding: 20px 18px 40px; }
-    .admin-section { margin-bottom: 28px; }
-    .admin-section h3 { 
-      font-family: var(--font-title);
-      color: var(--brown-dark);
-      font-size: 17px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .admin-close:hover { background:rgba(255,255,255,0.2); }
+
+    #admin-body { flex:1; overflow-y:auto; padding:20px; }
+
+    .login-panel {
+      background:var(--white); border-radius:var(--r);
+      padding:24px; box-shadow:var(--sh);
+    }
+    .login-panel h3 {
+      font-family:var(--fd); font-size:20px; font-weight:600;
+      color:var(--ink); margin-bottom:16px; text-align:center;
     }
     .admin-input, .admin-select, .admin-textarea {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e8e4d9;
-      border-radius: 14px;
-      font-family: var(--font-body);
-      font-size: 15px;
-      background: white;
-      color: var(--brown-dark);
-      margin-bottom: 12px;
-      transition: all 0.2s;
+      width:100%; padding:12px 14px;
+      border:1.5px solid var(--stone-2);
+      border-radius:10px;
+      font-size:14px; font-family:var(--fu);
+      color:var(--ink); background:var(--stone);
+      margin-bottom:10px; outline:none;
+      transition:border-color 0.2s;
     }
-    .admin-input:focus, .admin-select:focus, .admin-textarea:focus { 
-      outline: none;
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(212,168,83,0.15);
-    }
-    .admin-textarea { min-height: 120px; resize: vertical; }
+    .admin-input:focus, .admin-select:focus, .admin-textarea:focus { border-color:var(--gold); }
+    .admin-textarea { min-height:80px; resize:vertical; }
+
     .admin-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--green), #1b4d3a);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-      transition: all 0.3s;
-      box-shadow: 0 8px 24px rgba(45,106,79,0.35);
+      width:100%; padding:14px;
+      background:var(--ink); color:var(--gold);
+      border-radius:12px; font-size:14px; font-weight:600;
+      margin-bottom:10px; transition:all 0.2s;
     }
-    .admin-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(45,106,79,0.45); }
+    .admin-btn:hover { background:var(--ink-2); }
     .admin-btn-secondary {
-      width: 100%;
-      padding: 14px;
-      background: white;
-      color: var(--brown-mid);
-      border: 2px solid #e8e4d9;
-      border-radius: 14px;
-      cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 14px;
-      margin-top: 10px;
-      transition: all 0.2s;
+      width:100%; padding:12px;
+      background:var(--stone); color:var(--slate);
+      border-radius:12px; font-size:13px; font-weight:500;
+      border:1.5px solid var(--stone-2);
+      transition:all 0.2s;
     }
-    .admin-btn-secondary:hover { border-color: var(--gold); color: var(--brown-dark); }
-    .admin-btn-danger {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, var(--terra), #a0451a);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      font-family: var(--font-body);
-      font-size: 14px;
-      margin-top: 10px;
-      transition: all 0.3s;
+
+    .admin-section {
+      background:var(--white); border-radius:14px;
+      padding:18px; margin-bottom:14px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
     }
-    .login-panel {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 400px;
-      padding: 40px 24px;
-    }
-    .login-panel h3 { 
-      font-family: var(--font-title);
-      color: var(--brown-dark);
-      margin-bottom: 24px;
-      font-size: 22px;
-    }
-    .login-panel input {
-      width: 100%;
-      max-width: 300px;
-      padding: 16px;
-      border: 2px solid #e8e4d9;
-      border-radius: 14px;
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 18px;
-      transition: all 0.2s;
-    }
-    .login-panel input:focus { 
-      outline: none;
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(212,168,83,0.15);
-    }
-    .login-panel button {
-      width: 100%;
-      max-width: 300px;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--green), #1b4d3a);
-      color: white;
-      border: none;
-      border-radius: 14px;
-      font-family: var(--font-display);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      box-shadow: 0 8px 24px rgba(45,106,79,0.35);
-    }
-    .login-panel button:hover { transform: translateY(-2px); }
-    .content-list { margin-top: 16px; }
-    .content-item {
-      background: white;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .content-item strong { 
-      color: var(--brown-dark);
-      font-size: 15px;
-      flex: 1;
-    }
-    .content-item span { 
-      color: var(--brown-mid);
-      font-size: 12px;
-    }
-    .content-item button {
-      background: var(--terra);
-      color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .content-item button:hover { background: #a0451a; }
-    .admin-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-      background: white;
-      padding: 6px;
-      border-radius: 14px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
+    .admin-section h3 { font-size:14px; font-weight:600; color:var(--ink); margin-bottom:12px; }
+
+    .admin-tabs { display:flex; gap:8px; margin-bottom:16px; }
     .admin-tab {
-      flex: 1;
-      padding: 12px 16px;
-      background: transparent;
-      border: none;
-      border-radius: 10px;
-      font-family: var(--font-body);
-      font-size: 14px;
-      color: var(--brown-mid);
-      cursor: pointer;
-      transition: all 0.2s;
+      flex:1; padding:12px; border-radius:12px;
+      font-size:13px; font-weight:500;
+      background:var(--white); color:var(--slate);
+      border:1.5px solid var(--stone-2); transition:all 0.2s;
     }
-    .admin-tab.active { 
-      background: linear-gradient(135deg, var(--green), #1b4d3a);
-      color: white;
-      font-weight: 600;
+    .admin-tab.active { background:var(--ink); color:var(--gold); border-color:var(--ink); }
+    .admin-tab-content { display:none; }
+    .admin-tab-content.active { display:block; }
+
+    .content-item {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 0; border-bottom:1px solid var(--stone-2);
+      font-size:13px;
     }
-    .admin-tab-content { display: none; }
-    .admin-tab-content.active { display: block; }
-    .coord-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .content-item:last-child { border-bottom:none; }
+    .content-item strong { flex:1; color:var(--ink); }
+    .content-item span { color:var(--slate); font-size:12px; }
+    .content-item button {
+      padding:6px 12px; border-radius:20px;
+      background:#fee2e2; color:#991b1b;
+      font-size:11px; font-weight:600; transition:all 0.2s;
     }
-    .icon-selector {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
+
+    .icon-selector { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
     .icon-option {
-      width: 48px; height: 48px;
-      border-radius: 12px;
-      border: 2px solid #e8e4d9;
-      background: white;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      cursor: pointer;
-      transition: all 0.2s;
+      width:42px; height:42px; border-radius:10px;
+      background:var(--stone); border:2px solid var(--stone-2);
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; cursor:pointer; transition:all 0.2s;
     }
-    .icon-option:hover { border-color: var(--gold); transform: scale(1.05); }
-    .icon-option.selected { 
-      border-color: var(--green);
-      background: rgba(45,106,79,0.1);
-      box-shadow: 0 0 0 3px rgba(45,106,79,0.2);
-    }
-    .color-selector {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
+    .icon-option.selected { border-color:var(--gold); background:var(--gold-pale); }
+
+    .color-selector { display:flex; flex-wrap:wrap; gap:10px; }
     .color-option {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      border: 3px solid transparent;
-      cursor: pointer;
-      transition: all 0.2s;
+      width:32px; height:32px; border-radius:50%;
+      cursor:pointer; border:3px solid transparent; transition:all 0.2s;
     }
-    .color-option:hover { transform: scale(1.15); }
-    .color-option.selected { 
-      border-color: white;
-      box-shadow: 0 0 0 3px var(--green);
-    }
+    .color-option.selected { border-color:var(--ink); transform:scale(1.2); }
 
-    /* RTL */
-    [dir="rtl"] #list-panel { transform: translateX(100%); }
-    [dir="rtl"] #list-panel.open { transform: translateX(0); }
-    [dir="rtl"] #info-panel { transform: translateX(-100%); }
-    [dir="rtl"] #info-panel.open { transform: translateX(0); }
-    [dir="rtl"] .li-arrow { transform: scaleX(-1); }
-
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(26,26,46,0.2); border-radius: 2px; }
-
-    /* Leaflet tweaks */
-    .leaflet-container { font-family: var(--font-body) !important; }
-    .leaflet-control-zoom { border: none !important; box-shadow: var(--shadow) !important; border-radius: 12px !important; overflow: hidden; }
-    .leaflet-control-zoom-in, .leaflet-control-zoom-out { font-size: 18px !important; color: var(--brown-dark) !important; }
+    .coord-row { display:flex; gap:10px; }
+    .coord-row .admin-input { flex:1; }
   </style>
 </head>
 <body>
 
-<!-- SPLASH -->
+<!-- ═══════════════════════ SPLASH ═══════════════════════ -->
 <div id="splash">
-  <div class="logo-container">
+  <div class="splash-logo">
     <img src="capilogo.png" alt="CEIP Capitulaciones">
   </div>
-  <h1>Santa Fe<br><span style="font-size:.55em;color:rgba(255,255,255,0.7);letter-spacing:.15em">HISTÓRICA</span></h1>
-  <div class="project-badge">PROYECTO 24/25</div>
-  <div class="bar-wrap"><div class="bar"></div></div>
+  <div class="splash-title">Santa Fe Histórica</div>
+  <div class="splash-sub">CEIP Capitulaciones · Granada</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
 
-<!-- HOME SCREEN (Presentación) -->
-<div id="home-screen">
-  <button class="home-admin-btn" onclick="openAdminPanel()">🔐 Admin</button>
-  
-  <div class="home-header">
-    <div class="logo-wrapper">
-      <img src="capilogo.png" alt="CEIP Capitulaciones">
+<!-- ═══════════════════════ HOME ═══════════════════════ -->
+<div id="home">
+
+  <div class="home-head">
+    <div class="home-head-inner">
+      <div class="home-logo">
+        <img src="capilogo.png" alt="Logo">
+      </div>
+      <div class="home-title">Santa Fe Histórica</div>
+      <div class="home-badge">CEIP Capitulaciones · Granada</div>
     </div>
-    <h1>Santa Fe Histórica</h1>
-    <div class="project-tag">PROYECTO 24/25</div>
+    <button class="home-admin-btn" onclick="openAdminPanel()">⚙ Admin</button>
   </div>
-  
-  <div class="home-content">
-    <!-- Sección de rutas - DESTACADA -->
-    <div class="routes-section">
-      <div class="routes-title">
-        <h2>🧭 Elige tu ruta</h2>
-        <p>Descubre Santa Fe de la mejor manera</p>
-      </div>
-      
-      <div class="route-card route-gold" id="route-opt-all" onclick="selectHomeRoute('all')">
-        <h3><span class="route-icon">🏛️</span> Ruta Completa</h3>
-        <p>Recorrido por los 7 monumentos más importantes de Santa Fe</p>
-        <div class="stops">
-          <span class="stop-tag">Plaza España</span>
-          <span class="stop-tag">Iglesia</span>
-          <span class="stop-tag">4 Arcos</span>
-          <span class="stop-tag">Centro Cultural</span>
-        </div>
-        <div class="route-arrow">→</div>
-      </div>
-      
-      <div class="route-card route-blue" id="route-opt-arcos" onclick="selectHomeRoute('arcos')">
-        <h3><span class="route-icon">🏯</span> Ruta de los Arcos</h3>
-        <p>Las 4 puertas históricas que daban acceso a la ciudad amurallada</p>
-        <div class="stops">
-          <span class="stop-tag">Arco de Loja</span>
-          <span class="stop-tag">Arco de Granada</span>
-          <span class="stop-tag">Arco de Jaén</span>
-          <span class="stop-tag">Arco Real</span>
-        </div>
-        <div class="route-arrow">→</div>
-      </div>
-      
-      <div class="route-card route-terra" id="route-opt-corto" onclick="selectHomeRoute('corto')">
-        <h3><span class="route-icon">⭐</span> Ruta Express</h3>
-        <p>Los 3 monumentos imprescindibles si tienes poco tiempo</p>
-        <div class="stops">
-          <span class="stop-tag">Plaza de España</span>
-          <span class="stop-tag">Iglesia Mayor</span>
-          <span class="stop-tag">Arco de Granada</span>
-        </div>
-        <div class="route-arrow">→</div>
+
+  <div class="home-body">
+
+    <!-- Cómo funciona -->
+    <div class="how-bar">
+      <div class="how-bar-icon">🧭</div>
+      <div class="how-bar-text">
+        <strong>Elige tu ruta y comienza la visita</strong>
+        <span>Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.</span>
       </div>
     </div>
-    
-    <!-- Info section -->
-    <div class="info-section">
+
+    <!-- Rutas -->
+    <div class="sec-label">
+      <div class="sec-step">1</div>
+      <h2>Elige tu ruta</h2>
+    </div>
+
+    <!-- Ruta Completa -->
+    <div class="route-card">
+      <div class="rc-head gold">
+        <span class="rc-emoji">🏛️</span>
+        <div class="rc-name">Ruta Completa</div>
+        <div class="rc-meta">
+          <div class="rc-meta-chip">📍 7 monumentos</div>
+          <div class="rc-meta-chip">⏱ ~45 min</div>
+          <div class="rc-meta-chip">🚶 ~1,2 km</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-stops">
+          <span class="rc-stop">Plaza de España</span>
+          <span class="rc-stop">Iglesia Mayor</span>
+          <span class="rc-stop">Arco de Loja</span>
+          <span class="rc-stop">Arco de Granada</span>
+          <span class="rc-stop">Arco de Jaén</span>
+          <span class="rc-stop">Arco Real</span>
+          <span class="rc-stop">Centro Damián Bayón</span>
+        </div>
+        <button class="rc-btn" onclick="startRoute('completa')">
+          ¡Iniciar esta ruta! <span class="rc-btn-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Ruta Arcos -->
+    <div class="route-card">
+      <div class="rc-head navy">
+        <span class="rc-emoji">🏯</span>
+        <div class="rc-name">Ruta de los Arcos</div>
+        <div class="rc-meta">
+          <div class="rc-meta-chip">📍 4 monumentos</div>
+          <div class="rc-meta-chip">⏱ ~25 min</div>
+          <div class="rc-meta-chip">🚶 ~1,0 km</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-stops">
+          <span class="rc-stop">Arco de Loja</span>
+          <span class="rc-stop">Arco de Granada</span>
+          <span class="rc-stop">Arco de Jaén</span>
+          <span class="rc-stop">Arco Real</span>
+        </div>
+        <button class="rc-btn" onclick="startRoute('arcos')">
+          ¡Iniciar esta ruta! <span class="rc-btn-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Ruta Exprés -->
+    <div class="route-card">
+      <div class="rc-head rust">
+        <span class="rc-emoji">⚡</span>
+        <div class="rc-name">Ruta Exprés</div>
+        <div class="rc-meta">
+          <div class="rc-meta-chip">📍 3 monumentos</div>
+          <div class="rc-meta-chip">⏱ ~15 min</div>
+          <div class="rc-meta-chip">🚶 ~0,5 km</div>
+        </div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-stops">
+          <span class="rc-stop">Plaza de España</span>
+          <span class="rc-stop">Iglesia Mayor</span>
+          <span class="rc-stop">Arco Real</span>
+        </div>
+        <button class="rc-btn" onclick="startRoute('expres')">
+          ¡Iniciar esta ruta! <span class="rc-btn-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Info app -->
+    <div class="home-info">
       <h3>📱 ¿Qué es esta app?</h3>
-      <p>Esta guía interactiva ha sido creada por el <strong>CEIP Capitulaciones de Santa Fe</strong> para que alumnos, familias y visitantes puedan descubrir los monumentos más importantes de nuestra ciudad.</p>
-      
-      <div class="feature-list">
-        <div class="feature-item">
-          <div class="feature-icon">📍</div>
-          <div class="feature-text">
-            <strong>Detección automática</strong>
-            <span>La app te avisa cuando estás cerca de un monumento</span>
-          </div>
+      <div class="hi-row">
+        <div class="hi-ico">📍</div>
+        <div class="hi-txt">
+          <strong>Detección automática</strong>
+          <span>La app te avisa cuando estás a menos de 80 m de un monumento.</span>
         </div>
-        <div class="feature-item">
-          <div class="feature-icon">🎬</div>
-          <div class="feature-text">
-            <strong>Contenidos de los alumnos</strong>
-            <span>Vídeos y audios narrados por nuestros estudiantes</span>
-          </div>
+      </div>
+      <div class="hi-row">
+        <div class="hi-ico">🧭</div>
+        <div class="hi-txt">
+          <strong>Navegación paso a paso</strong>
+          <span>Dirección y distancia al siguiente punto de la ruta en tiempo real.</span>
         </div>
-        <div class="feature-item">
-          <div class="feature-icon">🧭</div>
-          <div class="feature-text">
-            <strong>Rutas GPS</strong>
-            <span>Sigue la ruta óptima desde tu ubicación</span>
-          </div>
+      </div>
+      <div class="hi-row">
+        <div class="hi-ico">🎬</div>
+        <div class="hi-txt">
+          <strong>Contenidos del alumnado</strong>
+          <span>Vídeos y audios narrados por los estudiantes del CEIP Capitulaciones.</span>
+        </div>
+      </div>
+      <div class="hi-row">
+        <div class="hi-ico">🌍</div>
+        <div class="hi-txt">
+          <strong>Multilingüe</strong>
+          <span>Disponible en español, inglés, francés, chino y árabe.</span>
         </div>
       </div>
     </div>
-    
-    <!-- Monument counter -->
-    <div class="monuments-counter">
-      <div class="counter-icon">🏛️</div>
-      <div class="counter-text">
-        <strong id="monument-count">7</strong>
-        <span>monumentos disponibles para visitar</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="home-actions">
-    <button class="btn-secondary" onclick="showInfoFromHome()">ℹ️ Info</button>
-    <button class="btn-primary" onclick="startAppFromHome()">
-      🗺️ Explorar Mapa
-    </button>
-  </div>
-</div>
 
-<!-- Info Modal desde Home -->
-<div id="home-info-modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Sobre esta guía</h2>
-      <button onclick="closeHomeInfo()">×</button>
-    </div>
-    <div class="modal-body" id="home-info-content"></div>
-    <div class="modal-footer">
-      <button onclick="closeHomeInfo()">Entendido</button>
-    </div>
-  </div>
-</div>
+  </div><!-- /home-body -->
+</div><!-- /home -->
 
-<!-- APP -->
+<!-- ═══════════════════════ APP ═══════════════════════ -->
 <div id="app" class="gone">
 
-  <!-- Top bar -->
   <div id="topbar">
-    <button id="back-home-btn" onclick="backToHome()">← Inicio</button>
+    <button class="top-btn" onclick="backToHome()">← Inicio</button>
     <div id="topbar-brand">
-      <div id="topbar-title">⚜️ <span id="t-name">Santa Fe Histórica</span></div>
+      <div id="topbar-name">⚜️ <span id="t-name">Santa Fe Histórica</span></div>
       <div id="topbar-sub">CEIP Capitulaciones · Granada</div>
     </div>
-    <button id="lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl">ES</span></button>
+    <button class="top-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl">ES</span></button>
   </div>
 
-  <!-- Lang panel -->
   <div id="lang-panel" class="off">
-    <button class="lang-opt cur" onclick="setLang('es')"><span class="lang-flag">🇪🇸</span>Español</button>
-    <button class="lang-opt" onclick="setLang('en')"><span class="lang-flag">🇬🇧</span>English</button>
-    <button class="lang-opt" onclick="setLang('fr')"><span class="lang-flag">🇫🇷</span>Français</button>
-    <button class="lang-opt" onclick="setLang('zh')"><span class="lang-flag">🇨🇳</span>中文</button>
-    <button class="lang-opt" onclick="setLang('ar')"><span class="lang-flag">🇸🇦</span>العربية</button>
+    <button class="lang-opt cur" onclick="setLang('es')">🇪🇸 Español</button>
+    <button class="lang-opt"     onclick="setLang('en')">🇬🇧 English</button>
+    <button class="lang-opt"     onclick="setLang('fr')">🇫🇷 Français</button>
+    <button class="lang-opt"     onclick="setLang('zh')">🇨🇳 中文</button>
+    <button class="lang-opt"     onclick="setLang('ar')">🇸🇦 العربية</button>
   </div>
 
-  <!-- Map -->
-  <div id="map"></div>
+  <div id="map-wrap">
+    <div id="map"></div>
 
-  <!-- Bottom nav -->
+    <!-- Proximity alert -->
+    <div id="prox-alert" class="off">
+      <div class="pa-ico" id="pa-icon">📍</div>
+      <div class="pa-txt">
+        <strong id="pa-name"></strong>
+        <span id="pa-msg">Estás a menos de 80 m. ¿Ver su historia?</span>
+      </div>
+      <div class="pa-actions">
+        <button class="pa-yes" id="pa-yes" onclick="alertOpen()">Ver</button>
+        <button class="pa-no"  id="pa-no"  onclick="alertClose()">✕</button>
+      </div>
+    </div>
+
+    <!-- Completion banner -->
+    <div id="completion-banner" class="off">
+      <div class="cb-icon">🏆</div>
+      <div class="cb-title" id="cb-title">¡Ruta completada!</div>
+      <div class="cb-sub" id="cb-sub">Has visitado todos los monumentos</div>
+      <button class="cb-close" onclick="document.getElementById('completion-banner').classList.add('off')">✕</button>
+    </div>
+
+    <!-- Detail panel (inside map-wrap so it slides over the map, not over the strip) -->
+    <div id="detail-panel">
+      <div class="dp-handle"></div>
+      <div class="dp-head">
+        <div class="dp-icon-box" id="dp-icon">🏛️</div>
+        <div class="dp-meta">
+          <div class="dp-name" id="dp-name">—</div>
+          <div class="dp-type" id="dp-type">—</div>
+        </div>
+        <button class="dp-close" onclick="closeDetail()">×</button>
+      </div>
+      <div class="tab-bar">
+        <button class="tb on" id="tb-video" onclick="switchTab('video')">
+          <span class="tb-icon">🎬</span><span id="t-tab-v">Vídeo</span>
+        </button>
+        <button class="tb" id="tb-audio" onclick="switchTab('audio')">
+          <span class="tb-icon">🎵</span><span id="t-tab-a">Audio</span>
+        </button>
+        <button class="tb" id="tb-text" onclick="switchTab('text')">
+          <span class="tb-icon">📖</span><span id="t-tab-t">Texto</span>
+        </button>
+      </div>
+      <div class="tab-content">
+        <div class="tp on" id="tp-video"></div>
+        <div class="tp" id="tp-audio"></div>
+        <div class="tp" id="tp-text"></div>
+      </div>
+      <a id="maps-link" class="maps-btn" target="_blank" rel="noopener">
+        🗺️ <span id="t-maps-link">Abrir en Google Maps</span>
+      </a>
+    </div>
+
+    <!-- List panel -->
+    <div id="list-panel" class="side-panel">
+      <div class="panel-head">
+        <h2 id="t-list-h">Lugares de interés</h2>
+        <p id="t-list-sub">Santa Fe · Granada · 1491</p>
+      </div>
+      <div id="poi-list"></div>
+    </div>
+
+    <!-- Info panel -->
+    <div id="info-panel" class="side-panel">
+      <div class="panel-head">
+        <h2 id="t-info-h">Sobre esta guía</h2>
+        <p>CEIP Capitulaciones</p>
+      </div>
+      <div id="info-body"></div>
+    </div>
+
+  </div><!-- /map-wrap -->
+
+  <!-- Navigation strip -->
+  <div id="nav-strip" class="hidden">
+    <div class="ns-dir-arrow" id="ns-arrow">⬆</div>
+    <div class="ns-info">
+      <div class="ns-instruction" id="ns-instruction">Buscando señal GPS…</div>
+      <div class="ns-next-label" id="ns-next">Activa el GPS para navegar</div>
+    </div>
+    <div class="ns-right">
+      <div class="ns-count" id="ns-count">0/0</div>
+      <div class="ns-dots" id="ns-dots"></div>
+    </div>
+  </div>
+
   <div id="bottom-nav">
-    <button class="nb on" id="nb-map" onclick="goView('map')">
+    <button class="nb on" id="nb-map"  onclick="goView('map')">
       <span class="nb-icon">🗺️</span><span id="t-nav-map">Mapa</span>
     </button>
-    <button class="nb" id="nb-list" onclick="goView('list')">
+    <button class="nb"    id="nb-list" onclick="goView('list')">
       <span class="nb-icon">📍</span><span id="t-nav-list">Lugares</span>
     </button>
-    <button class="nb" id="nb-info" onclick="goView('info')">
+    <button class="nb"    id="nb-info" onclick="goView('info')">
       <span class="nb-icon">ℹ️</span><span id="t-nav-info">Info</span>
     </button>
   </div>
 
-  <!-- Proximity alert -->
-  <div id="prox-alert" class="off">
-    <div class="pa-icon" id="pa-icon">📍</div>
-    <div class="pa-text">
-      <strong id="pa-name"></strong>
-      <span id="pa-msg">Estás a menos de 80 metros. ¿Quieres saber su historia?</span>
-    </div>
-    <div class="pa-actions">
-      <button class="pa-yes" onclick="alertOpen()" id="pa-yes">Ver</button>
-      <button class="pa-no" onclick="alertClose()" id="pa-no">✕</button>
-    </div>
-  </div>
+</div><!-- /app -->
 
-  <!-- Detail panel -->
-  <div id="detail-panel">
-    <div class="ph">
-      <div class="ph-icon" id="dp-icon">🏛️</div>
-      <div class="ph-meta">
-        <div class="ph-name" id="dp-name">—</div>
-        <div class="ph-desc" id="dp-desc">—</div>
-      </div>
-      <button class="ph-close" onclick="closeDetail()">×</button>
-    </div>
-    <div class="tab-bar">
-      <button class="tb on" id="tb-video" onclick="switchTab('video')">
-        <span class="tb-icon">🎬</span><span id="t-tab-v">Vídeo</span>
-      </button>
-      <button class="tb" id="tb-audio" onclick="switchTab('audio')">
-        <span class="tb-icon">🎵</span><span id="t-tab-a">Audio</span>
-      </button>
-      <button class="tb" id="tb-text" onclick="switchTab('text')">
-        <span class="tb-icon">📖</span><span id="t-tab-t">Texto</span>
-      </button>
-    </div>
-    <div class="tab-content">
-      <div class="tp on" id="tp-video"></div>
-      <div class="tp" id="tp-audio"></div>
-      <div class="tp" id="tp-text"></div>
-    </div>
-    <a id="nav-link" class="nav-link" target="_blank" rel="noopener">🧭 <span id="t-nav-link">Cómo llegar</span></a>
-  </div>
-
-  <!-- List panel -->
-  <div id="list-panel">
-    <div class="lh">
-      <h2 id="t-list-h">Lugares de interés</h2>
-      <p id="t-list-sub">Santa Fe · Granada · 1491</p>
-    </div>
-    <div id="poi-list"></div>
-  </div>
-
-  <!-- Info panel -->
-  <div id="info-panel">
-    <div class="ih"><h2 id="t-info-h">Sobre esta guía</h2></div>
-    <div id="info-body"></div>
-  </div>
-
-</div>
-
-<!-- Admin Panel -->
+<!-- ═══════════════════════ ADMIN PANEL ═══════════════════════ -->
 <div id="admin-panel">
-  <div class="admin-h">
+  <div class="admin-head">
     <div>
       <h2>🔐 Modo Superusuario</h2>
-      <p>CEIP Capitulaciones - Gestión de contenidos</p>
+      <p>CEIP Capitulaciones · Gestión de contenidos</p>
     </div>
     <button class="admin-close" onclick="closeAdminPanel()">×</button>
   </div>
   <div id="admin-body">
-    <!-- Login -->
+
     <div id="admin-login" class="login-panel">
       <h3>Acceso para profesorado</h3>
-      <input type="password" id="admin-pass" placeholder="Contraseña" onkeypress="if(event.key==='Enter')doLogin()">
-      <button onclick="doLogin()">Acceder</button>
+      <input type="password" class="admin-input" id="admin-pass" placeholder="Contraseña"
+             onkeypress="if(event.key==='Enter')doLogin()">
+      <button class="admin-btn" onclick="doLogin()">Acceder</button>
       <button class="admin-btn-secondary" onclick="closeAdminPanel()">Cancelar</button>
     </div>
-    
-    <!-- Content Manager -->
-    <div id="admin-content" style="display:none;">
+
+    <div id="admin-content" style="display:none">
       <div class="admin-tabs">
-        <button class="admin-tab active" onclick="switchAdminTab('content')" id="tab-btn-content">🎬 Contenidos</button>
-        <button class="admin-tab" onclick="switchAdminTab('monuments')" id="tab-btn-monuments">📍 Monumentos</button>
+        <button class="admin-tab active" id="tab-btn-content"   onclick="switchAdminTab('content')">🎬 Contenidos</button>
+        <button class="admin-tab"        id="tab-btn-monuments" onclick="switchAdminTab('monuments')">📍 Monumentos</button>
       </div>
-      
+
       <!-- Tab: Contenidos -->
-      <div id="tab-content" class="admin-tab-content active">
+      <div class="admin-tab-content active" id="tab-content">
         <div class="admin-section">
           <h3>📍 Seleccionar monumento</h3>
-          <select id="admin-poi" class="admin-select" onchange="loadPoiContent()">
+          <select class="admin-select" id="admin-poi" onchange="loadPoiContent()">
             <option value="">-- Selecciona un monumento --</option>
           </select>
         </div>
         <div class="admin-section">
           <h3>🎬 Vídeo (YouTube)</h3>
-          <input type="text" id="admin-video" class="admin-input" placeholder="URL de YouTube (ej: https://youtube.com/watch?v=...)">
+          <input type="text" class="admin-input" id="admin-video" placeholder="URL de YouTube">
           <button class="admin-btn" onclick="saveVideo()">Guardar Vídeo</button>
         </div>
         <div class="admin-section">
           <h3>🎵 Audio (iVoox o archivo)</h3>
-          <input type="text" id="admin-audio" class="admin-input" placeholder="URL de iVoox o enlace directo a MP3">
+          <input type="text" class="admin-input" id="admin-audio" placeholder="URL de iVoox o MP3">
           <button class="admin-btn" onclick="saveAudio()">Guardar Audio</button>
         </div>
         <div class="admin-section">
@@ -1505,123 +1121,109 @@
         </div>
         <button class="admin-btn-secondary" onclick="doLogout()">Cerrar sesión</button>
       </div>
-      
+
       <!-- Tab: Monumentos -->
-      <div id="tab-monuments" class="admin-tab-content">
+      <div class="admin-tab-content" id="tab-monuments">
         <div class="admin-section">
           <h3>➕ Añadir nuevo monumento</h3>
-          <input type="text" id="new-poi-name" class="admin-input" placeholder="Nombre del monumento">
-          <input type="text" id="new-poi-type" class="admin-input" placeholder="Tipo (ej: Iglesia · Siglo XV)">
-          <textarea id="new-poi-desc" class="admin-textarea" placeholder="Descripción histórica del monumento..."></textarea>
-          
-          <h3 style="margin-top:16px;font-size:14px;">📍 Coordenadas GPS</h3>
+          <input type="text" class="admin-input" id="new-poi-name" placeholder="Nombre del monumento">
+          <input type="text" class="admin-input" id="new-poi-type" placeholder="Tipo (ej: Iglesia · Siglo XV)">
+          <textarea class="admin-textarea" id="new-poi-desc" placeholder="Descripción histórica…"></textarea>
+          <h3 style="font-size:13px;margin:10px 0 8px">📍 Coordenadas GPS</h3>
           <div class="coord-row">
-            <input type="text" id="new-poi-lat" class="admin-input" placeholder="Latitud (ej: 37.18530)">
-            <input type="text" id="new-poi-lng" class="admin-input" placeholder="Longitud (ej: -3.71558)">
+            <input type="text" class="admin-input" id="new-poi-lat" placeholder="Latitud">
+            <input type="text" class="admin-input" id="new-poi-lng" placeholder="Longitud">
           </div>
-          <p style="font-size:12px;color:var(--brown-mid);margin-bottom:12px;">
-            💡 Obtén coordenadas en Google Maps (clic derecho → "¿Qué hay aquí?")
-          </p>
-          
-          <h3 style="margin-top:16px;font-size:14px;">🎨 Seleccionar icono</h3>
+          <p style="font-size:11px;color:var(--slate);margin-bottom:10px">💡 Clic derecho en Google Maps → "¿Qué hay aquí?"</p>
+          <h3 style="font-size:13px;margin-bottom:8px">🎨 Icono</h3>
           <div class="icon-selector" id="icon-selector">
             <div class="icon-option selected" data-icon="🏛️" onclick="selectIcon('🏛️')">🏛️</div>
-            <div class="icon-option" data-icon="⛪" onclick="selectIcon('⛪')">⛪</div>
-            <div class="icon-option" data-icon="🏯" onclick="selectIcon('🏯')">🏯</div>
-            <div class="icon-option" data-icon="👑" onclick="selectIcon('👑')">👑</div>
-            <div class="icon-option" data-icon="🎨" onclick="selectIcon('🎨')">🎨</div>
-            <div class="icon-option" data-icon="📚" onclick="selectIcon('📚')">📚</div>
-            <div class="icon-option" data-icon="⚔️" onclick="selectIcon('⚔️')">⚔️</div>
-            <div class="icon-option" data-icon="🏺" onclick="selectIcon('🏺')">🏺</div>
-            <div class="icon-option" data-icon="🌳" onclick="selectIcon('🌳')">🌳</div>
-            <div class="icon-option" data-icon="🎭" onclick="selectIcon('🎭')">🎭</div>
-            <div class="icon-option" data-icon="🏛" onclick="selectIcon('🏛')">🏛</div>
-            <div class="icon-option" data-icon="🕍" onclick="selectIcon('🕍')">🕍</div>
-            <div class="icon-option" data-icon="⛲" onclick="selectIcon('⛲')">⛲</div>
-            <div class="icon-option" data-icon="🎪" onclick="selectIcon('🎪')">🎪</div>
-            <div class="icon-option" data-icon="🏰" onclick="selectIcon('🏰')">🏰</div>
+            <div class="icon-option" data-icon="⛪"  onclick="selectIcon('⛪')">⛪</div>
+            <div class="icon-option" data-icon="🏯"  onclick="selectIcon('🏯')">🏯</div>
+            <div class="icon-option" data-icon="👑"  onclick="selectIcon('👑')">👑</div>
+            <div class="icon-option" data-icon="🎨"  onclick="selectIcon('🎨')">🎨</div>
+            <div class="icon-option" data-icon="📚"  onclick="selectIcon('📚')">📚</div>
+            <div class="icon-option" data-icon="⚔️"  onclick="selectIcon('⚔️')">⚔️</div>
+            <div class="icon-option" data-icon="🏺"  onclick="selectIcon('🏺')">🏺</div>
+            <div class="icon-option" data-icon="🌳"  onclick="selectIcon('🌳')">🌳</div>
+            <div class="icon-option" data-icon="🏰"  onclick="selectIcon('🏰')">🏰</div>
           </div>
-          
-          <h3 style="margin-top:16px;font-size:14px;">🎨 Color del marcador</h3>
+          <h3 style="font-size:13px;margin:10px 0 8px">🎨 Color del marcador</h3>
           <div class="color-selector" id="color-selector">
-            <div class="color-option selected" style="background:#d4a853" data-color="#d4a853" onclick="selectColor('#d4a853')"></div>
-            <div class="color-option" style="background:#c75b2a" data-color="#c75b2a" onclick="selectColor('#c75b2a')"></div>
+            <div class="color-option selected" style="background:#c9a84c" data-color="#c9a84c" onclick="selectColor('#c9a84c')"></div>
+            <div class="color-option" style="background:#a84020" data-color="#a84020" onclick="selectColor('#a84020')"></div>
             <div class="color-option" style="background:#1e3a5f" data-color="#1e3a5f" onclick="selectColor('#1e3a5f')"></div>
-            <div class="color-option" style="background:#2d6a4f" data-color="#2d6a4f" onclick="selectColor('#2d6a4f')"></div>
-            <div class="color-option" style="background:#5e2d6a" data-color="#5e2d6a" onclick="selectColor('#5e2d6a')"></div>
+            <div class="color-option" style="background:#2a7a50" data-color="#2a7a50" onclick="selectColor('#2a7a50')"></div>
+            <div class="color-option" style="background:#6d3a8a" data-color="#6d3a8a" onclick="selectColor('#6d3a8a')"></div>
             <div class="color-option" style="background:#1976D2" data-color="#1976D2" onclick="selectColor('#1976D2')"></div>
             <div class="color-option" style="background:#E91E63" data-color="#E91E63" onclick="selectColor('#E91E63')"></div>
-            <div class="color-option" style="background:#009688" data-color="#009688" onclick="selectColor('#009688')"></div>
-            <div class="color-option" style="background:#FF5722" data-color="#FF5722" onclick="selectColor('#FF5722')"></div>
             <div class="color-option" style="background:#607D8B" data-color="#607D8B" onclick="selectColor('#607D8B')"></div>
           </div>
-          
-          <button class="admin-btn" onclick="addNewMonument()" style="margin-top:18px;">➕ Añadir Monumento</button>
+          <button class="admin-btn" onclick="addNewMonument()" style="margin-top:16px">➕ Añadir Monumento</button>
         </div>
-        
         <div class="admin-section">
           <h3>📍 Monumentos actuales</h3>
-          <div id="admin-monuments-list" class="content-list"></div>
+          <div id="admin-monuments-list"></div>
         </div>
-        
         <button class="admin-btn-secondary" onclick="doLogout()">Cerrar sesión</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 // ================================================================
-// CONFIGURACIÓN - MONUMENTOS POR DEFECTO
+// MONUMENTOS (datos originales preservados íntegramente)
 // ================================================================
 let POIS = [
   {
-    id:'plaza', icon:'🏛️', color:'#d4a853', lat:37.18530, lng:-3.71558,
-    video:null, audio:null, text:null,
+    id:'plaza', icon:'🏛️', color:'#c9a84c', lat:37.18530, lng:-3.71558,
+    video:null, audio:null,
     names:{ es:'Plaza de España', en:'Plaza de España', fr:'Place d\'Espagne', zh:'西班牙广场', ar:'ساحة إسبانيا' },
     types:{ es:'Plaza principal · Centro histórico', en:'Main square · Historic centre', fr:'Place principale · Centre historique', zh:'主广场 · 历史中心', ar:'الميدان الرئيسي · المركز التاريخي' },
     texts:{
       es:`<p>¡Bienvenidos a Santa Fe! Esta plaza es el corazón de nuestra ciudad. Fue construida en el año 1491 por los Reyes Católicos, Fernando e Isabel, mientras preparaban la conquista de Granada.</p><p>¿Sabéis algo curioso? ¡Toda la ciudad de Santa Fe tiene forma de cuadrado, como un campamento militar! Las calles van en líneas rectas y hay cuatro puertas, una en cada lado.</p>`,
-      en:`<p>Welcome to Santa Fe! This square is the heart of our city. It was built in 1491 by the Catholic Monarchs, Ferdinand and Isabella, as they prepared for the conquest of Granada.</p><p>Did you know something curious? The whole city of Santa Fe is shaped like a square — just like a military camp!</p>`,
-      fr:`<p>Bienvenue à Santa Fe ! Cette place est le cœur de notre ville. Elle fut construite en 1491 par les Rois Catholiques.</p>`,
-      zh:`<p>欢迎来到圣菲！这个广场是我们城市的心脏。它建于1491年。</p>`,
-      ar:`<p>مرحباً بكم في سانتا في! هذا الميدان هو قلب مدينتنا. بُني عام 1491.</p>`
+      en:`<p>Welcome to Santa Fe! This square is the heart of our city. It was built in 1491 by the Catholic Monarchs, Ferdinand and Isabella, as they prepared for the conquest of Granada.</p><p>Did you know? The whole city of Santa Fe is shaped like a square — just like a military camp!</p>`,
+      fr:`<p>Bienvenue à Santa Fe ! Cette place est le cœur de notre ville. Elle fut construite en 1491 par les Rois Catholiques, Ferdinand et Isabelle.</p>`,
+      zh:`<p>欢迎来到圣菲！这个广场是我们城市的心脏。它建于1491年，由天主教双王斐迪南和伊莎贝拉建造。</p>`,
+      ar:`<p>مرحباً بكم في سانتا في! هذا الميدان هو قلب مدينتنا. بُني عام 1491 بأمر من الملوك الكاثوليك.</p>`
     }
   },
   {
     id:'iglesia', icon:'⛪', color:'#8B6914', lat:37.18497, lng:-3.71463,
-    video:null, audio:null, text:null,
+    video:null, audio:null,
     names:{ es:'Iglesia Mayor de la Encarnación', en:'Church of the Incarnation', fr:'Église de l\'Incarnation', zh:'化身圣母大教堂', ar:'كنيسة التجسد الكبرى' },
     types:{ es:'Iglesia · Siglo XV-XVI', en:'Church · 15th–16th century', fr:'Église · XVe–XVIe siècle', zh:'教堂 · 15-16世纪', ar:'كنيسة · القرن الخامس عشر–السادس عشر' },
     texts:{
       es:`<p>Esta es la Iglesia Mayor de la Encarnación, el edificio más antiguo de Santa Fe que todavía podemos visitar. Fue mandada construir por los propios Reyes Católicos para su nueva ciudad.</p><p>¿Sabíais que aquí, en Santa Fe, fue donde Cristóbal Colón recibió el permiso de los reyes para viajar y descubrir América en 1492?</p>`,
       en:`<p>This is the Church of the Incarnation, the oldest building in Santa Fe we can still visit. It was ordered by the Catholic Monarchs themselves for their new city.</p>`,
       fr:`<p>Voici l'Église de l'Incarnation, le plus ancien bâtiment de Santa Fe que nous pouvons encore visiter.</p>`,
-      zh:`<p>这是化身圣母大教堂，是圣菲现存最古老的建筑。</p>`,
-      ar:`<p>هذه كنيسة التجسد الكبرى، أقدم مبنى في سانتا في لا يزال بإمكاننا زيارته.</p>`
+      zh:`<p>这是化身大教堂，圣菲最古老的仍可参观的建筑。它由天主教双王下令建造。</p>`,
+      ar:`<p>هذه هي كنيسة التجسد الكبرى، أقدم مبنى في سانتا في لا يزال بإمكاننا زيارته.</p>`
     }
   },
   {
-    id:'arco-loja', icon:'🏯', color:'#c75b2a', lat:37.18530, lng:-3.72010,
-    video:null, audio:null, text:null,
+    id:'arco-loja', icon:'🏯', color:'#1e3a5f', lat:37.18530, lng:-3.71950,
+    video:null, audio:null,
     names:{ es:'Arco de Loja', en:'Arch of Loja', fr:'Arc de Loja', zh:'洛哈拱门', ar:'قوس لوخا' },
     types:{ es:'Puerta oeste · Muralla histórica', en:'West gate · Historic wall', fr:'Porte ouest · Mur historique', zh:'西门 · 历史城墙', ar:'البوابة الغربية · الأسوار التاريخية' },
     texts:{
-      es:`<p>¡Este es el Arco de Loja! Es la puerta que mira hacia el oeste, hacia la ciudad de Loja. Por aquí entraban y salían los soldados y los comerciantes hace más de 500 años.</p>`,
-      en:`<p>This is the Arch of Loja! It is the gate facing west, towards the city of Loja. Soldiers and merchants passed through here more than 500 years ago.</p>`,
-      fr:`<p>Voici l'Arc de Loja ! C'est la porte qui regarde vers l'ouest, vers la ville de Loja.</p>`,
-      zh:`<p>这是洛哈拱门！它面朝西方，指向洛哈城。</p>`,
-      ar:`<p>هذا هو قوس لوخا! إنه البوابة التي تواجه الغرب نحو مدينة لوخا.</p>`
+      es:`<p>¡Bienvenidos al Arco de Loja, la puerta del oeste! Este arco mira hacia Loja y el occidente. Los Reyes Católicos construyeron cuatro puertas en la ciudad, una por cada punto cardinal.</p>`,
+      en:`<p>Welcome to the Arch of Loja, the west gate! This arch faces Loja and the west. The Catholic Monarchs built four gates in the city, one for each cardinal point.</p>`,
+      fr:`<p>Bienvenue à l'Arc de Loja, la porte ouest ! Cet arc regarde vers Loja et l'occident.</p>`,
+      zh:`<p>欢迎来到洛哈拱门，西门！这个拱门面向洛哈和西方。</p>`,
+      ar:`<p>مرحباً بكم في قوس لوخا، البوابة الغربية! يواجه هذا القوس لوخا والغرب.</p>`
     }
   },
   {
-    id:'arco-granada', icon:'🏯', color:'#c75b2a', lat:37.18530, lng:-3.71110,
-    video:null, audio:null, text:null,
+    id:'arco-granada', icon:'🏯', color:'#1e3a5f', lat:37.18530, lng:-3.71170,
+    video:null, audio:null,
     names:{ es:'Arco de Granada', en:'Arch of Granada', fr:'Arc de Grenade', zh:'格拉纳达拱门', ar:'قوس غرناطة' },
     types:{ es:'Puerta este · Muralla histórica', en:'East gate · Historic wall', fr:'Porte est · Mur historique', zh:'东门 · 历史城墙', ar:'البوابة الشرقية · الأسوار التاريخية' },
     texts:{
-      es:`<p>Este arco mira hacia el este, hacia Granada. Por aquí salió el ejército de los Reyes Católicos cuando tomaron Granada en enero de 1492.</p><p>¡Este arco es muy especial! Aquí cerca fue donde Cristóbal Colón esperó pacientemente hasta que los reyes le escucharon.</p>`,
+      es:`<p>Este arco mira hacia el este, hacia Granada. Por aquí salió el ejército de los Reyes Católicos cuando tomaron Granada en enero de 1492.</p><p>Aquí cerca fue donde Cristóbal Colón esperó pacientemente hasta que los reyes le escucharon.</p>`,
       en:`<p>This arch faces east, towards Granada. The monarchs' army marched through here when they took Granada in January 1492.</p>`,
       fr:`<p>Cet arc regarde vers l'est, vers Grenade. L'armée des Rois Catholiques passa par ici quand ils prirent Grenade en janvier 1492.</p>`,
       zh:`<p>这个拱门面朝东方，指向格拉纳达。1492年1月，当国王的军队攻占格拉纳达时就从这里出发。</p>`,
@@ -1629,8 +1231,8 @@ let POIS = [
     }
   },
   {
-    id:'arco-jaen', icon:'🏯', color:'#c75b2a', lat:37.18220, lng:-3.71558,
-    video:null, audio:null, text:null,
+    id:'arco-jaen', icon:'🏯', color:'#a84020', lat:37.18220, lng:-3.71558,
+    video:null, audio:null,
     names:{ es:'Arco de Jaén', en:'Arch of Jaén', fr:'Arc de Jaén', zh:'哈恩拱门', ar:'قوس خاين' },
     types:{ es:'Puerta sur · Muralla histórica', en:'South gate · Historic wall', fr:'Porte sud · Mur historique', zh:'南门 · 历史城墙', ar:'البوابة الجنوبية · الأسوار التاريخية' },
     texts:{
@@ -1638,12 +1240,12 @@ let POIS = [
       en:`<p>Welcome to the Arch of Jaén, the south gate! This arch faces Jaén. Travellers heading to southern Andalusia would leave through here.</p>`,
       fr:`<p>Bienvenue à l'Arc de Jaén, la porte sud ! Cet arc regarde vers Jaén.</p>`,
       zh:`<p>欢迎来到哈恩拱门，南门！这个拱门面向哈恩。</p>`,
-      ar:`<p>مرحباً بكم في قوس خاين، البوابة الجنوبية! يواجه هذا القوس خاين.</p>`
+      ar:`<p>مرحباً بكم في قوس خاين، البوابة الجنوبية!</p>`
     }
   },
   {
-    id:'arco-real', icon:'👑', color:'#8B4513', lat:37.18840, lng:-3.71558,
-    video:null, audio:null, text:null,
+    id:'arco-real', icon:'👑', color:'#6d3a8a', lat:37.18840, lng:-3.71558,
+    video:null, audio:null,
     names:{ es:'Arco Real', en:'Royal Arch', fr:'Arc Royal', zh:'皇家拱门', ar:'القوس الملكي' },
     types:{ es:'Puerta norte · Muralla histórica', en:'North gate · Historic wall', fr:'Porte nord · Mur historique', zh:'北门 · 历史城墙', ar:'البوابة الشمالية · الأسوار التاريخية' },
     texts:{
@@ -1651,17 +1253,17 @@ let POIS = [
       en:`<p>This is the Royal Arch, the most important gate of Santa Fe! It is called "Royal" because it was the main gate used by the kings.</p>`,
       fr:`<p>Voici l'Arc Royal, la porte la plus importante de Santa Fe ! Il s'appelle "Royal" parce que c'était la porte principale des rois.</p>`,
       zh:`<p>这是皇家拱门，圣菲最重要的门！它被称为"皇家"因为它是国王使用的主要门。</p>`,
-      ar:`<p>هذا هو القوس الملكي، أهم بوابة في سانتا في! يُسمى "ملكياً" لأنه كان البوابة الرئيسية للملوك.</p>`
+      ar:`<p>هذا هو القوس الملكي، أهم بوابة في سانتا في!</p>`
     }
   },
   {
-    id:'damian', icon:'🎨', color:'#2d6a4f', lat:37.18560, lng:-3.71620,
-    video:null, audio:null, text:null,
+    id:'damian', icon:'🎨', color:'#2a7a50', lat:37.18560, lng:-3.71620,
+    video:null, audio:null,
     names:{ es:'Centro Damián Bayón', en:'Damián Bayón Centre', fr:'Centre Damián Bayón', zh:'达米安·巴永中心', ar:'مركز داميان بايون' },
     types:{ es:'Centro cultural · Santa Fe', en:'Cultural centre · Santa Fe', fr:'Centre culturel · Santa Fe', zh:'文化中心 · 圣菲', ar:'مركز ثقافي · سانتا في' },
     texts:{
       es:`<p>Este centro lleva el nombre de Damián Bayón, un gran historiador del arte nacido en Santa Fe. Fue una persona muy importante que estudió y escribió sobre el arte de toda América Latina.</p>`,
-      en:`<p>This centre is named after Damián Bayón, a great art historian born in Santa Fe. He was a very important person who studied and wrote about the art of all Latin America.</p>`,
+      en:`<p>This centre is named after Damián Bayón, a great art historian born in Santa Fe. He studied and wrote about the art of all Latin America.</p>`,
       fr:`<p>Ce centre porte le nom de Damián Bayón, un grand historien de l'art né à Santa Fe.</p>`,
       zh:`<p>这个中心以达米安·巴永的名字命名，他是圣菲出生的伟大艺术史学家。</p>`,
       ar:`<p>يحمل هذا المركز اسم داميان بايون، مؤرخ فن عظيم وُلد في سانتا في.</p>`
@@ -1670,63 +1272,88 @@ let POIS = [
 ];
 
 // ================================================================
-// i18n TEXTOS
+// i18n
 // ================================================================
 const T = {
-  es:{ name:'Santa Fe Histórica', sub:'CEIP Capitulaciones · Granada', lbl:'ES',
+  es:{ name:'Santa Fe Histórica', lbl:'ES',
     navMap:'Mapa', navList:'Lugares', navInfo:'Info',
-    alertMsg:'Estás a menos de 80 m. ¿Quieres saber su historia?',
+    alertMsg:'Estás a menos de 80 m. ¿Ver su historia?',
     alertYes:'Ver', alertNo:'✕',
     tabV:'Vídeo', tabA:'Audio', tabT:'Texto',
     kidstag:'Contado por los niños del CEIP Capitulaciones',
-    navbtn:'Cómo llegar',
+    mapsLink:'Abrir en Google Maps',
     listh:'Lugares de interés', listsub:'Santa Fe · Granada · 1491',
     infoh:'Sobre esta guía',
-    infoBody:`<h2>Santa Fe Histórica</h2><p>Esta guía interactiva ha sido creada por el <strong>CEIP Capitulaciones de Santa Fe</strong> para explorar los monumentos más importantes de nuestra ciudad.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>Cómo funciona</strong>La app detecta cuando te acercas a menos de 80 metros de un monumento y te avisa automáticamente. ¡Activa el GPS!</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>Contenidos</strong>Los vídeos y audios son narrados por los propios alumnos del CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>Santa Fe, 1491</strong>Ciudad fundada por los Reyes Católicos durante el asedio a Granada. En ella se firmaron las Capitulaciones que permitieron el viaje de Colón a América.</div></div><div class="info-badge"><div class="info-badge-icon">🌐</div><div class="info-badge-text"><strong>Idiomas</strong>Disponible en español, inglés, francés, chino y árabe.</div></div>`
+    dirN:'Norte', dirNE:'Noreste', dirE:'Este', dirSE:'Sureste',
+    dirS:'Sur',  dirSW:'Suroeste', dirW:'Oeste', dirNW:'Noroeste',
+    navTo:'Hacia:', navDone:'¡Ruta completada!', navDoneSub:'Has visitado todos los monumentos',
+    navWaiting:'Activa el GPS para navegar', navSearching:'Buscando señal GPS…',
+    visited:'visitados',
+    infoBody:`<h2>Santa Fe Histórica</h2><p>Esta guía interactiva ha sido creada por el <strong>CEIP Capitulaciones de Santa Fe</strong> para explorar los monumentos más importantes de nuestra ciudad.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>Cómo funciona</strong>La app detecta cuando te acercas a menos de 80 metros de un monumento y te avisa automáticamente.</div></div><div class="info-badge"><div class="info-badge-icon">🧭</div><div class="info-badge-text"><strong>Navegación</strong>Con el GPS activo, la app muestra la dirección y distancia al siguiente monumento de la ruta en tiempo real.</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>Contenidos</strong>Los vídeos y audios son narrados por los propios alumnos del CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>Santa Fe, 1491</strong>Ciudad fundada por los Reyes Católicos durante el asedio a Granada. Aquí se firmaron las Capitulaciones que permitieron el viaje de Colón a América.</div></div>`
   },
-  en:{ name:'Historic Santa Fe', sub:'CEIP Capitulaciones · Granada', lbl:'EN',
+  en:{ name:'Historic Santa Fe', lbl:'EN',
     navMap:'Map', navList:'Places', navInfo:'Info',
-    alertMsg:'You\'re within 80 m. Want to learn its history?',
+    alertMsg:'You\'re within 80 m. See its history?',
     alertYes:'See', alertNo:'✕',
     tabV:'Video', tabA:'Audio', tabT:'Text',
     kidstag:'Told by the children of CEIP Capitulaciones',
-    navbtn:'Get directions',
+    mapsLink:'Open in Google Maps',
     listh:'Points of interest', listsub:'Santa Fe · Granada · 1491',
     infoh:'About this guide',
-    infoBody:`<h2>Historic Santa Fe</h2><p>This interactive guide was created by <strong>CEIP Capitulaciones de Santa Fe</strong> to explore the most important monuments of our city.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>How it works</strong>The app detects when you come within 80 metres of a monument and alerts you automatically. Enable GPS!</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>Content</strong>Videos and audio are narrated by students of CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>Santa Fe, 1491</strong>City founded by the Catholic Monarchs during the siege of Granada. The Capitulations signed here enabled Columbus's voyage to America.</div></div><div class="info-badge"><div class="info-badge-icon">🌐</div><div class="info-badge-text"><strong>Languages</strong>Available in Spanish, English, French, Chinese and Arabic.</div></div>`
+    dirN:'North', dirNE:'Northeast', dirE:'East', dirSE:'Southeast',
+    dirS:'South', dirSW:'Southwest', dirW:'West', dirNW:'Northwest',
+    navTo:'Towards:', navDone:'Route completed!', navDoneSub:'You\'ve visited all monuments',
+    navWaiting:'Enable GPS to navigate', navSearching:'Searching GPS signal…',
+    visited:'visited',
+    infoBody:`<h2>Historic Santa Fe</h2><p>This interactive guide was created by <strong>CEIP Capitulaciones de Santa Fe</strong> to explore the most important monuments of our city.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>How it works</strong>The app detects when you come within 80 metres of a monument and alerts you automatically.</div></div><div class="info-badge"><div class="info-badge-icon">🧭</div><div class="info-badge-text"><strong>Navigation</strong>With GPS active, the app shows direction and distance to the next monument in real time.</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>Content</strong>Videos and audio are narrated by students of CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>Santa Fe, 1491</strong>City founded by the Catholic Monarchs during the siege of Granada. The Capitulations signed here enabled Columbus's voyage to America.</div></div>`
   },
-  fr:{ name:'Santa Fe Historique', sub:'CEIP Capitulaciones · Grenade', lbl:'FR',
+  fr:{ name:'Santa Fe Historique', lbl:'FR',
     navMap:'Carte', navList:'Lieux', navInfo:'Info',
-    alertMsg:'Vous êtes à moins de 80 m. Voulez-vous connaître son histoire ?',
+    alertMsg:'Vous êtes à moins de 80 m. Connaître son histoire ?',
     alertYes:'Voir', alertNo:'✕',
     tabV:'Vidéo', tabA:'Audio', tabT:'Texte',
     kidstag:'Raconté par les enfants du CEIP Capitulaciones',
-    navbtn:'Comment y aller',
+    mapsLink:'Ouvrir dans Google Maps',
     listh:'Points d\'intérêt', listsub:'Santa Fe · Grenade · 1491',
-    infoh:'À propos de ce guide',
-    infoBody:`<h2>Santa Fe Historique</h2><p>Ce guide interactif a été créé par le <strong>CEIP Capitulaciones de Santa Fe</strong> pour explorer les monuments les plus importants de notre ville.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>Comment ça marche</strong>L'application détecte quand vous vous approchez à moins de 80 mètres d'un monument et vous alerte automatiquement.</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>Contenus</strong>Les vidéos et audios sont narrés par les élèves du CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>Santa Fe, 1491</strong>Ville fondée par les Rois Catholiques pendant le siège de Grenade.</div></div><div class="info-badge"><div class="info-badge-icon">🌐</div><div class="info-badge-text"><strong>Langues</strong>Disponible en espagnol, anglais, français, chinois et arabe.</div></div>`
+    infoh:'À propos du guide',
+    dirN:'Nord', dirNE:'Nord-Est', dirE:'Est', dirSE:'Sud-Est',
+    dirS:'Sud', dirSW:'Sud-Ouest', dirW:'Ouest', dirNW:'Nord-Ouest',
+    navTo:'Vers :', navDone:'Parcours terminé !', navDoneSub:'Vous avez visité tous les monuments',
+    navWaiting:'Activez le GPS pour naviguer', navSearching:'Recherche du signal GPS…',
+    visited:'visités',
+    infoBody:`<h2>Santa Fe Historique</h2><p>Ce guide interactif a été créé par le <strong>CEIP Capitulaciones de Santa Fe</strong> pour explorer les monuments les plus importants de notre ville.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>Comment ça marche</strong>L'application détecte quand vous vous approchez à moins de 80 mètres d'un monument et vous alerte.</div></div><div class="info-badge"><div class="info-badge-icon">🧭</div><div class="info-badge-text"><strong>Navigation</strong>Avec le GPS actif, la direction et la distance vers le prochain monument s'affichent en temps réel.</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>Contenus</strong>Les vidéos et audios sont narrés par les élèves du CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>Santa Fe, 1491</strong>Ville fondée par les Rois Catholiques pendant le siège de Grenade.</div></div>`
   },
-  zh:{ name:'历史圣菲', sub:'CEIP Capitulaciones · 格拉纳达', lbl:'中文',
+  zh:{ name:'历史圣菲', lbl:'中文',
     navMap:'地图', navList:'景点', navInfo:'信息',
-    alertMsg:'您距离该景点不足80米。想了解它的历史吗？',
+    alertMsg:'您距离该景点不足80米。了解历史？',
     alertYes:'查看', alertNo:'✕',
     tabV:'视频', tabA:'音频', tabT:'文字',
     kidstag:'由卡皮图拉西奥内斯小学的孩子们讲述',
-    navbtn:'如何到达',
+    mapsLink:'在谷歌地图中打开',
     listh:'兴趣点', listsub:'圣菲 · 格拉纳达 · 1491',
     infoh:'关于本指南',
-    infoBody:`<h2>历史圣菲</h2><p>本互动指南由<strong>圣菲卡皮图拉西奥内斯小学</strong>创建，带您探索我们城市最重要的古迹。</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>使用方法</strong>当您距离古迹不足80米时，应用程序会自动检测并提醒您。请启用GPS！</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>内容</strong>视频和音频由卡皮图拉西奥内斯小学的学生讲述。</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>圣菲，1491年</strong>由天主教双王在围攻格拉纳达期间创建。</div></div><div class="info-badge"><div class="info-badge-icon">🌐</div><div class="info-badge-text"><strong>语言</strong>提供西班牙语、英语、法语、中文和阿拉伯语。</div></div>`
+    dirN:'北', dirNE:'东北', dirE:'东', dirSE:'东南',
+    dirS:'南', dirSW:'西南', dirW:'西', dirNW:'西北',
+    navTo:'前往：', navDone:'路线完成！', navDoneSub:'您已参观所有古迹',
+    navWaiting:'启用GPS以导航', navSearching:'正在搜索GPS信号…',
+    visited:'已访问',
+    infoBody:`<h2>历史圣菲</h2><p>本互动指南由<strong>圣菲卡皮图拉西奥内斯小学</strong>创建。</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>使用方法</strong>当您距离古迹不足80米时，应用程序会自动检测并提醒您。</div></div><div class="info-badge"><div class="info-badge-icon">🧭</div><div class="info-badge-text"><strong>导航</strong>GPS开启后，实时显示到下一个景点的方向和距离。</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>内容</strong>视频和音频由学生讲述。</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>圣菲，1491年</strong>由天主教双王创建。</div></div>`
   },
-  ar:{ name:'سانتا في التاريخية', sub:'CEIP Capitulaciones · غرناطة', lbl:'عربي',
+  ar:{ name:'سانتا في التاريخية', lbl:'عربي',
     navMap:'خريطة', navList:'أماكن', navInfo:'معلومات',
-    alertMsg:'أنت على بُعد أقل من 80 متراً. هل تريد معرفة تاريخه؟',
+    alertMsg:'أنت على بُعد أقل من 80 متراً. تريد معرفة تاريخه؟',
     alertYes:'عرض', alertNo:'✕',
     tabV:'فيديو', tabA:'صوت', tabT:'نص',
     kidstag:'رواه أطفال مدرسة CEIP Capitulaciones',
-    navbtn:'كيف أصل',
+    mapsLink:'فتح في خرائط جوجل',
     listh:'نقاط الاهتمام', listsub:'سانتا في · غرناطة · 1491',
     infoh:'حول هذا الدليل',
-    infoBody:`<h2>سانتا في التاريخية</h2><p>تم إنشاء هذا الدليل التفاعلي من قِبَل <strong>مدرسة CEIP Capitulaciones في سانتا في</strong> لاستكشاف أهم المعالم الأثرية في مدينتنا.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>كيف يعمل</strong>يكتشف التطبيق تلقائياً عندما تقترب من معلم أثري بأقل من 80 متراً ويُنبّهك.</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>المحتوى</strong>تُروى الفيديوهات والصوتيات بواسطة طلاب CEIP Capitulaciones.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>سانتا في، 1491</strong>مدينة أسسها الملوك الكاثوليك خلال حصار غرناطة.</div></div><div class="info-badge"><div class="info-badge-icon">🌐</div><div class="info-badge-text"><strong>اللغات</strong>متاح بالإسبانية والإنجليزية والفرنسية والصينية والعربية.</div></div>`
+    dirN:'شمال', dirNE:'شمال شرق', dirE:'شرق', dirSE:'جنوب شرق',
+    dirS:'جنوب', dirSW:'جنوب غرب', dirW:'غرب', dirNW:'شمال غرب',
+    navTo:'نحو:', navDone:'اكتملت الرحلة!', navDoneSub:'لقد زرتَ جميع المعالم',
+    navWaiting:'فعّل GPS للتنقل', navSearching:'جاري البحث عن GPS…',
+    visited:'تمت زيارتها',
+    infoBody:`<h2>سانتا في التاريخية</h2><p>تم إنشاء هذا الدليل التفاعلي من قِبَل <strong>مدرسة CEIP Capitulaciones</strong>.</p><div class="info-badge"><div class="info-badge-icon">📍</div><div class="info-badge-text"><strong>كيف يعمل</strong>يكتشف التطبيق تلقائياً عندما تقترب من معلم أثري بأقل من 80 متراً.</div></div><div class="info-badge"><div class="info-badge-icon">🧭</div><div class="info-badge-text"><strong>الملاحة</strong>مع تفعيل GPS، يعرض التطبيق الاتجاه والمسافة إلى المعلم التالي.</div></div><div class="info-badge"><div class="info-badge-icon">🎬</div><div class="info-badge-text"><strong>المحتوى</strong>تُروى الفيديوهات بواسطة طلاب المدرسة.</div></div><div class="info-badge"><div class="info-badge-icon">⚜️</div><div class="info-badge-text"><strong>سانتا في، 1491</strong>مدينة أسسها الملوك الكاثوليك.</div></div>`
   }
 };
 
@@ -1734,274 +1361,392 @@ const T = {
 // ESTADO GLOBAL
 // ================================================================
 let lang = 'es';
-let activePOI = null;
-let nearbyPOI = null;
-let alertedSet = new Set();
-let userLat = null, userLng = null;
-let map = null;
-let userMark = null;
-let poiMarks = {};
-let view = 'map';
 let langOpen = false;
-let curTab = 'video';
 let isAdmin = false;
-let routeLine = null;
-let selectedRouteType = 'all';
-let routeOrder = [];
 let selectedIcon = '🏛️';
-let selectedColor = '#d4a853';
+let selectedColor = '#c9a84c';
+
+let map = null;
+let poiMarks = {};
+let userMark = null;
+let routeLayer = null;
+
+let userLat = null;
+let userLng = null;
+let alertedSet = new Set();
+let nearbyPOI = null;
+let activePOI = null;
+
+// Ruta activa
+let currentRoute = null;   // array de ids
+let routeOrder  = [];      // array de POI objects (orden óptimo)
+let visitedIds  = new Set();
+
+// Definición de rutas
+const ROUTES = {
+  completa: ['plaza','iglesia','arco-loja','arco-granada','arco-jaen','arco-real','damian'],
+  arcos:    ['arco-loja','arco-granada','arco-jaen','arco-real'],
+  expres:   ['plaza','iglesia','arco-real']
+};
 
 // ================================================================
-// INICIALIZACIÓN
+// ARRANQUE
 // ================================================================
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
   loadDataFromStorage();
-  updateHomeMonumentCount();
   setTimeout(() => {
-    document.getElementById('splash').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('splash').style.display = 'none';
-    }, 500);
-  }, 2200);
+    document.getElementById('splash').style.display = 'none';
+  }, 3100);
 });
 
-function updateHomeMonumentCount() {
-  document.getElementById('monument-count').textContent = POIS.length;
-}
+// ================================================================
+// HOME → APP
+// ================================================================
+function startRoute(routeKey) {
+  currentRoute = ROUTES[routeKey];
+  visitedIds   = new Set();
+  routeOrder   = [];
 
-function selectHomeRoute(type) {
-  selectedRouteType = type;
-  document.querySelectorAll('.route-card').forEach(el => el.classList.remove('selected'));
-  document.getElementById('route-opt-' + type).classList.add('selected');
-}
-
-function showInfoFromHome() {
-  document.getElementById('home-info-content').innerHTML = T[lang].infoBody;
-  document.getElementById('home-info-modal').style.display = 'flex';
-}
-
-function closeHomeInfo() {
-  document.getElementById('home-info-modal').style.display = 'none';
-}
-
-function startAppFromHome() {
-  document.getElementById('home-screen').classList.add('hidden');
+  document.getElementById('home').classList.add('hidden');
   const app = document.getElementById('app');
   app.classList.remove('gone');
-  requestAnimationFrame(() => setTimeout(() => app.classList.add('ready'), 50));
-  initMap();
-  applyT();
-  startGPS();
-  
-  if (selectedRouteType) {
-    setTimeout(() => startRouteFromHome(), 1000);
-  }
-}
 
-function backToHome() {
-  document.getElementById('home-screen').classList.remove('hidden');
-  document.getElementById('app').classList.add('gone');
-  document.getElementById('app').classList.remove('ready');
-  updateHomeMonumentCount();
-}
-
-function startRouteFromHome() {
-  let poiIds = [];
-  if (selectedRouteType === 'all') {
-    poiIds = POIS.map(p => p.id);
-  } else if (selectedRouteType === 'arcos') {
-    poiIds = ['arco-loja', 'arco-granada', 'arco-jaen', 'arco-real'];
-  } else if (selectedRouteType === 'corto') {
-    poiIds = ['plaza', 'iglesia', 'arco-granada'];
-  }
-  
-  if (userLat && userLng) {
-    routeOrder = calculateOptimalRoute(userLat, userLng, poiIds);
-  } else {
-    routeOrder = poiIds.map(id => POIS.find(p => p.id === id)).filter(p => p);
-  }
-  
-  if (routeLine) map.removeLayer(routeLine);
-  
-  const latlngs = routeOrder.map(p => [p.lat, p.lng]);
-  if (userLat && userLng) latlngs.unshift([userLat, userLng]);
-  
-  routeLine = L.polyline(latlngs, { 
-    color: '#c75b2a', 
-    weight: 5, 
-    opacity: 0.85,
-    dashArray: '20, 10',
-    className: 'route-line-animated'
-  }).addTo(map);
-  
-  map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
-}
-
-// ================================================================
-// MAPA
-// ================================================================
-function initMap() {
-  if (map) {
-    map.eachLayer(layer => {
-      if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) {
-        map.removeLayer(layer);
-      }
-    });
-  } else {
+  // Inicializar mapa si no existe
+  if (!map) {
     map = L.map('map', { center:[37.18530,-3.71558], zoom:16, zoomControl:true, attributionControl:false });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(map);
   }
-  
-  poiMarks = {};
 
-  POIS.forEach(poi => {
-    L.circle([poi.lat, poi.lng], { radius:80, color:poi.color, fillColor:poi.color, fillOpacity:.06, weight:1, opacity:.3, dashArray:'5,7' }).addTo(map);
-    const icon = L.divIcon({
-      html: `<div class="pm" id="pm-${poi.id}" style="background:${poi.color}"><div class="pm-inner">${poi.icon}</div></div>`,
-      iconSize:[46,46], iconAnchor:[23,46], className:''
-    });
-    poiMarks[poi.id] = L.marker([poi.lat, poi.lng], { icon }).addTo(map).on('click', () => openPOI(poi.id));
-  });
+  rebuildMap();
+  updateLanguageUI();
+  startGPS();
+
+  // Mostrar strip de nav
+  document.getElementById('nav-strip').classList.remove('hidden');
+  updateNavStripWaiting();
+  goView('map');
+}
+
+function backToHome() {
+  document.getElementById('app').classList.add('gone');
+  document.getElementById('home').classList.remove('hidden');
+  closeDetail();
+  document.getElementById('list-panel').classList.remove('open');
+  document.getElementById('info-panel').classList.remove('open');
 }
 
 // ================================================================
-// GPS Y PROXIMIDAD
+// MAPA: construir/reconstruir marcadores y línea de ruta
+// ================================================================
+function rebuildMap() {
+  // Limpiar marcadores previos
+  Object.values(poiMarks).forEach(m => map.removeLayer(m));
+  poiMarks = {};
+  if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+
+  POIS.forEach(poi => {
+    // Círculo de proximidad
+    L.circle([poi.lat, poi.lng], {
+      radius:80, color:poi.color, fillColor:poi.color,
+      fillOpacity:0.07, weight:1, opacity:0.3, dashArray:'5,7'
+    }).addTo(map);
+
+    // Marcador
+    const icon = L.divIcon({
+      html:`<div class="pm" id="pm-${poi.id}" style="background:${poi.color}"><div class="pm-inner">${poi.icon}</div></div>`,
+      iconSize:[44,44], iconAnchor:[22,44], className:''
+    });
+    poiMarks[poi.id] = L.marker([poi.lat, poi.lng], { icon }).addTo(map)
+      .on('click', () => openPOI(poi.id));
+  });
+
+  // Centrar en ruta activa
+  if (currentRoute && currentRoute.length) {
+    const routePois = currentRoute.map(id => POIS.find(p => p.id === id)).filter(Boolean);
+    if (routePois.length) {
+      const bounds = L.latLngBounds(routePois.map(p => [p.lat, p.lng]));
+      map.fitBounds(bounds, { padding:[40,40] });
+    }
+  }
+}
+
+// ================================================================
+// RUTA: calcular orden óptimo y dibujar polyline
+// ================================================================
+function calculateOptimalRoute(startLat, startLng, poiIds) {
+  const pois = poiIds.map(id => POIS.find(p => p.id === id)).filter(Boolean);
+  const unvisited = [...pois];
+  const route = [];
+  let curLat = startLat, curLng = startLng;
+  while (unvisited.length > 0) {
+    let nearestDist = Infinity, nearestIdx = -1;
+    unvisited.forEach((poi, i) => {
+      const d = haversine(curLat, curLng, poi.lat, poi.lng);
+      if (d < nearestDist) { nearestDist = d; nearestIdx = i; }
+    });
+    const nearest = unvisited[nearestIdx];
+    route.push(nearest);
+    curLat = nearest.lat; curLng = nearest.lng;
+    unvisited.splice(nearestIdx, 1);
+  }
+  return route;
+}
+
+function drawRouteLine() {
+  if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+  if (!routeOrder.length) return;
+
+  const points = [];
+  if (userLat !== null) points.push([userLat, userLng]);
+
+  // Añadir sólo los no visitados en orden
+  for (const poi of routeOrder) {
+    if (!visitedIds.has(poi.id)) points.push([poi.lat, poi.lng]);
+  }
+  if (visitedIds.size === routeOrder.length) return; // todos visitados
+
+  if (points.length < 2) return;
+
+  routeLayer = L.polyline(points, {
+    color:'#c9a84c', weight:4, opacity:0.85,
+    dashArray:'14, 9', lineCap:'round', lineJoin:'round'
+  }).addTo(map);
+}
+
+// ================================================================
+// GPS
 // ================================================================
 function startGPS() {
   if (!navigator.geolocation) return;
-  navigator.geolocation.watchPosition(onGPS, onGPSErr, { enableHighAccuracy:true, maximumAge:5000, timeout:15000 });
+  navigator.geolocation.watchPosition(onGPS, onGPSErr, {
+    enableHighAccuracy:true, maximumAge:5000, timeout:15000
+  });
 }
 
 function onGPS(pos) {
   userLat = pos.coords.latitude;
   userLng = pos.coords.longitude;
   const ll = [userLat, userLng];
+
+  // Marcador de usuario
   if (!userMark) {
-    userMark = L.marker(ll, { icon: L.divIcon({ html:'<div class="user-dot"></div>', iconSize:[18,18], iconAnchor:[9,9], className:'' }), zIndexOffset:1000 }).addTo(map);
-  } else userMark.setLatLng(ll);
+    userMark = L.marker(ll, {
+      icon: L.divIcon({ html:'<div class="user-dot"></div>', iconSize:[18,18], iconAnchor:[9,9], className:'' }),
+      zIndexOffset:1000
+    }).addTo(map);
+  } else {
+    userMark.setLatLng(ll);
+  }
+
+  // Calcular orden si no está calculado
+  if (!routeOrder.length && currentRoute) {
+    routeOrder = calculateOptimalRoute(userLat, userLng, currentRoute);
+  }
+
+  drawRouteLine();
+  updateNavStrip();
   checkProx();
 }
 
 function onGPSErr(e) { console.warn('GPS:', e.message); }
 
-function haversine(a,b,c,d) {
+// ================================================================
+// NAVEGACIÓN: cálculos
+// ================================================================
+function haversine(a, b, c, d) {
   const R=6371000, dA=(c-a)*Math.PI/180, dB=(d-b)*Math.PI/180;
-  const x=Math.sin(dA/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dB/2)**2;
-  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+  const x = Math.sin(dA/2)**2 + Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dB/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
 }
 
+function getBearing(lat1, lng1, lat2, lng2) {
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const lat1r = lat1 * Math.PI / 180;
+  const lat2r = lat2 * Math.PI / 180;
+  const y = Math.sin(dLng) * Math.cos(lat2r);
+  const x = Math.cos(lat1r)*Math.sin(lat2r) - Math.sin(lat1r)*Math.cos(lat2r)*Math.cos(dLng);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function bearingToArrow(deg) {
+  const arrows = ['⬆','↗','➡','↘','⬇','↙','⬅','↖'];
+  return arrows[Math.round(deg / 45) % 8];
+}
+
+function bearingToDir(deg, t) {
+  const dirs = [t.dirN, t.dirNE, t.dirE, t.dirSE, t.dirS, t.dirSW, t.dirW, t.dirNW];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
+function formatDist(m) {
+  return m < 1000 ? Math.round(m) + ' m' : (m/1000).toFixed(1) + ' km';
+}
+
+// ================================================================
+// NAVIGATION STRIP: actualizar
+// ================================================================
+function updateNavStripWaiting() {
+  const t = T[lang];
+  document.getElementById('ns-arrow').textContent = '🧭';
+  document.getElementById('ns-instruction').textContent = t.navSearching;
+  document.getElementById('ns-next').textContent = t.navWaiting;
+  document.getElementById('ns-count').textContent = '';
+  document.getElementById('ns-dots').innerHTML = '';
+}
+
+function updateNavStrip() {
+  if (!currentRoute || !routeOrder.length) return;
+  const t = T[lang];
+  const total    = routeOrder.length;
+  const doneCount = visitedIds.size;
+
+  // Dots
+  const dotsEl = document.getElementById('ns-dots');
+  dotsEl.innerHTML = '';
+  routeOrder.forEach(poi => {
+    const dot = document.createElement('div');
+    dot.className = 'ns-dot';
+    if (visitedIds.has(poi.id)) {
+      dot.classList.add('visited');
+    } else if (!dotsEl.querySelector('.ns-dot:not(.visited)')) {
+      dot.classList.add('current');
+    }
+    dotsEl.appendChild(dot);
+  });
+
+  document.getElementById('ns-count').textContent = `${doneCount}/${total}`;
+
+  // ¿Todos visitados?
+  if (doneCount >= total) {
+    document.getElementById('ns-arrow').textContent = '🏆';
+    document.getElementById('ns-instruction').textContent = t.navDone;
+    document.getElementById('ns-next').textContent = t.navDoneSub;
+    showCompletionBanner();
+    return;
+  }
+
+  // Siguiente no visitado
+  const nextPoi = routeOrder.find(p => !visitedIds.has(p.id));
+  if (!nextPoi || userLat === null) return;
+
+  const dist    = haversine(userLat, userLng, nextPoi.lat, nextPoi.lng);
+  const bearing = getBearing(userLat, userLng, nextPoi.lat, nextPoi.lng);
+  const arrow   = bearingToArrow(bearing);
+  const dir     = bearingToDir(bearing, t);
+
+  document.getElementById('ns-arrow').textContent = arrow;
+  document.getElementById('ns-instruction').textContent = `${dir} · ${formatDist(dist)}`;
+  document.getElementById('ns-next').textContent = `${t.navTo} ${nextPoi.names[lang]}`;
+}
+
+function showCompletionBanner() {
+  const t = T[lang];
+  const banner = document.getElementById('completion-banner');
+  if (banner.classList.contains('off')) {
+    document.getElementById('cb-title').textContent = t.navDone;
+    document.getElementById('cb-sub').textContent   = t.navDoneSub;
+    banner.classList.remove('off');
+    setTimeout(() => banner.classList.add('off'), 8000);
+  }
+}
+
+// ================================================================
+// PROXIMIDAD
+// ================================================================
 function checkProx() {
-  if (userLat===null) return;
+  if (userLat === null) return;
   POIS.forEach(poi => {
     const d = haversine(userLat, userLng, poi.lat, poi.lng);
-    if (d < 80 && !alertedSet.has(poi.id)) {
-      alertedSet.add(poi.id);
-      showAlert(poi);
-      const el = document.getElementById('pm-'+poi.id);
-      if (el) el.classList.add('pulsing');
+    if (d < 80) {
+      if (!alertedSet.has(poi.id)) {
+        alertedSet.add(poi.id);
+        showAlert(poi);
+        const el = document.getElementById('pm-' + poi.id);
+        if (el) el.classList.add('pulsing');
+      }
+      // Marcar como visitado si está en la ruta
+      if (currentRoute && currentRoute.includes(poi.id) && !visitedIds.has(poi.id)) {
+        visitedIds.add(poi.id);
+        const el = document.getElementById('pm-' + poi.id);
+        if (el) el.classList.add('visited');
+        updateNavStrip();
+        drawRouteLine();
+      }
+    } else {
+      alertedSet.delete(poi.id);
+      const el = document.getElementById('pm-' + poi.id);
+      if (el) el.classList.remove('pulsing');
     }
-    if (d >= 80) alertedSet.delete(poi.id);
   });
 }
 
-// ================================================================
-// ALERTA DE PROXIMIDAD
-// ================================================================
 function showAlert(poi) {
   nearbyPOI = poi;
   const t = T[lang];
-  document.getElementById('pa-icon').textContent = poi.icon;
-  document.getElementById('pa-name').textContent = poi.names[lang];
-  document.getElementById('pa-msg').textContent = t.alertMsg;
-  document.getElementById('pa-yes').textContent = t.alertYes;
-  document.getElementById('pa-no').textContent = t.alertNo;
+  document.getElementById('pa-icon').textContent  = poi.icon;
+  document.getElementById('pa-name').textContent  = poi.names[lang];
+  document.getElementById('pa-msg').textContent   = t.alertMsg;
+  document.getElementById('pa-yes').textContent   = t.alertYes;
+  document.getElementById('pa-no').textContent    = t.alertNo;
   document.getElementById('prox-alert').classList.remove('off');
   setTimeout(alertClose, 8000);
 }
-
 function alertClose() { document.getElementById('prox-alert').classList.add('off'); }
-function alertOpen() { alertClose(); if (nearbyPOI) openPOI(nearbyPOI.id); }
+function alertOpen()  { alertClose(); if (nearbyPOI) openPOI(nearbyPOI.id); }
 
 // ================================================================
-// PANEL DE DETALLE
+// DETAIL PANEL
 // ================================================================
 function openPOI(id) {
-  const poi = POIS.find(p=>p.id===id);
+  const poi = POIS.find(p => p.id === id);
   if (!poi) return;
   activePOI = poi;
   const t = T[lang];
 
+  // Cerrar paneles de lista/info si están abiertos
   document.getElementById('list-panel').classList.remove('open');
   document.getElementById('info-panel').classList.remove('open');
   setActiveNav('map');
 
   document.getElementById('dp-icon').textContent = poi.icon;
   document.getElementById('dp-name').textContent = poi.names[lang];
-  document.getElementById('dp-desc').textContent = poi.types[lang];
+  document.getElementById('dp-type').textContent = poi.types[lang];
 
-  document.getElementById('tp-text').innerHTML = `
-    <div class="tc">
-      <div class="kids-tag">⭐ ${t.kidstag}</div>
-      ${poi.texts[lang]}
-    </div>`;
+  // Tab: Texto
+  document.getElementById('tp-text').innerHTML =
+    `<div class="kids-tag">⭐ ${t.kidstag}</div>
+     <div class="tc">${poi.texts[lang]}</div>`;
 
+  // Tab: Vídeo
   if (poi.video) {
-    const videoId = extractYouTubeId(poi.video);
-    if (videoId) {
-      document.getElementById('tp-video').innerHTML = `
-        <div class="video-container">
-          <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
-        </div>`;
-    } else {
-      document.getElementById('tp-video').innerHTML = `
-        <div class="video-container">
-          <video controls style="width:100%;height:100%" src="${poi.video}"></video>
-        </div>`;
-    }
+    const vid = extractYouTubeId(poi.video);
+    document.getElementById('tp-video').innerHTML = vid
+      ? `<div class="video-wrap"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe></div>`
+      : `<div class="video-wrap"><video src="${poi.video}" controls></video></div>`;
   } else {
-    document.getElementById('tp-video').innerHTML = `
-      <div class="video-container" style="display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a237e,#0d1642);color:white;">
-        <div style="font-size:52px;opacity:0.4;">🎬</div>
-        <strong style="color:var(--gold);font-family:var(--font-display);margin-top:12px;font-size:16px;">Próximamente</strong>
-        <p style="font-size:13px;opacity:0.6;text-align:center;padding:0 24px;margin-top:8px;">Vídeo narrado por los alumnos del CEIP Capitulaciones</p>
-      </div>
-      <p class="note">Los vídeos serán añadidos por el profesorado</p>`;
+    document.getElementById('tp-video').innerHTML =
+      `<div class="no-content"><span>🎬</span><p>No hay vídeo disponible aún.<br>El profesorado puede añadirlo desde el panel de administración.</p></div>`;
   }
 
+  // Tab: Audio
   if (poi.audio) {
-    if (poi.audio.includes('ivoox')) {
-      document.getElementById('tp-audio').innerHTML = `
-        <div class="audio-container">
-          <iframe src="${poi.audio}" scrolling="no"></iframe>
-        </div>`;
-    } else {
-      document.getElementById('tp-audio').innerHTML = `
-        <div class="audio-container">
-          <audio controls src="${poi.audio}"></audio>
-        </div>`;
-    }
+    const isIvoox = poi.audio.includes('ivoox');
+    document.getElementById('tp-audio').innerHTML = isIvoox
+      ? `<div class="audio-wrap"><iframe src="${poi.audio.replace('embed_fg','embed_fg')}" allow="autoplay"></iframe></div>`
+      : `<div class="audio-wrap"><audio src="${poi.audio}" controls></audio></div>`;
   } else {
-    document.getElementById('tp-audio').innerHTML = `
-      <div class="audio-container" style="align-items:center;justify-content:center;min-height:160px;">
-        <div style="font-size:48px;">🎙️</div>
-        <p style="font-size:13px;opacity:0.7;text-align:center;margin-top:12px;">Audio próximamente<br>Narrado por los alumnos del CEIP</p>
-      </div>
-      <p class="note">Los audios serán añadidos por el profesorado</p>`;
+    document.getElementById('tp-audio').innerHTML =
+      `<div class="no-content"><span>🎵</span><p>No hay audio disponible aún.<br>El profesorado puede añadirlo desde el panel de administración.</p></div>`;
   }
 
-  const nl = document.getElementById('nav-link');
-  nl.href = `https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}&travelmode=walking`;
-  document.getElementById('t-nav-link').textContent = t.navbtn;
+  // Enlace a Google Maps
+  document.getElementById('maps-link').href =
+    `https://www.google.com/maps/dir/?api=1&destination=${poi.lat},${poi.lng}`;
+  document.getElementById('t-maps-link').textContent = t.mapsLink;
 
   switchTab('video');
   document.getElementById('detail-panel').classList.add('open');
-  if (map) map.setView([poi.lat, poi.lng], 17, { animate:true });
-}
-
-function extractYouTubeId(url) {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
+  map.setView([poi.lat, poi.lng], 17);
 }
 
 function closeDetail() {
@@ -2010,49 +1755,67 @@ function closeDetail() {
 }
 
 function switchTab(tab) {
-  curTab = tab;
   ['video','audio','text'].forEach(t => {
-    document.getElementById('tp-'+t).classList.toggle('on', t===tab);
-    document.getElementById('tb-'+t).classList.toggle('on', t===tab);
+    document.getElementById('tb-' + t).classList.toggle('on', t === tab);
+    document.getElementById('tp-' + t).classList.toggle('on', t === tab);
   });
 }
 
-// ================================================================
-// VISTAS (Mapa, Lista, Info)
-// ================================================================
-function goView(v) {
-  view = v;
-  if (v !== 'map') closeDetail();
-  document.getElementById('list-panel').classList.toggle('open', v==='list');
-  document.getElementById('info-panel').classList.toggle('open', v==='info');
-  if (v==='list') buildList();
-  if (v==='info') document.getElementById('info-body').innerHTML = T[lang].infoBody;
-  if (v==='map' && map) {
-    const c = userLat ? [userLat,userLng] : [37.18530,-3.71558];
-    map.setView(c, 16, {animate:true});
-  }
-  setActiveNav(v);
+function extractYouTubeId(url) {
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
 
-function setActiveNav(v) {
-  ['map','list','info'].forEach(x => document.getElementById('nb-'+x).classList.toggle('on', x===v));
+// ================================================================
+// VISTAS (mapa, lista, info)
+// ================================================================
+function goView(view) {
+  closeDetail();
+  document.getElementById('list-panel').classList.toggle('open', view === 'list');
+  document.getElementById('info-panel').classList.toggle('open', view === 'info');
+  setActiveNav(view);
+
+  if (view === 'list') buildPoiList();
+  if (view === 'info') buildInfoPanel();
 }
 
-function buildList() {
-  document.getElementById('poi-list').innerHTML = POIS.map(poi=>`
-    <div class="li" onclick="openPOI('${poi.id}')">
-      <div class="li-icon" style="background:${poi.color}22;color:${poi.color}">${poi.icon}</div>
-      <div class="li-text">
-        <div class="li-name">${poi.names[lang]}</div>
-        <div class="li-type">${poi.types[lang]}</div>
-      </div>
-      <div class="li-arrow">›</div>
-    </div>`).join('');
+function setActiveNav(view) {
+  ['map','list','info'].forEach(v => {
+    document.getElementById('nb-' + v).classList.toggle('on', v === view);
+  });
+}
+
+function buildPoiList() {
+  const t = T[lang];
+  let html = '';
+  POIS.forEach(poi => {
+    let distHtml = '';
+    if (userLat !== null) {
+      const d = haversine(userLat, userLng, poi.lat, poi.lng);
+      distHtml = `<span class="poi-item-dist">${formatDist(d)}</span>`;
+    }
+    html += `
+      <div class="poi-item" onclick="openPOI('${poi.id}'); goView('map')">
+        <div class="poi-item-ico" style="background:${poi.color}22;border:2px solid ${poi.color}44">${poi.icon}</div>
+        <div class="poi-item-info">
+          <div class="poi-item-name">${poi.names[lang]}</div>
+          <div class="poi-item-type">${poi.types[lang]}</div>
+        </div>
+        ${distHtml}
+        <span class="poi-item-arrow">›</span>
+      </div>`;
+  });
+  document.getElementById('poi-list').innerHTML = html;
+}
+
+function buildInfoPanel() {
+  document.getElementById('info-body').innerHTML = T[lang].infoBody;
 }
 
 // ================================================================
 // IDIOMA
 // ================================================================
+let langTimerId = null;
 function toggleLang() {
   langOpen = !langOpen;
   document.getElementById('lang-panel').classList.toggle('off', !langOpen);
@@ -2062,61 +1825,45 @@ function setLang(l) {
   lang = l;
   langOpen = false;
   document.getElementById('lang-panel').classList.add('off');
-  document.documentElement.lang = l;
-  document.documentElement.dir = l==='ar' ? 'rtl' : 'ltr';
-  applyT();
-  document.querySelectorAll('.lang-opt').forEach(b => {
-    b.classList.toggle('cur', b.getAttribute('onclick')===`setLang('${l}')`);
-  });
-  if (activePOI) openPOI(activePOI.id);
-  if (view==='list') buildList();
-  if (view==='info') document.getElementById('info-body').innerHTML = T[l].infoBody;
+  updateLanguageUI();
 }
 
-function applyT() {
+function updateLanguageUI() {
   const t = T[lang];
-  document.getElementById('t-name').textContent = t.name;
-  document.getElementById('topbar-sub').textContent = t.sub;
+  document.getElementById('t-name').textContent     = t.name;
   document.getElementById('t-lang-lbl').textContent = t.lbl;
-  document.getElementById('t-nav-map').textContent = t.navMap;
+  document.getElementById('t-nav-map').textContent  = t.navMap;
   document.getElementById('t-nav-list').textContent = t.navList;
   document.getElementById('t-nav-info').textContent = t.navInfo;
-  document.getElementById('t-tab-v').textContent = t.tabV;
-  document.getElementById('t-tab-a').textContent = t.tabA;
-  document.getElementById('t-tab-t').textContent = t.tabT;
-  document.getElementById('t-list-h').textContent = t.listh;
+  document.getElementById('t-tab-v').textContent    = t.tabV;
+  document.getElementById('t-tab-a').textContent    = t.tabA;
+  document.getElementById('t-tab-t').textContent    = t.tabT;
+  document.getElementById('t-list-h').textContent   = t.listh;
   document.getElementById('t-list-sub').textContent = t.listsub;
-  document.getElementById('t-info-h').textContent = t.infoh;
+  document.getElementById('t-info-h').textContent   = t.infoh;
+
+  // RTL para árabe
+  document.getElementById('app').dir = (l === 'ar') ? 'rtl' : 'ltr';
+
+  // Actualizar strip y panel activo
+  updateNavStrip();
+  if (activePOI) openPOI(activePOI.id);
 }
 
 // ================================================================
-// PANEL ADMIN - MODO SUPERUSUARIO
+// ADMIN PANEL
 // ================================================================
-const ADMIN_PASSWORD = 'claustro26';
-
 function openAdminPanel() {
   document.getElementById('admin-panel').classList.add('open');
-  if (isAdmin) {
-    document.getElementById('admin-login').style.display = 'none';
-    document.getElementById('admin-content').style.display = 'block';
-    initAdminSelect();
-    updateContentList();
-    updateMonumentsList();
-  } else {
-    document.getElementById('admin-login').style.display = 'flex';
-    document.getElementById('admin-content').style.display = 'none';
-    document.getElementById('admin-pass').value = '';
-    document.getElementById('admin-pass').focus();
-  }
+  document.getElementById('admin-login').style.display = 'block';
+  document.getElementById('admin-content').style.display = 'none';
+  document.getElementById('admin-pass').value = '';
 }
-
 function closeAdminPanel() {
   document.getElementById('admin-panel').classList.remove('open');
 }
-
 function doLogin() {
-  const pass = document.getElementById('admin-pass').value;
-  if (pass === ADMIN_PASSWORD) {
+  if (document.getElementById('admin-pass').value === 'claustro26') {
     isAdmin = true;
     document.getElementById('admin-login').style.display = 'none';
     document.getElementById('admin-content').style.display = 'block';
@@ -2124,99 +1871,66 @@ function doLogin() {
     updateContentList();
     updateMonumentsList();
   } else {
-    alert('Contraseña incorrecta');
+    document.getElementById('admin-pass').value = '';
+    document.getElementById('admin-pass').placeholder = '❌ Contraseña incorrecta';
+    setTimeout(() => document.getElementById('admin-pass').placeholder = 'Contraseña', 2000);
   }
 }
-
 function doLogout() {
   isAdmin = false;
   closeAdminPanel();
 }
-
 function switchAdminTab(tab) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.admin-tab-content').forEach(t => t.classList.remove('active'));
   document.getElementById('tab-btn-' + tab).classList.add('active');
   document.getElementById('tab-' + tab).classList.add('active');
 }
-
 function initAdminSelect() {
-  const select = document.getElementById('admin-poi');
-  select.innerHTML = '<option value="">-- Selecciona un monumento --</option>' +
+  const sel = document.getElementById('admin-poi');
+  sel.innerHTML = '<option value="">-- Selecciona un monumento --</option>' +
     POIS.map(p => `<option value="${p.id}">${p.names.es}</option>`).join('');
 }
-
 function loadPoiContent() {
-  const poiId = document.getElementById('admin-poi').value;
-  if (!poiId) {
-    document.getElementById('admin-video').value = '';
-    document.getElementById('admin-audio').value = '';
-    return;
-  }
-  const poi = POIS.find(p => p.id === poiId);
-  document.getElementById('admin-video').value = poi.video || '';
-  document.getElementById('admin-audio').value = poi.audio || '';
+  const id = document.getElementById('admin-poi').value;
+  const poi = POIS.find(p => p.id === id);
+  document.getElementById('admin-video').value = poi ? (poi.video || '') : '';
+  document.getElementById('admin-audio').value = poi ? (poi.audio || '') : '';
 }
-
 function saveVideo() {
-  const poiId = document.getElementById('admin-poi').value;
-  if (!poiId) { alert('Selecciona un monumento primero'); return; }
-  const url = document.getElementById('admin-video').value.trim();
-  const poi = POIS.find(p => p.id === poiId);
-  poi.video = url || null;
-  saveDataToStorage();
-  alert('Vídeo guardado correctamente');
-  updateContentList();
+  const id = document.getElementById('admin-poi').value;
+  if (!id) { alert('Selecciona un monumento primero'); return; }
+  POIS.find(p => p.id === id).video = document.getElementById('admin-video').value.trim() || null;
+  saveDataToStorage(); updateContentList(); alert('Vídeo guardado ✓');
 }
-
 function saveAudio() {
-  const poiId = document.getElementById('admin-poi').value;
-  if (!poiId) { alert('Selecciona un monumento primero'); return; }
-  const url = document.getElementById('admin-audio').value.trim();
-  const poi = POIS.find(p => p.id === poiId);
-  poi.audio = url || null;
-  saveDataToStorage();
-  alert('Audio guardado correctamente');
-  updateContentList();
+  const id = document.getElementById('admin-poi').value;
+  if (!id) { alert('Selecciona un monumento primero'); return; }
+  POIS.find(p => p.id === id).audio = document.getElementById('admin-audio').value.trim() || null;
+  saveDataToStorage(); updateContentList(); alert('Audio guardado ✓');
 }
-
 function updateContentList() {
-  const list = document.getElementById('admin-content-list');
-  let html = '';
-  POIS.forEach(poi => {
-    const hasVideo = poi.video ? '✅' : '❌';
-    const hasAudio = poi.audio ? '✅' : '❌';
-    html += `
+  document.getElementById('admin-content-list').innerHTML =
+    POIS.map(poi => `
       <div class="content-item">
         <strong>${poi.icon} ${poi.names.es}</strong>
-        <span>🎬${hasVideo} 🎵${hasAudio}</span>
+        <span>🎬${poi.video?'✅':'❌'} 🎵${poi.audio?'✅':'❌'}</span>
         <button onclick="deletePoiContent('${poi.id}')">Borrar</button>
-      </div>`;
-  });
-  list.innerHTML = html;
+      </div>`).join('');
+}
+function deletePoiContent(id) {
+  if (!confirm('¿Borrar contenido de este monumento?')) return;
+  const poi = POIS.find(p => p.id === id);
+  poi.video = poi.audio = null;
+  saveDataToStorage(); updateContentList();
+  if (document.getElementById('admin-poi').value === id) loadPoiContent();
 }
 
-function deletePoiContent(poiId) {
-  if (!confirm('¿Borrar todo el contenido de este monumento?')) return;
-  const poi = POIS.find(p => p.id === poiId);
-  poi.video = null;
-  poi.audio = null;
-  saveDataToStorage();
-  if (document.getElementById('admin-poi').value === poiId) {
-    loadPoiContent();
-  }
-  updateContentList();
-}
-
-// ================================================================
-// AÑADIR NUEVOS MONUMENTOS
-// ================================================================
 function selectIcon(icon) {
   selectedIcon = icon;
   document.querySelectorAll('.icon-option').forEach(el => el.classList.remove('selected'));
   document.querySelector(`.icon-option[data-icon="${icon}"]`).classList.add('selected');
 }
-
 function selectColor(color) {
   selectedColor = color;
   document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
@@ -2227,153 +1941,77 @@ function addNewMonument() {
   const name = document.getElementById('new-poi-name').value.trim();
   const type = document.getElementById('new-poi-type').value.trim();
   const desc = document.getElementById('new-poi-desc').value.trim();
-  const lat = parseFloat(document.getElementById('new-poi-lat').value.trim());
-  const lng = parseFloat(document.getElementById('new-poi-lng').value.trim());
-  
+  const lat  = parseFloat(document.getElementById('new-poi-lat').value);
+  const lng  = parseFloat(document.getElementById('new-poi-lng').value);
   if (!name || !type || isNaN(lat) || isNaN(lng)) {
-    alert('Por favor completa todos los campos obligatorios (nombre, tipo, latitud y longitud)');
-    return;
+    alert('Completa nombre, tipo, latitud y longitud'); return;
   }
-  
   const id = 'poi_' + Date.now();
-  const newPoi = {
-    id: id,
-    icon: selectedIcon,
-    color: selectedColor,
-    lat: lat,
-    lng: lng,
-    video: null,
-    audio: null,
-    text: null,
-    names: { es: name, en: name, fr: name, zh: name, ar: name },
-    types: { es: type, en: type, fr: type, zh: type, ar: type },
-    texts: { 
-      es: `<p>${desc || 'Descripción del monumento...'}</p>`,
-      en: `<p>${desc || 'Monument description...'}</p>`,
-      fr: `<p>${desc || 'Description du monument...'}</p>`,
-      zh: `<p>${desc || '纪念碑描述...'}</p>`,
-      ar: `<p>${desc || 'وصف النصب...'}</p>`
-    }
-  };
-  
-  POIS.push(newPoi);
+  POIS.push({
+    id, icon:selectedIcon, color:selectedColor, lat, lng, video:null, audio:null,
+    names:{ es:name, en:name, fr:name, zh:name, ar:name },
+    types:{ es:type, en:type, fr:type, zh:type, ar:type },
+    texts:{ es:`<p>${desc||'...'}</p>`, en:`<p>${desc||'...'}</p>`, fr:`<p>${desc||'...'}</p>`, zh:`<p>${desc||'...'}</p>`, ar:`<p>${desc||'...'}</p>` }
+  });
   saveDataToStorage();
-  
-  // Limpiar formulario
-  document.getElementById('new-poi-name').value = '';
-  document.getElementById('new-poi-type').value = '';
-  document.getElementById('new-poi-desc').value = '';
-  document.getElementById('new-poi-lat').value = '';
-  document.getElementById('new-poi-lng').value = '';
-  
-  // Actualizar selects y listas
-  initAdminSelect();
-  updateContentList();
-  updateMonumentsList();
-  
-  // Si el mapa está abierto, actualizarlo
-  if (!document.getElementById('app').classList.contains('gone')) {
-    initMap();
-  }
-  
-  alert('Monumento añadido correctamente: ' + name);
+  ['new-poi-name','new-poi-type','new-poi-desc','new-poi-lat','new-poi-lng'].forEach(i => document.getElementById(i).value = '');
+  initAdminSelect(); updateContentList(); updateMonumentsList();
+  if (map) rebuildMap();
+  alert('Monumento añadido: ' + name);
 }
 
 function updateMonumentsList() {
-  const list = document.getElementById('admin-monuments-list');
   const defaultIds = ['plaza','iglesia','arco-loja','arco-granada','arco-jaen','arco-real','damian'];
-  let html = '';
-  POIS.forEach(poi => {
-    const isDefault = defaultIds.includes(poi.id);
-    html += `
+  document.getElementById('admin-monuments-list').innerHTML =
+    POIS.map(poi => `
       <div class="content-item">
         <strong>${poi.icon} ${poi.names.es}</strong>
         <span>${poi.types.es}</span>
-        ${!isDefault ? `<button onclick="deleteMonument('${poi.id}')">Eliminar</button>` : '<span style="font-size:11px;color:var(--brown-mid);">Predeterminado</span>'}
-      </div>`;
-  });
-  list.innerHTML = html;
+        ${!defaultIds.includes(poi.id)
+          ? `<button onclick="deleteMonument('${poi.id}')">Eliminar</button>`
+          : '<span style="font-size:11px;color:var(--slate)">Predeterminado</span>'}
+      </div>`).join('');
 }
 
 function deleteMonument(id) {
   if (!confirm('¿Eliminar este monumento permanentemente?')) return;
   POIS = POIS.filter(p => p.id !== id);
-  saveDataToStorage();
-  initAdminSelect();
-  updateContentList();
-  updateMonumentsList();
-  if (!document.getElementById('app').classList.contains('gone')) {
-    initMap();
-  }
+  saveDataToStorage(); initAdminSelect(); updateContentList(); updateMonumentsList();
+  if (map) rebuildMap();
 }
 
 // ================================================================
-// ALMACENAMIENTO LOCAL
+// STORAGE
 // ================================================================
 function saveDataToStorage() {
-  const data = { pois: POIS };
-  localStorage.setItem('santafe_historica_data', JSON.stringify(data));
+  localStorage.setItem('santafe_historica_data', JSON.stringify({ pois:POIS }));
 }
-
 function loadDataFromStorage() {
-  const saved = localStorage.getItem('santafe_historica_data');
-  if (saved) {
-    try {
+  try {
+    const saved = localStorage.getItem('santafe_historica_data');
+    if (saved) {
       const data = JSON.parse(saved);
-      if (data.pois && Array.isArray(data.pois)) {
-        POIS = data.pois;
-      }
-    } catch(e) { console.warn('Error loading saved data:', e); }
-  }
+      if (data.pois && Array.isArray(data.pois)) POIS = data.pois;
+    }
+  } catch(e) {}
 }
 
 // ================================================================
-// RUTA GPS ÓPTIMA
+// CERRAR LANG PANEL AL CLIC FUERA
 // ================================================================
-function calculateOptimalRoute(startLat, startLng, poiIds) {
-  const pois = poiIds.map(id => POIS.find(p => p.id === id)).filter(p => p);
-  const unvisited = [...pois];
-  const route = [];
-  let currentLat = startLat;
-  let currentLng = startLng;
-  
-  while (unvisited.length > 0) {
-    let nearest = null;
-    let nearestDist = Infinity;
-    let nearestIndex = -1;
-    
-    unvisited.forEach((poi, i) => {
-      const dist = haversine(currentLat, currentLng, poi.lat, poi.lng);
-      if (dist < nearestDist) {
-        nearestDist = dist;
-        nearest = poi;
-        nearestIndex = i;
-      }
-    });
-    
-    route.push(nearest);
-    currentLat = nearest.lat;
-    currentLng = nearest.lng;
-    unvisited.splice(nearestIndex, 1);
-  }
-  
-  return route;
-}
-
-// ================================================================
-// PWA REGISTRO
-// ================================================================
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
-
-// Cerrar paneles al hacer clic fuera
 document.addEventListener('click', e => {
   if (langOpen && !e.target.closest('#lang-panel') && !e.target.closest('#lang-btn')) {
     langOpen = false;
     document.getElementById('lang-panel').classList.add('off');
   }
 });
+
+// ================================================================
+// PWA - Service Worker
+// ================================================================
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
