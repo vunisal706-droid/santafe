@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Santa Fe Histórica · Escape Room VR</title>
+<meta name="theme-color" content="#1D7A4F">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.5.0/aframe.min.js"></script>
+<style>
+  :root {
+    --green-1:#1D7A4F; --green-2:#27C97A; --ink:#1C2A3A; --text-2:#5B6B7E;
+    --line:#DCE5F0; --gold:#C9A84C;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; }
+  body { font-family:'Segoe UI', system-ui, -apple-system, sans-serif; background:linear-gradient(165deg,#F2F7FF 0%,#E8F4EC 100%); color:var(--ink); }
+
+  /* ── Menú 2D (modo claro) ── */
+  #menu { position:fixed; inset:0; overflow-y:auto; z-index:20; display:flex; flex-direction:column; align-items:center; padding:28px 18px 40px; }
+  #menu.gone { display:none; }
+  .m-hero {
+    width:100%; max-width:560px; text-align:center; border-radius:22px; padding:26px 18px;
+    background:linear-gradient(150deg,#27C97A,#0E7A46); color:#fff;
+    box-shadow:0 14px 34px rgba(14,122,70,0.25); margin-bottom:18px;
+  }
+  .m-hero .big { font-size:44px; display:block; margin-bottom:6px; }
+  .m-hero h1 { font-size:24px; font-weight:800; letter-spacing:-0.3px; }
+  .m-hero p { font-size:13px; opacity:0.92; margin-top:4px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; }
+  .m-card {
+    width:100%; max-width:560px; background:#fff; border:1.5px solid var(--line);
+    border-radius:18px; padding:18px; margin-bottom:14px; box-shadow:0 6px 20px rgba(28,42,58,0.06);
+  }
+  .m-card h2 { font-size:15px; margin-bottom:8px; }
+  .m-card p, .m-card li { font-size:13.5px; color:var(--text-2); line-height:1.55; }
+  .m-card ol { padding-left:20px; }
+  .m-card ol li { margin-bottom:5px; }
+  .m-name { width:100%; padding:13px 14px; border:1.5px solid var(--line); border-radius:13px; font-size:15px; margin-top:8px; outline-color:var(--green-2); }
+  .m-btn {
+    display:block; width:100%; max-width:560px; padding:16px; border:none; border-radius:16px;
+    background:linear-gradient(135deg,#27C97A,#0E7A46); color:#fff; font-size:17px; font-weight:800;
+    cursor:pointer; box-shadow:0 8px 22px rgba(14,122,70,0.3); margin-bottom:10px;
+  }
+  .m-btn:active { transform:scale(0.98); }
+  .m-btn.ghost { background:#fff; color:var(--ink); border:1.5px solid var(--line); box-shadow:none; font-weight:700; font-size:15px; }
+  .m-note { font-size:12px; color:var(--text-2); text-align:center; max-width:560px; margin-top:6px; line-height:1.5; }
+  .m-note a { color:var(--green-1); font-weight:700; }
+
+  /* ── Ranking 2D ── */
+  #rankModal { position:fixed; inset:0; background:rgba(28,42,58,0.45); z-index:40; display:none; align-items:flex-end; justify-content:center; }
+  #rankModal.on { display:flex; }
+  .rank-card { background:#fff; width:100%; max-width:560px; border-radius:22px 22px 0 0; padding:20px 18px 30px; max-height:80vh; overflow-y:auto; }
+  .rank-card h2 { font-size:18px; margin-bottom:12px; }
+  .rank-row { display:flex; align-items:center; gap:10px; padding:10px 12px; margin-bottom:8px; background:#fff; border:1.5px solid var(--line); border-radius:14px; }
+  .rank-row.top { background:linear-gradient(150deg,#FFF9E8,#FFF2CC); border-color:#EAD48A; }
+  .rank-row .pos { font-size:18px; font-weight:800; min-width:38px; text-align:center; }
+  .rank-row .nm { flex:1; font-size:14px; font-weight:700; display:flex; flex-direction:column; }
+  .rank-row .nm small { font-size:11px; font-weight:600; color:var(--text-2); }
+  .rank-row .pt { font-size:16px; font-weight:800; color:#8A5A10; text-align:right; display:flex; flex-direction:column; }
+  .rank-row .pt small { font-size:10px; font-weight:700; color:var(--text-2); }
+  .rank-loading { text-align:center; color:var(--text-2); padding:20px 8px; font-size:14px; }
+
+  /* ── HUD 2D sobre la escena (fuera de VR inmersivo) ── */
+  #hud { position:fixed; top:10px; left:10px; right:10px; z-index:15; display:none; justify-content:space-between; pointer-events:none; }
+  #hud.on { display:flex; }
+  .hud-chip { background:rgba(255,255,255,0.92); border:1.5px solid var(--line); border-radius:999px; padding:8px 14px; font-size:14px; font-weight:800; box-shadow:0 4px 14px rgba(28,42,58,0.12); }
+  #hud-exit { pointer-events:auto; cursor:pointer; }
+  a-scene { position:fixed; inset:0; z-index:5; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ MENÚ (2D, modo claro) ═══════════ -->
+<div id="menu">
+  <div class="m-hero">
+    <span class="big">🥽🔐</span>
+    <h1>El Enigma de las Cuatro Puertas</h1>
+    <p>Escape Room VR · Santa Fe 1491</p>
+  </div>
+  <div class="m-card">
+    <h2>📜 La leyenda</h2>
+    <p>Un escribano de los Reyes Católicos escondió un código de cuatro cifras entre las cuatro puertas de Santa Fe. Viaja a cada puerta, busca el <strong>pergamino brillante</strong>, supera sus 3 preguntas y reúne las cifras para abrir el <strong>Cofre de las Capitulaciones</strong> en la Iglesia Mayor.</p>
+  </div>
+  <div class="m-card">
+    <h2>🎮 Cómo se juega con las Meta Quest</h2>
+    <ol>
+      <li>Pulsa <strong>Comenzar</strong> y después el botón <strong>VR</strong> de la esquina inferior derecha.</li>
+      <li>Apunta con el <strong>láser del mando</strong> (o mirando fijamente 2 segundos, sin mandos) al pergamino 📜 y a las respuestas.</li>
+      <li>Aprieta el <strong>gatillo</strong> para seleccionar.</li>
+    </ol>
+    <p style="margin-top:8px">También funciona sin gafas: en el ordenador o el móvil, arrastra para mirar y haz clic/toca para seleccionar.</p>
+  </div>
+  <div class="m-card">
+    <h2>🧑‍🚀 Nombre del equipo o explorador</h2>
+    <input id="vr-name" class="m-name" type="text" maxlength="24" placeholder="Ej.: Los Guardianes de Capitulín" autocomplete="off">
+  </div>
+  <button class="m-btn" onclick="vrStart()">🚀 Comenzar la aventura</button>
+  <button class="m-btn ghost" onclick="vrShowRanking()">🏆 Ver ranking Top 10</button>
+  <button class="m-btn ghost" onclick="location.href='index.html'">← Volver a Santa Fe Histórica</button>
+  <p class="m-note">Puntuación: +100 al primer intento · +50 al segundo · Bonus del cofre hasta +200.<br>El ranking es común con los modos GPS y Clase de la app.</p>
+</div>
+
+<!-- ═══════════ RANKING (2D) ═══════════ -->
+<div id="rankModal" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="rank-card">
+    <h2>🏆 Ranking · Top 10</h2>
+    <div id="rank-list"><div class="rank-loading">⏳ Cargando…</div></div>
+    <button class="m-btn ghost" onclick="document.getElementById('rankModal').classList.remove('on')">Cerrar</button>
+  </div>
+</div>
+
+<!-- ═══════════ HUD ═══════════ -->
+<div id="hud">
+  <span class="hud-chip" id="hud-exit" onclick="vrExit()">← Salir</span>
+  <span class="hud-chip">⭐ <span id="hud-pts">0</span></span>
+  <span class="hud-chip">🔢 <span id="hud-code">— — — —</span></span>
+</div>
+
+<!-- ═══════════ ESCENA A-FRAME ═══════════ -->
+<a-scene id="scene" embedded style="display:none" background="color: #BFE0FF"
+         loading-screen="dotsColor: #1D7A4F; backgroundColor: #EAF4FF"
+         renderer="colorManagement: true">
+  <a-assets id="assets" timeout="4000"></a-assets>
+
+  <a-entity id="rig" position="0 0 0">
+    <a-entity id="cam" camera look-controls wasd-controls="enabled:false" position="0 1.6 0">
+      <a-entity id="gazeCursor" cursor="fuse: true; fuseTimeout: 2000"
+                raycaster="objects: .clk; far: 30"
+                position="0 0 -1.5"
+                geometry="primitive: ring; radiusInner: 0.012; radiusOuter: 0.02"
+                material="color: #1D7A4F; shader: flat; opacity: 0.9"
+                animation__fusing="property: scale; startEvents: fusing; easing: easeInCubic; dur: 2000; from: 1 1 1; to: 0.4 0.4 0.4"
+                animation__reset="property: scale; startEvents: mouseleave; dur: 150; to: 1 1 1"></a-entity>
+    </a-entity>
+    <a-entity laser-controls="hand: left"  raycaster="objects: .clk; far: 30" line="color: #27C97A"></a-entity>
+    <a-entity laser-controls="hand: right" raycaster="objects: .clk; far: 30" line="color: #27C97A"></a-entity>
+  </a-entity>
+
+  <a-entity id="world"></a-entity>
+
+  <!-- Suelo empedrado suave -->
+  <a-circle rotation="-90 0 0" radius="40" color="#D9CDB4"></a-circle>
+  <a-ring rotation="-90 0 0" position="0 0.01 0" radius-inner="2.6" radius-outer="3" color="#C9A84C" opacity="0.55"></a-ring>
+</a-scene>
+
+<script>
+
+'use strict';
+
+/* ═══════════ DATOS ═══════════ */
+const ESC_BANK = {
+ "arco-loja": [
+  {
+   "q": "¿Cuál era el nombre original de esta puerta?",
+   "opts": [
+    "Puerta de Jerez",
+    "Puerta del Oeste",
+    "Puerta Real",
+    "Puerta de Málaga"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Por qué acabó llamándose Arco de Loja?",
+   "opts": [
+    "Porque Loja pagó su construcción",
+    "Porque la construyeron canteros de Loja",
+    "Porque un rey nació en Loja",
+    "Porque el camino que salía por aquí llevaba hacia Loja"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿A quién hacía referencia el nombre original de Puerta de Jerez?",
+   "opts": [
+    "A un mercader de vinos de Jerez",
+    "A los soldados de Jerez que vivían en este cuartel de la ciudad",
+    "A un caballo llamado Jerez",
+    "A la reina, que era de Jerez"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué le ocurrió a esta puerta en 1912?",
+   "opts": [
+    "Se quemó en un incendio",
+    "Fue demolida por completo",
+    "La convirtieron en museo",
+    "Le añadieron una cúpula"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿En qué año fue reconstruida esta puerta?",
+   "opts": [
+    "1912",
+    "1952",
+    "1975",
+    "1898"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué se conmemoraba con su reconstrucción en 1952?",
+   "opts": [
+    "La boda de los Reyes Católicos",
+    "La visita del Papa a Granada",
+    "El quinto centenario de la muerte de Fernando el Católico",
+    "El descubrimiento de América"
+   ],
+   "a": 2
+  },
+  {
+   "q": "La puerta que vemos hoy es en realidad…",
+   "opts": [
+    "Una reconstrucción del siglo XX que imita la original",
+    "Un decorado de cine",
+    "Una copia traída de otra ciudad",
+    "La original de 1491 intacta"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿A qué virgen está dedicada la capilla de su interior?",
+   "opts": [
+    "A la Virgen del Carmen",
+    "A la Virgen de los Dolores",
+    "A la Virgen de Belén",
+    "A la Virgen del Rosario"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Quién escribió los versos en latín de su famosa placa?",
+   "opts": [
+    "Garcilaso de la Vega",
+    "Cristóbal Colón",
+    "Pedro Mártir de Anglería",
+    "Ventura Rodríguez"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Qué se considera que es esa placa con versos en latín?",
+   "opts": [
+    "Un anuncio de mercado medieval",
+    "Una lápida de un soldado",
+    "El primer mapa de Santa Fe",
+    "La placa fundacional de la ciudad"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Con qué tipo de letras está grabado el texto de la placa?",
+   "opts": [
+    "Letras de plomo",
+    "Letras de mármol",
+    "Letras de oro",
+    "Letras pintadas a mano"
+   ],
+   "a": 0
+  },
+  {
+   "q": "Según la placa, ¿para qué fundaron los Reyes Católicos Santa Fe?",
+   "opts": [
+    "Para combatir a los enemigos de la fe católica",
+    "Para comerciar con especias",
+    "Para celebrar torneos",
+    "Para descansar del viaje"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Quién era Pedro Mártir de Anglería?",
+   "opts": [
+    "Un arquitecto",
+    "Un rey moro",
+    "Un almirante",
+    "Un cronista"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cuál de las cuatro puertas tiene la historia más accidentada?",
+   "opts": [
+    "El Arco de Jaén",
+    "El Arco de Granada",
+    "El Arco de Loja",
+    "El Arco Real"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Qué había en Santa Fe antes de construirse la ciudad?",
+   "opts": [
+    "Un campamento provisional",
+    "Un bosque encantado",
+    "Un castillo árabe",
+    "Un puerto de mar"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿En cuántos días se construyó la ciudad de Santa Fe?",
+   "opts": [
+    "80 días",
+    "1.000 días",
+    "365 días",
+    "10 días"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿De qué ciudad se copió el trazado de Santa Fe?",
+   "opts": [
+    "De Sevilla",
+    "De Toledo",
+    "De Roma",
+    "De Briviesca, en Burgos"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cuántas puertas tiene la muralla de Santa Fe?",
+   "opts": [
+    "Una sola puerta gigante",
+    "Cuatro, una por cada punto cardinal",
+    "Dos, una de entrada y otra de salida",
+    "Siete, como los días de la semana"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿En qué año se fundó Santa Fe?",
+   "opts": [
+    "1492",
+    "1898",
+    "1491",
+    "1512"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Por qué convirtieron el campamento en una ciudad de piedra?",
+   "opts": [
+    "Porque lo mandó el Papa",
+    "Porque llovía mucho y las tiendas se mojaban",
+    "Para demostrar a los sitiados de la Alhambra que no se iban a marchar",
+    "Para vender las casas a los soldados"
+   ],
+   "a": 2
+  }
+ ],
+ "arco-granada": [
+  {
+   "q": "¿Qué ocurrió el 2 de enero de 1492 en esta puerta?",
+   "opts": [
+    "Se terminó de construir la muralla",
+    "Salió el ejército cristiano hacia la Alhambra",
+    "Se casaron los Reyes Católicos",
+    "Regresó Colón de América"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Hacia dónde marchó el ejército que salió por esta puerta?",
+   "opts": [
+    "Hacia la Alhambra",
+    "Hacia el mar",
+    "Hacia Madrid",
+    "Hacia Sevilla"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Quién entregó las llaves de Granada a los Reyes Católicos?",
+   "opts": [
+    "Boabdil",
+    "Aben Humeya",
+    "Almanzor",
+    "Tarfe"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Qué destruyó por completo esta puerta en 1698?",
+   "opts": [
+    "Un incendio",
+    "Un rayo",
+    "Un terremoto",
+    "Una guerra"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Qué se hizo con la puerta tras el terremoto de 1698?",
+   "opts": [
+    "Se reconstruyó inmediatamente",
+    "Se dejó en ruinas cien años",
+    "Se trasladó a otra calle",
+    "Se vendió piedra a piedra"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Qué conserva esta puerta de la estructura original de 1491?",
+   "opts": [
+    "La mitad exacta",
+    "Prácticamente nada",
+    "Solo el tejado",
+    "Todo el arco original"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿A qué virgen está dedicada la capilla de su interior?",
+   "opts": [
+    "A la Virgen de Belén",
+    "A la Virgen del Rosario",
+    "A la Virgen del Pópolo",
+    "A la Virgen del Carmen"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué elemento hace reconocible esta puerta desde lejos?",
+   "opts": [
+    "Una estatua de bronce",
+    "Una torre de reloj",
+    "Una bandera gigante",
+    "Su cúpula"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cuántas de las cuatro puertas conservan cúpula?",
+   "opts": [
+    "Dos de ellas",
+    "Solo esta, el Arco de Granada",
+    "Ninguna",
+    "Todas"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Cuál era el nombre histórico de esta puerta?",
+   "opts": [
+    "Puerta de Boabdil",
+    "Puerta del Este",
+    "Puerta de Córdoba",
+    "Puerta de la Alhambra"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Por qué se llamaba históricamente Puerta de Córdoba?",
+   "opts": [
+    "Porque un obispo de Córdoba la bendijo",
+    "Porque la pagó el rey de Córdoba",
+    "Porque sus piedras vinieron de Córdoba",
+    "Porque el camino llevaba a Córdoba pasando por Granada"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Hacia qué ciudad mira esta puerta?",
+   "opts": [
+    "Granada",
+    "Loja",
+    "Jaén",
+    "Sevilla"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Por qué es la puerta con más carga simbólica?",
+   "opts": [
+    "Porque tiene un tesoro escondido",
+    "Porque es la más alta de España",
+    "Porque en ella vivió Colón",
+    "Porque por ella salió el ejército a recibir las llaves de Granada"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cuándo se firmó la rendición de Granada en Santa Fe?",
+   "opts": [
+    "El 12 de octubre de 1492",
+    "El 6 de enero de 1500",
+    "El 2 de enero de 1492",
+    "El 25 de noviembre de 1491"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cómo se llamaba el edificio donde vivieron y trabajaron los reyes en Santa Fe?",
+   "opts": [
+    "El Palacio de la Alhambra",
+    "El Castillo de Santa Fe",
+    "La Torre del Homenaje",
+    "La Casa Real"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué edificio ocupa hoy el solar donde estuvo la Casa Real?",
+   "opts": [
+    "Una plaza de toros",
+    "El Instituto de América",
+    "El ayuntamiento",
+    "La estación de tren"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué reyes fundaron Santa Fe?",
+   "opts": [
+    "Los Reyes Magos",
+    "Felipe II y su corte",
+    "Los Reyes Católicos",
+    "Carlos III y su familia"
+   ],
+   "a": 2
+  },
+  {
+   "q": "Meses después de la rendición de Granada, ¿qué acuerdo se firmó en Santa Fe?",
+   "opts": [
+    "La paz con Francia",
+    "La compra de Portugal",
+    "El primer tratado de pesca",
+    "El acuerdo con Cristóbal Colón para su viaje"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿En qué se convirtió primero el edificio de la Casa Real?",
+   "opts": [
+    "En Hospital Real",
+    "En cuartel de bomberos",
+    "En teatro",
+    "En mercado de abastos"
+   ],
+   "a": 0
+  },
+  {
+   "q": "El modelo de ciudad en cuadrícula de Santa Fe se exportó después a…",
+   "opts": [
+    "Los pueblos del norte de Europa",
+    "Las islas del Pacífico",
+    "Decenas de ciudades de América",
+    "Las ciudades de China"
+   ],
+   "a": 2
+  }
+ ],
+ "arco-jaen": [
+  {
+   "q": "¿Cuál es el apodo popular de esta puerta?",
+   "opts": [
+    "Puerta del Mercado",
+    "Puerta de los Reyes",
+    "Puerta de los Carros",
+    "Puerta Ancha"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Por qué se ganó el apodo de Puerta de los Carros?",
+   "opts": [
+    "Era la entrada más ancha y por ella pasaban los carros de suministros",
+    "Porque los reyes entraban siempre en carroza",
+    "Porque un carro de oro está enterrado debajo",
+    "Porque se fabricaban carros en su interior"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿A qué virgen está dedicada la capilla de su interior?",
+   "opts": [
+    "A la Virgen del Rosario",
+    "A la Virgen de Belén",
+    "A la Virgen de los Dolores",
+    "A la Virgen del Carmen"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Cómo se llama la curiosa escalera que guarda esta puerta?",
+   "opts": [
+    "El Caracol Sagrado",
+    "La Escalera Real",
+    "La Escala de Colón",
+    "La Santa Escala"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cómo son los peldaños de la Santa Escala?",
+   "opts": [
+    "De cristal",
+    "Muy pequeños",
+    "Enormes, de un metro cada uno",
+    "De madera pintada de oro"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué concede la Santa Escala a quien la sube como es debido?",
+   "opts": [
+    "Un título de caballero",
+    "Una bula de indulgencia",
+    "Una moneda de plata",
+    "Un deseo"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Cómo hay que subir la Santa Escala para ganar la indulgencia?",
+   "opts": [
+    "A la pata coja",
+    "De rodillas y rezando",
+    "Con los ojos vendados",
+    "Corriendo lo más rápido posible"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Cuándo se puede ganar la indulgencia de la Santa Escala?",
+   "opts": [
+    "Cualquier día a cualquier hora",
+    "Solo en Nochebuena",
+    "Solo el día de tu cumpleaños",
+    "En determinados días del año"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Quiénes se encargaron del sistema defensivo de Santa Fe?",
+   "opts": [
+    "Los Reyes Católicos en persona",
+    "Las Órdenes Militares de Santiago, Calatrava y Alcántara",
+    "Los marineros de Colón",
+    "Los soldados de Boabdil"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué ciudades financiaron los cuadrantes de la ciudad?",
+   "opts": [
+    "Granada, Málaga y Almería",
+    "Madrid, Barcelona y Valencia",
+    "Roma, París y Londres",
+    "Sevilla, Córdoba y Jaén"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cómo se construyeron los cuatro arcos de Santa Fe?",
+   "opts": [
+    "Todos por el mismo arquitecto",
+    "Se compraron ya hechos",
+    "Los construyeron prisioneros",
+    "Cada uno por un promotor diferente"
+   ],
+   "a": 3
+  },
+  {
+   "q": "Desde su fundación, Santa Fe fue…",
+   "opts": [
+    "Un capricho de un solo noble",
+    "Un proyecto colectivo de toda España",
+    "Un regalo de Portugal",
+    "Una ciudad secreta"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Hacia qué provincia mira esta puerta?",
+   "opts": [
+    "Cádiz",
+    "Jaén",
+    "Huelva",
+    "Almería"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué otro nombre le dan algunas fuentes antiguas a esta puerta?",
+   "opts": [
+    "Puerta del Norte",
+    "Puerta del Sol",
+    "Puerta Dorada",
+    "Puerta de la Luna"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Qué pasaba por esta puerta al ser la más ancha?",
+   "opts": [
+    "Los carros de suministros",
+    "Los elefantes del circo",
+    "Las carrozas del carnaval",
+    "Los barcos del río"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Cuántas calles principales tiene el trazado de Santa Fe?",
+   "opts": [
+    "Cinco en forma de estrella",
+    "Diez paralelas",
+    "Una sola en espiral",
+    "Dos, que se cruzan en ángulo recto"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Dónde terminan las dos calles principales de Santa Fe?",
+   "opts": [
+    "En el castillo",
+    "En la plaza de toros",
+    "En las cuatro puertas de la muralla",
+    "En el río"
+   ],
+   "a": 2
+  },
+  {
+   "q": "Santa Fe es considerada…",
+   "opts": [
+    "El primer modelo urbano de la España moderna",
+    "La primera ciudad con metro",
+    "La ciudad más antigua de Europa",
+    "La capital del reino de Granada"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Con qué materiales se levantó Santa Fe en 1491?",
+   "opts": [
+    "Adobe y cañas",
+    "Piedra y ladrillo",
+    "Madera y paja",
+    "Hierro y cristal"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué demuestran las Órdenes Militares y los concejos que construyeron Santa Fe?",
+   "opts": [
+    "Que fue un esfuerzo conjunto de muchos lugares de España",
+    "Que la ciudad se hizo sin planos",
+    "Que solo trabajaron los reyes",
+    "Que la construyó un ejército extranjero"
+   ],
+   "a": 0
+  }
+ ],
+ "arco-real": [
+  {
+   "q": "¿Cuál era el nombre histórico del Arco Real?",
+   "opts": [
+    "Puerta de Madrid",
+    "Puerta del Rey",
+    "Puerta de Granada",
+    "Puerta de Sevilla"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Por qué se llamaba Puerta de Sevilla?",
+   "opts": [
+    "Porque el camino que salía por aquí llevaba hacia Sevilla",
+    "Porque allí se bailaban sevillanas",
+    "Porque Sevilla regaló sus piedras",
+    "Porque la construyeron albañiles sevillanos"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿En qué año fue reformada esta puerta?",
+   "opts": [
+    "1491",
+    "1952",
+    "1798",
+    "1912"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Qué estilo tiene la capilla que se le añadió en 1798?",
+   "opts": [
+    "Barroco",
+    "Modernista",
+    "Gótico",
+    "Románico"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿A quién está dedicada su capilla?",
+   "opts": [
+    "A la Virgen del Rosario",
+    "A la Virgen del Carmen",
+    "A San Fernando",
+    "A Nuestra Señora de los Dolores"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué imágenes procesionan saliendo por esta puerta?",
+   "opts": [
+    "Los Reyes Magos",
+    "La Virgen del Pilar",
+    "San Isidro Labrador",
+    "La Virgen de los Dolores y el Santo Sepulcro"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué día del año sale esa procesión?",
+   "opts": [
+    "Cada Viernes Santo",
+    "El día de Navidad",
+    "El último día de feria",
+    "El 1 de enero"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Qué valiosa pieza renacentista guarda en su interior?",
+   "opts": [
+    "Un Cristo atado a la columna de alabastro",
+    "Una corona de plata",
+    "Una espada de los Reyes",
+    "Un mapa del Nuevo Mundo"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿De qué material es el Cristo atado a la columna?",
+   "opts": [
+    "De bronce",
+    "De madera de olivo",
+    "De mármol negro",
+    "De alabastro"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿De qué estilo es el Cristo atado a la columna?",
+   "opts": [
+    "Renacentista",
+    "Árabe",
+    "Gótico",
+    "Barroco"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Qué belén conserva esta puerta?",
+   "opts": [
+    "Uno traído de Belén",
+    "Uno barroco del siglo XVII",
+    "Uno de plastilina moderno",
+    "Uno de chocolate"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Qué escultura hay en el exterior, bajo el dintel?",
+   "opts": [
+    "La Virgen del Pópolo",
+    "Un busto de Colón",
+    "Un león de piedra",
+    "Un águila imperial"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿De qué material y siglo es la Virgen del Pópolo?",
+   "opts": [
+    "Mármol del siglo XVI",
+    "Yeso del siglo XIX",
+    "Madera del siglo XV",
+    "Bronce del siglo XX"
+   ],
+   "a": 0
+  },
+  {
+   "q": "Junto con la Puerta de Granada, esta puerta destaca por…",
+   "opts": [
+    "Estar pintada de colores",
+    "Tener un ascensor secreto",
+    "Ser de las que mejor conservan su estructura",
+    "Ser la más pequeña de Europa"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Sobre qué solar se construyó el Centro Damián Bayón?",
+   "opts": [
+    "Sobre un antiguo circo romano",
+    "Sobre un lago desecado",
+    "Sobre las cuadras del ejército",
+    "Sobre el de la Casa Real de los Reyes Católicos"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿En qué año se inauguró el Centro Damián Bayón?",
+   "opts": [
+    "1952",
+    "2010",
+    "1992, en el quinto centenario del descubrimiento de América",
+    "1892"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Quién era Damián Bayón?",
+   "opts": [
+    "Un alcalde de Santa Fe",
+    "Un pintor holandés",
+    "Un futbolista famoso",
+    "Un historiador y crítico de arte argentino"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué donó Damián Bayón para crear el centro que lleva su nombre?",
+   "opts": [
+    "Su casa de París",
+    "Su biblioteca, archivos y colección fotográfica",
+    "Un barco antiguo",
+    "Una colección de espadas"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Cómo hablan las guías del Centro Damián Bayón?",
+   "opts": [
+    "En latín",
+    "Cantando coplas",
+    "Solo por señas",
+    "En castellano antiguo, para recrear la época"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué exposición permanente hay en el Centro Damián Bayón?",
+   "opts": [
+    "Una sobre el primer viaje de Colón",
+    "Una de trajes de flamenca",
+    "Una de dinosaurios",
+    "Una de coches antiguos"
+   ],
+   "a": 0
+  }
+ ],
+ "iglesia": [
+  {
+   "q": "¿Qué destruyó la primera iglesia, construida en 1491?",
+   "opts": [
+    "Una batalla",
+    "Una inundación",
+    "Un incendio",
+    "Un terremoto"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué pasó con la iglesia levantada en el siglo XVI?",
+   "opts": [
+    "Sigue en pie tal cual",
+    "Fue derribada a mediados del siglo XVIII por estar muy dañada",
+    "Se trasladó a Granada",
+    "Se convirtió en castillo"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿En qué año empezó a construirse la iglesia actual?",
+   "opts": [
+    "1491",
+    "1912",
+    "1774",
+    "1698"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Cuánto tardó en terminarse la iglesia actual?",
+   "opts": [
+    "Tres meses",
+    "Un siglo entero",
+    "Una semana",
+    "Más de diez años"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué famoso arquitecto firmó los planos de la iglesia actual?",
+   "opts": [
+    "Antonio Gaudí",
+    "Juan de Herrera",
+    "Diego de Siloé",
+    "Ventura Rodríguez"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué otra obra famosa diseñó Ventura Rodríguez en Madrid?",
+   "opts": [
+    "El estadio Bernabéu",
+    "La Puerta de Alcalá",
+    "El Museo del Prado",
+    "La fuente de Cibeles"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué diseñó Ventura Rodríguez en Zaragoza?",
+   "opts": [
+    "Un puente colgante",
+    "La capilla de la Virgen del Pilar",
+    "Un acueducto",
+    "La estación de tren"
+   ],
+   "a": 1
+  },
+  {
+   "q": "¿Quién dirigió las obras de la iglesia?",
+   "opts": [
+    "Pedro Mártir de Anglería",
+    "El propio rey",
+    "Un maestro italiano anónimo",
+    "Domingo Lois de Monteagudo, discípulo de Ventura Rodríguez"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Qué le ocurrió a Domingo Lois de Monteagudo?",
+   "opts": [
+    "Abandonó las obras para ser pintor",
+    "Fue nombrado obispo",
+    "Murió sin ver terminada la iglesia",
+    "Se hizo famoso en América"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Qué hay colocado encima de la puerta principal de la iglesia?",
+   "opts": [
+    "Un reloj de sol",
+    "Una campana de oro",
+    "Un escudo de fútbol",
+    "Una cabeza de piedra de un guerrero moro"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cómo se llamaba el guerrero moro de la fachada?",
+   "opts": [
+    "Almanzor",
+    "Aben Humeya",
+    "Tarfe",
+    "Boabdil"
+   ],
+   "a": 2
+  },
+  {
+   "q": "Según la leyenda, ¿qué había atado Tarfe a su caballo?",
+   "opts": [
+    "Una bandera pirata",
+    "Un saco de monedas",
+    "Un letrero con el Ave María robado de una iglesia",
+    "Una serpiente"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Quién retó y venció a Tarfe en duelo?",
+   "opts": [
+    "Ventura Rodríguez",
+    "El rey Fernando",
+    "Cristóbal Colón",
+    "Garcilaso de la Vega"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Dónde venció Garcilaso de la Vega a Tarfe?",
+   "opts": [
+    "En el campo de batalla de Santa Fe",
+    "En alta mar",
+    "En un torneo en Sevilla",
+    "En la Alhambra"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Cuál es el secreto del órgano del lado izquierdo?",
+   "opts": [
+    "Solo suena en Navidad",
+    "Está hecho de oro",
+    "Es completamente falso: solo decora",
+    "Perteneció a la reina Isabel"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Por qué se colocó un órgano falso?",
+   "opts": [
+    "Para engañar a los ladrones",
+    "Porque sonaba fatal",
+    "Porque no había dinero para dos",
+    "Para mantener la simetría perfecta del estilo neoclásico"
+   ],
+   "a": 3
+  },
+  {
+   "q": "¿Cuál de los dos órganos suena de verdad?",
+   "opts": [
+    "Solo el de la derecha",
+    "Los dos",
+    "Solo el de la izquierda",
+    "Ninguno de los dos"
+   ],
+   "a": 0
+  },
+  {
+   "q": "¿Qué estilo artístico exigía esa simetría perfecta?",
+   "opts": [
+    "El gótico",
+    "El romántico",
+    "El neoclásico",
+    "El barroco"
+   ],
+   "a": 2
+  },
+  {
+   "q": "¿Quién construyó el primer templo de 1491?",
+   "opts": [
+    "Los peregrinos ingleses",
+    "Boabdil",
+    "Los Reyes Católicos",
+    "Los romanos"
+   ],
+   "a": 2
+  },
+  {
+   "q": "La iglesia que vemos hoy es…",
+   "opts": [
+    "La tercera: la actual, del siglo XVIII",
+    "Un edificio del siglo XXI",
+    "Una copia de la catedral de Granada",
+    "La original de 1491"
+   ],
+   "a": 0
+  }
+ ]
+};
+
+const VR_STATIONS = [
+  { id:'arco-loja',    name:'Arco de Loja',    emoji:'🏯', ord:0, digit:'1', sky:'#2E5A8F',
+    intro:'La puerta oeste. Su nombre original era Puerta de Jerez y guarda la placa fundacional de la ciudad.' },
+  { id:'arco-granada', name:'Arco de Granada', emoji:'🏯', ord:1, digit:'4', sky:'#7A4B2E',
+    intro:'La puerta este, la más simbólica: por aquí salió el ejército hacia la Alhambra el 2 de enero de 1492.' },
+  { id:'arco-jaen',    name:'Arco de Jaén',    emoji:'🏯', ord:2, digit:'9', sky:'#8F3A2E',
+    intro:'La Puerta de los Carros, la más ancha. Dentro esconde la Santa Escala.' },
+  { id:'arco-real',    name:'Arco Real',       emoji:'👑', ord:3, digit:'2', sky:'#5E3A8F',
+    intro:'Su nombre histórico era Puerta de Sevilla. Cada Viernes Santo sale por aquí la procesión.' },
+  { id:'iglesia',      name:'Iglesia Mayor de la Encarnación', emoji:'⛪', final:true, sky:'#8A6A1E',
+    intro:'El Cofre de las Capitulaciones espera. Supera la prueba final e introduce el código.' }
+];
+// Fotos planas: sube tus imágenes con EXACTAMENTE estos nombres y aparecerán solas.
+const VR_PHOTOS = {
+  'arco-loja':    'fotos/vr/arco-loja.jpg',
+  'arco-granada': 'fotos/vr/arco-granada.jpg',
+  'arco-jaen':    'fotos/vr/arco-jaen.jpg',
+  'arco-real':    'fotos/vr/arco-real.jpg',
+  'iglesia':      'fotos/vr/iglesia.jpg'
+};
+const VR_CODE = '1492';
+const VR_FB_URL = 'https://santafe-2bd4e-default-rtdb.europe-west1.firebasedatabase.app/santafe_escape/ranking';
+const VR_KEY_USED = 'santafe_vr_used_v1';
+
+/* ═══════════ ESTADO ═══════════ */
+let S = null;            // estado de partida
+let curIdx = 0;          // estación actual (0..4)
+let qIdx = 0, tries = 0;
+let codeBuf = '';
+let codeFails = 0;
+let startT = 0;
+let audioCtx = null;
+
+function newGame() {
+  return { name:'', points:0, hits:0, totalQ:0, digits:{}, qsel: pickQuestions() };
+}
+
+function pickQuestions() {
+  let used = {};
+  try { used = JSON.parse(localStorage.getItem(VR_KEY_USED) || '{}') || {}; } catch(e) { used = {}; }
+  const sel = {};
+  for (const sid in ESC_BANK) {
+    const total = ESC_BANK[sid].length;
+    let u = Array.isArray(used[sid]) ? used[sid].filter(i => Number.isInteger(i) && i >= 0 && i < total) : [];
+    let avail = [];
+    for (let i = 0; i < total; i++) if (!u.includes(i)) avail.push(i);
+    if (avail.length < 3) { u = []; avail = Array.from({length: total}, (_, i) => i); }
+    for (let i = avail.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [avail[i], avail[j]] = [avail[j], avail[i]];
+    }
+    sel[sid] = avail.slice(0, 3);
+    used[sid] = u.concat(sel[sid]);
+  }
+  try { localStorage.setItem(VR_KEY_USED, JSON.stringify(used)); } catch(e) {}
+  return sel;
+}
+function getQ(sid, i) { return ESC_BANK[sid][S.qsel[sid][i]]; }
+
+/* ═══════════ SONIDO (WebAudio, sin ficheros) ═══════════ */
+function beep(kind) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const seqs = {
+      ok:[[660,0,.09],[880,.09,.12]], ko:[[220,0,.16]], key:[[520,0,.05]],
+      unlock:[[523,0,.1],[659,.1,.1],[784,.2,.18]],
+      win:[[523,0,.12],[659,.12,.12],[784,.24,.12],[1046,.36,.3]]
+    };
+    (seqs[kind] || seqs.key).forEach(([f, d, len]) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.frequency.value = f; o.type = 'triangle';
+      g.gain.setValueAtTime(0.16, audioCtx.currentTime + d);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d + len);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + d); o.stop(audioCtx.currentTime + d + len + 0.02);
+    });
+  } catch(e) {}
+}
+function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+/* ═══════════ UTILIDADES DE ESCENA ═══════════ */
+const $ = id => document.getElementById(id);
+function clearWorld() {
+  const w = $('world');
+  while (w.firstChild) w.removeChild(w.firstChild);
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtTime(sec){ const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+
+// Panel de texto sobre lienzo (soporta tildes, ñ y emoji sin fuentes MSDF)
+let canvasN = 0;
+function textPanel(opts) {
+  const o = Object.assign({ w:2.4, h:1.0, px:512, bg:'#FFFFFF', fg:'#1C2A3A',
+    title:'', body:'', titleSize:44, bodySize:34, radius:36, border:'#DCE5F0', align:'center' }, opts);
+  const cw = o.px, ch = Math.round(o.px * o.h / o.w);
+  const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+  const x = c.getContext('2d');
+  // fondo redondeado
+  x.fillStyle = o.bg;
+  x.strokeStyle = o.border; x.lineWidth = 6;
+  const r = o.radius;
+  x.beginPath();
+  x.moveTo(r,3); x.lineTo(cw-r,3); x.arcTo(cw-3,3,cw-3,r,r); x.lineTo(cw-3,ch-r); x.arcTo(cw-3,ch-3,cw-r,ch-3,r);
+  x.lineTo(r,ch-3); x.arcTo(3,ch-3,3,ch-r,r); x.lineTo(3,r); x.arcTo(3,3,r,3,r); x.closePath();
+  x.fill(); x.stroke();
+  // texto con salto de línea
+  x.fillStyle = o.fg; x.textAlign = o.align; x.textBaseline = 'top';
+  const cx = o.align === 'center' ? cw/2 : 40;
+  let y = 34;
+  function wrap(t, size, weight, color, lineH) {
+    x.font = weight + ' ' + size + 'px "Segoe UI", system-ui, sans-serif';
+    x.fillStyle = color;
+    const words = String(t).split(' ');
+    let line = '';
+    const maxW = cw - 80;
+    for (const w of words) {
+      const test = line ? line + ' ' + w : w;
+      if (x.measureText(test).width > maxW && line) { x.fillText(line, cx, y); y += lineH; line = w; }
+      else line = test;
+    }
+    if (line) { x.fillText(line, cx, y); y += lineH; }
+  }
+  if (o.title) { wrap(o.title, o.titleSize, '800', o.fg, o.titleSize * 1.25); y += 8; }
+  if (o.body)  { String(o.body).split('\n').forEach(par => { wrap(par, o.bodySize, '600', o.bodyColor || '#5B6B7E', o.bodySize * 1.3); }); }
+  const ent = document.createElement('a-entity');
+  const cid = 'cnv' + (++canvasN);
+  c.id = cid; c.style.display = 'none'; document.body.appendChild(c);
+  ent.setAttribute('geometry', `primitive: plane; width: ${o.w}; height: ${o.h}`);
+  ent.setAttribute('material', `shader: flat; src: #${cid}; transparent: true`);
+  return ent;
+}
+
+function button3d(label, opts) {
+  const o = Object.assign({ w:2.0, h:0.42, bg:'#FFFFFF', fg:'#1C2A3A', border:'#DCE5F0', size:34 }, opts);
+  const b = textPanel({ w:o.w, h:o.h, px:512, bg:o.bg, fg:o.fg, border:o.border, title:label, titleSize:o.size, radius:60 });
+  b.classList.add('clk');
+  b.setAttribute('animation__over', 'property: scale; startEvents: mouseenter; dur: 120; to: 1.06 1.06 1');
+  b.setAttribute('animation__out',  'property: scale; startEvents: mouseleave; dur: 120; to: 1 1 1');
+  return b;
+}
+
+/* ═══════════ FLUJO ═══════════ */
+function vrStart() {
+  S = newGame();
+  S.name = ($('vr-name').value || '').trim();
+  curIdx = 0; codeBuf = ''; codeFails = 0;
+  startT = Date.now();
+  $('menu').classList.add('gone');
+  $('hud').classList.add('on');
+  const sc = $('scene'); sc.style.display = 'block';
+  if (sc.hasLoaded) enterStation(0);
+  else sc.addEventListener('loaded', () => enterStation(0), { once:true });
+  updateHUD();
+}
+function vrExit() {
+  if ($('scene').is && $('scene').is('vr-mode')) { try { $('scene').exitVR(); } catch(e){} }
+  $('scene').style.display = 'none';
+  $('hud').classList.remove('on');
+  $('menu').classList.remove('gone');
+}
+function updateHUD() {
+  $('hud-pts').textContent = S ? S.points : 0;
+  const code = [0,1,2,3].map(i => (S && S.digits[i]) ? S.digits[i] : '—').join(' ');
+  $('hud-code').textContent = code;
+}
+
+function setBackdrop(st) {
+  const w = $('world');
+  const holder = document.createElement('a-entity');
+  holder.id = 'backdrop';
+  const img = new Image();
+  img.onload = () => {
+    // Foto plana curvada delante del jugador
+    const cid = 'photo-' + st.id;
+    img.id = cid; img.style.display = 'none'; document.body.appendChild(img);
+    const cv = document.createElement('a-curvedimage');
+    cv.setAttribute('src', '#' + cid);
+    cv.setAttribute('radius', '7');
+    cv.setAttribute('theta-length', '110');
+    cv.setAttribute('theta-start', '125');
+    cv.setAttribute('height', '5.2');
+    cv.setAttribute('position', '0 2.4 0');
+    holder.appendChild(cv);
+    $('scene').setAttribute('background', 'color: #BFE0FF');
+  };
+  img.onerror = () => {
+    // Sin foto todavía: cielo de color + gran monumento con emoji
+    $('scene').setAttribute('background', 'color: ' + st.sky);
+    const ped = textPanel({ w:5.2, h:3.0, px:900, bg:'#FFFFFFEE',
+      title: st.emoji + '  ' + st.name, titleSize:72,
+      body: '(Aquí aparecerá la foto real del monumento)\n' + st.intro, bodySize:36 });
+    ped.setAttribute('position', '0 2.6 -6.4');
+    holder.appendChild(ped);
+  };
+  img.src = VR_PHOTOS[st.id] + '?v=1';
+  w.appendChild(holder);
+}
+
+function enterStation(i) {
+  curIdx = i;
+  const st = VR_STATIONS[i];
+  clearWorld();
+  setBackdrop(st);
+  const w = $('world');
+
+  // Título flotante
+  const title = textPanel({ w:3.4, h:0.62, px:768, bg:'#0E7A46EE', fg:'#FFFFFF', border:'#0A5C35',
+    title: st.emoji + ' ' + st.name + (st.final ? '' : ' · ' + (st.ord+1) + 'ª cifra'), titleSize:44 });
+  title.setAttribute('position', '0 3.6 -4.6');
+  w.appendChild(title);
+
+  if (st.final && Object.keys(S.digits).length < 4) {
+    const warn = textPanel({ w:3.2, h:1.2, px:768, bg:'#FFF6DC', border:'#E8C860',
+      title:'⛓️ El cofre está encadenado', titleSize:44,
+      body:'Necesitas las 4 cifras de las puertas antes de entrar en la Iglesia Mayor.', bodySize:34 });
+    warn.setAttribute('position', '0 1.9 -3.4');
+    w.appendChild(warn);
+    const back = button3d('← Volver a las puertas', { w:2.2, h:0.44 });
+    back.setAttribute('position', '0 0.9 -3.2');
+    back.addEventListener('click', () => enterStation(0));
+    w.appendChild(back);
+    return;
+  }
+
+  // Pergamino brillante (hotspot)
+  const scroll = textPanel({ w:0.9, h:0.9, px:256, bg:'#FFF3C8', border:'#C9A84C', title:'📜', titleSize:120 });
+  scroll.classList.add('clk');
+  scroll.setAttribute('position', '1.6 1.5 -3.4');
+  scroll.setAttribute('animation__float', 'property: position; dir: alternate; dur: 1600; easing: easeInOutSine; loop: true; to: 1.6 1.72 -3.4');
+  scroll.setAttribute('animation__over', 'property: scale; startEvents: mouseenter; dur: 130; to: 1.12 1.12 1');
+  scroll.setAttribute('animation__out',  'property: scale; startEvents: mouseleave; dur: 130; to: 1 1 1');
+  scroll.addEventListener('click', () => { beep('key'); qIdx = 0; tries = 0; showQuestion(); });
+  w.appendChild(scroll);
+
+  const hint = textPanel({ w:2.6, h:0.8, px:640, bg:'#FFFFFFF2',
+    title: st.final ? '⚔️ La prueba final' : '🔒 Candado cerrado', titleSize:40,
+    body:'Toca el pergamino 📜 para responder las 3 preguntas.', bodySize:32 });
+  hint.setAttribute('position', '-1.3 1.6 -3.4');
+  w.appendChild(hint);
+}
+
+function showQuestion() {
+  const st = VR_STATIONS[curIdx];
+  const q = getQ(st.id, qIdx);
+  clearWorld();
+  setBackdrop(st);
+  const w = $('world');
+
+  const head = textPanel({ w:3.9, h:1.15, px:1024, bg:'#FFFFFFF7',
+    title: st.emoji + ' Pregunta ' + (qIdx+1) + ' de 3', titleSize:38,
+    body: q.q, bodySize:42, bodyColor:'#1C2A3A' });
+  head.setAttribute('position', '0 3.15 -4.2');
+  w.appendChild(head);
+
+  // Opciones barajadas
+  const letters = ['A','B','C','D'];
+  const ord = q.opts.map((_, i) => i);
+  for (let i = ord.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [ord[i],ord[j]]=[ord[j],ord[i]]; }
+  ord.forEach((oi, pos) => {
+    const b = button3d(letters[pos] + ')  ' + q.opts[oi], { w:3.6, h:0.5, size:32 });
+    b.setAttribute('position', `0 ${2.25 - pos*0.62} -4.0`);
+    b.dataset.oi = oi;
+    b.addEventListener('click', ev => answer(oi, b, q, st));
+    w.appendChild(b);
+  });
+  tries = 0;
+}
+
+function answer(oi, btn, q, st) {
+  if (btn.dataset.done) return;
+  if (oi === q.a) {
+    const gained = tries === 0 ? 100 : 50;
+    S.points += gained; S.hits++; S.totalQ++;
+    btn.setAttribute('material', 'color', '#BDF3D4');
+    beep('ok'); buzz(40); updateHUD();
+    flash('+' + gained, '#1D7A4F');
+    lockButtons();
+    setTimeout(nextQ, 950);
+  } else {
+    tries++;
+    btn.dataset.done = '1';
+    btn.setAttribute('material', 'color', '#F6C7C7');
+    btn.setAttribute('animation__shake', 'property: position; dir: alternate; dur: 60; loop: 4; to: ' +
+      btn.getAttribute('position').x + 0.06 + ' ' + btn.getAttribute('position').y + ' ' + btn.getAttribute('position').z);
+    beep('ko'); buzz(90);
+    if (tries >= 2) {
+      S.totalQ++;
+      // marca la correcta
+      document.querySelectorAll('#world [data-oi]').forEach(el => {
+        if (parseInt(el.dataset.oi) === q.a) el.setAttribute('material', 'color', '#BDF3D4');
+      });
+      lockButtons();
+      setTimeout(nextQ, 1500);
+    }
+  }
+}
+function lockButtons(){ document.querySelectorAll('#world [data-oi]').forEach(el => { el.dataset.done='1'; el.classList.remove('clk'); }); }
+function flash(txt, color) {
+  const f = textPanel({ w:1.2, h:0.5, px:256, bg:'#FFFFFF00', border:'#FFFFFF00', fg:color, title:txt, titleSize:88 });
+  f.setAttribute('position', '1.8 2.6 -3.6');
+  f.setAttribute('animation__up', 'property: position; dur: 900; easing: easeOutQuad; to: 1.8 3.3 -3.6');
+  f.setAttribute('animation__fade', 'property: material.opacity; dur: 900; from: 1; to: 0');
+  $('world').appendChild(f);
+  setTimeout(() => f.remove(), 950);
+}
+
+function nextQ() {
+  const st = VR_STATIONS[curIdx];
+  qIdx++;
+  if (qIdx < 3) { tries = 0; showQuestion(); return; }
+  if (st.final) { showKeypad(); return; }
+  // Revelación de cifra
+  S.digits[st.ord] = st.digit;
+  updateHUD(); beep('unlock'); buzz([60,40,60]);
+  clearWorld(); setBackdrop(st);
+  const w = $('world');
+  const card = textPanel({ w:3.4, h:2.0, px:900, bg:'#FFF9E4', border:'#C9A84C',
+    title:'🔓 ¡Candado abierto!', titleSize:52,
+    body:'Has conseguido la ' + (st.ord+1) + 'ª cifra del código secreto:\n\n' + st.digit, bodySize:64, bodyColor:'#8A5A10' });
+  card.setAttribute('position', '0 2.4 -3.8');
+  card.setAttribute('animation__pop', 'property: scale; from: 0.4 0.4 0.4; to: 1 1 1; dur: 420; easing: easeOutBack');
+  w.appendChild(card);
+  const nxt = VR_STATIONS[curIdx + 1];
+  const b = button3d('➡ Ir a ' + nxt.name, { w:2.8, h:0.5, bg:'#0E7A46', fg:'#FFFFFF', border:'#0A5C35' });
+  b.setAttribute('position', '0 1.0 -3.6');
+  b.addEventListener('click', () => enterStation(curIdx + 1));
+  w.appendChild(b);
+}
+
+function showKeypad(msg) {
+  clearWorld(); setBackdrop(VR_STATIONS[4]);
+  const w = $('world');
+  const head = textPanel({ w:3.4, h:0.9, px:900, bg:'#FFFFFFF7',
+    title:'🗝️ El Cofre de las Capitulaciones', titleSize:42,
+    body: msg || 'Introduce las 4 cifras en orden (1ª → 4ª).', bodySize:34 });
+  head.setAttribute('position', '0 3.35 -4.0');
+  w.appendChild(head);
+
+  const disp = textPanel({ w:2.4, h:0.6, px:640, bg:'#F2F7FF', border:'#9FB8D8',
+    title: (codeBuf.padEnd(4, '·')).split('').join('  '), titleSize:72 });
+  disp.setAttribute('position', '0 2.6 -3.9');
+  disp.id = 'code-display';
+  w.appendChild(disp);
+
+  const keys = ['1','2','3','4','5','6','7','8','9','⌫','0','✔'];
+  keys.forEach((k, i) => {
+    const col = i % 3, row = Math.floor(i / 3);
+    const b = button3d(k, { w:0.66, h:0.5, size:52,
+      bg: k === '✔' ? '#0E7A46' : '#FFFFFF', fg: k === '✔' ? '#FFFFFF' : '#1C2A3A' });
+    b.setAttribute('position', `${(col-1)*0.78} ${2.0 - row*0.58} -3.8`);
+    b.addEventListener('click', () => keyPress(k));
+    w.appendChild(b);
+  });
+}
+function keyPress(k) {
+  beep('key');
+  if (k === '⌫') codeBuf = codeBuf.slice(0, -1);
+  else if (k === '✔') { checkCode(); return; }
+  else if (codeBuf.length < 4) codeBuf += k;
+  showKeypad();
+}
+function checkCode() {
+  if (codeBuf.length < 4) { showKeypad('Introduce las 4 cifras.'); return; }
+  if (codeBuf === VR_CODE) {
+    const bonus = codeFails === 0 ? 200 : (codeFails === 1 ? 100 : 0);
+    S.points += bonus;
+    win();
+  } else {
+    codeFails++; codeBuf = '';
+    beep('ko'); buzz(160);
+    showKeypad(codeFails >= 2
+      ? '❌ Código incorrecto. Pista: es un año muy importante para Santa Fe…'
+      : '❌ Código incorrecto. ¡Revisa el orden de tus cifras!');
+  }
+}
+
+function win() {
+  const elapsed = Math.round((Date.now() - startT) / 1000);
+  beep('win'); buzz([80,50,80,50,160]);
+  clearWorld(); setBackdrop(VR_STATIONS[4]);
+  const w = $('world');
+  const card = textPanel({ w:4.0, h:2.6, px:1024, bg:'#FFF9E4', border:'#C9A84C',
+    title:'🏆 ¡Cofre abierto! ¡Enhorabuena' + (S.name ? ', ' + S.name : '') + '!', titleSize:48,
+    body:'⭐ ' + S.points + ' puntos · ⏱ ' + fmtTime(elapsed) + ' · ✔ ' + S.hits + '/' + S.totalQ + ' aciertos\n\nEl código era 1492: el año en que Granada se rindió, Colón zarpó hacia lo desconocido… y la historia cambió para siempre. Todo empezó aquí, en Santa Fe.', bodySize:36 });
+  card.setAttribute('position', '0 2.7 -4.0');
+  card.setAttribute('animation__pop', 'property: scale; from: 0.4 0.4 0.4; to: 1 1 1; dur: 450; easing: easeOutBack');
+  w.appendChild(card);
+
+  const again = button3d('🔁 Jugar de nuevo', { w:2.2, h:0.48, bg:'#0E7A46', fg:'#FFFFFF', border:'#0A5C35' });
+  again.setAttribute('position', '-1.2 0.95 -3.7');
+  again.addEventListener('click', () => { vrExit(); });
+  w.appendChild(again);
+  const menuB = button3d('🏆 Ranking y menú', { w:2.2, h:0.48 });
+  menuB.setAttribute('position', '1.2 0.95 -3.7');
+  menuB.addEventListener('click', () => { vrExit(); vrShowRanking(); });
+  w.appendChild(menuB);
+
+  submitScore(elapsed);
+}
+
+/* ═══════════ RANKING (Firebase REST) ═══════════ */
+async function submitScore(elapsed) {
+  try {
+    await fetch(VR_FB_URL + '.json', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        n:(S.name || 'Explorador/a VR').slice(0,24), p:S.points, t:elapsed,
+        h:S.hits, tt:S.totalQ, m:'vr', d:new Date().toISOString().slice(0,10)
+      })
+    });
+  } catch(e) {}
+}
+async function fetchRanking() {
+  let data = null;
+  try {
+    const r = await fetch(VR_FB_URL + '.json?orderBy=%22p%22&limitToLast=60');
+    if (r.ok) data = await r.json();
+  } catch(e) {}
+  if (!data) {
+    try { const r2 = await fetch(VR_FB_URL + '.json'); if (r2.ok) data = await r2.json(); } catch(e) {}
+  }
+  if (!data) return null;
+  return Object.values(data).filter(x => x && typeof x.p === 'number')
+    .sort((a,b) => (b.p - a.p) || ((a.t||0) - (b.t||0))).slice(0, 10);
+}
+async function vrShowRanking() {
+  $('rankModal').classList.add('on');
+  const box = $('rank-list');
+  box.innerHTML = '<div class="rank-loading">⏳ Cargando…</div>';
+  const top = await fetchRanking();
+  if (top === null) { box.innerHTML = '<div class="rank-loading">⚠️ Sin conexión: no se pudo cargar.</div>'; return; }
+  if (!top.length)  { box.innerHTML = '<div class="rank-loading">Aún no hay puntuaciones. ¡Sé el primero!</div>'; return; }
+  const icons = { gps:'📍', clase:'🏫', vr:'🥽' };
+  const medals = ['🥇','🥈','🥉'];
+  box.innerHTML = top.map((r, i) => `
+    <div class="rank-row ${i < 3 ? 'top' : ''}">
+      <span class="pos">${medals[i] || (i+1)+'º'}</span>
+      <span class="nm">${esc(r.n)}<small>${icons[r.m] || ''} ${esc(r.d || '')}</small></span>
+      <span class="pt">${r.p} <small>pts</small><small>⏱ ${fmtTime(r.t || 0)}</small></span>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
