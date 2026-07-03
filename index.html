@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="capilogo.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
     /* ═══════════════════════════════════════════
@@ -1176,7 +1176,127 @@
       #escape *, #escape *::before, #escape *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
     }
 
-</style>
+
+    /* ═══════════════════════════════════════════════════════════════
+       TEMA «SANTA FE 1491» · pergamino, borgoña heráldico y oro viejo
+       (bloque de overrides: re-viste la app sin tocar su estructura)
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --grad-sky: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.32 0 0 0 0 0.16 0 0 0 0.055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(160deg, #FAF4E4 0%, #F2E7CE 50%, #F7EFDC 100%);
+
+      --glass:        rgba(253,248,238,0.78);
+      --glass-2:      rgba(255,252,244,0.94);
+      --glass-border: rgba(186,150,80,0.42);
+      --glass-shadow: 0 8px 30px rgba(110,75,25,0.13);
+
+      --blue-1: #7C2130;  --blue-2: #5A1520;  --blue-3: #A34250;
+      --blue-pale: rgba(124,33,48,0.09);
+      --orange-1: #A87B24; --orange-2: #C9A227;
+      --green-1: #2F6B4F;  --green-2: #3F8A66;
+      --red-1: #8C3A24;    --red-2: #B25A3C;
+      --purple-1: #5B2A63; --purple-2: #7C4485;
+
+      --ink: #2E2013; --ink-2: #4A3320; --text-2: #6B5637; --text-3: #9A8663;
+      --stone: rgba(252,246,234,0.75); --stone-2: rgba(246,238,220,0.92); --stone-3: #C4AE84;
+
+      --gold: #C9A227; --gold-soft: rgba(201,162,39,0.45);
+      --fd: 'Cinzel', 'Playfair Display', serif;
+      --fu: 'EB Garamond', Georgia, serif;
+      --r: 14px; --r-lg: 20px;
+      --sh: 0 4px 18px rgba(110,75,25,0.12);
+      --sh-lg: 0 14px 44px rgba(90,60,20,0.2);
+    }
+    body { letter-spacing: 0.01em; }
+
+    /* Splash: estandarte real */
+    #splash {
+      background: radial-gradient(ellipse 100% 75% at 50% 15%, #8C2A3A 0%, #5A1520 58%, #3B0D16 100%);
+    }
+    .splash-logo { box-shadow: 0 0 0 3px #C9A227, 0 0 0 10px rgba(201,162,39,0.22), 0 0 60px rgba(201,162,39,0.35); }
+    .splash-title { letter-spacing: 0.1em; }
+    .splash-sub { color: #E7CD7E; letter-spacing: 0.32em; }
+    .splash-bar { background: rgba(201,162,39,0.25); }
+    .splash-bar-fill { background: linear-gradient(90deg, #E7CD7E, #C9A227); }
+
+    /* Cabecera del home: paño de borgoña con filo de oro */
+    .home-head {
+      background: linear-gradient(150deg, #7C2130 0%, #5A1520 55%, #40101A 100%);
+      border-bottom: 3px solid var(--gold);
+    }
+
+    /* Tarjetas de ruta: brillos cálidos y filo dorado */
+    .rc-head.gold::before, .rc-head.navy::before, .rc-head.rust::before,
+    .rc-head.sofa::before, .rc-head.esc::before {
+      background: radial-gradient(ellipse 70% 85% at 8% 6%, rgba(255,240,200,0.30), transparent 55%);
+    }
+    .rc-head { border-bottom: 2px solid var(--gold-soft); }
+    .rc-head.esc { background: linear-gradient(140deg, #2F6B4F 0%, #24523C 58%, #18382A 100%); }
+
+    /* Marcos de pergamino con doble filete */
+    .rc, .home-info {
+      border: 1px solid var(--gold-soft);
+      box-shadow: var(--sh), inset 0 0 0 1px rgba(255,250,236,0.65);
+    }
+
+    /* Botones principales */
+    .rc-btn.esc-btn, .esc-main-btn, .esc-step-ico {
+      background: linear-gradient(135deg, #3F8A66, #24523C);
+      border: 1px solid rgba(255,244,205,0.35);
+    }
+    .esc-main-btn { box-shadow: 0 8px 22px rgba(36,82,60,0.35), inset 0 0 0 1px rgba(231,205,126,0.35); }
+
+    /* Escape room: héroe pino real con remate burdeos y oro */
+    .esc-hero {
+      background: linear-gradient(140deg, #24523C 0%, #2F6B4F 60%, #7C2130 145%);
+      border-bottom: 3px solid var(--gold);
+    }
+    .esc-continue-btn { border: 1px solid var(--gold-soft); }
+    .esc-vr-link {
+      background: linear-gradient(150deg, #FBF4E0, #F3E7C8);
+      border: 1.5px solid var(--gold-soft); color: #6B4A12;
+    }
+    .esc-slot.got { background: linear-gradient(160deg, #FFFDF5, #F3E7C8); border-color: var(--gold); }
+    .esc-rank-row { border-color: var(--gold-soft); background: #FFFDF6; }
+    .esc-rank-row.top { background: linear-gradient(150deg, #FBF2D8, #F3E3B4); border-color: #CDA845; }
+    .esc-win-stat, .esc-pista-item, .esc-pista-card, .esc-digit-reveal { border-color: var(--gold-soft); }
+
+    /* Títulos con aire de códice */
+    .splash-title, .home-head h1, .sec-label h2, .esc-win-title, .esc-card-title, .panel-head h2 {
+      letter-spacing: 0.045em; font-weight: 700;
+    }
+    .sec-label h2 { position: relative; padding-bottom: 6px; }
+    .sec-label h2::after {
+      content: ''; position: absolute; left: 0; bottom: 0; width: 46px; height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent); border-radius: 2px;
+    }
+
+    /* Barra superior y navegación: madera clara y oro */
+    #topbar { border-bottom: 1.5px solid var(--gold-soft); }
+    #bottom-nav { border-top: 1.5px solid var(--gold-soft); }
+    #nav-strip { border: 1px solid var(--gold-soft); }
+
+    /* Inputs */
+    input[type="text"], input[type="password"], input[type="number"], select, textarea {
+      font-family: var(--fu); border-color: var(--gold-soft) !important;
+    }
+    .esc-name-row input { background: #FFFDF6; }
+
+  
+    /* Tema 1491 · segunda pasada: gradientes fijos restantes */
+    body::before {
+      background:
+        radial-gradient(ellipse 60% 50% at 12% 8%, rgba(201,162,39,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 88% 18%, rgba(124,33,48,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 55% 45% at 50% 100%, rgba(168,123,36,0.10) 0%, transparent 55%);
+    }
+    .rc-head.navy { background: linear-gradient(140deg, #93303F 0%, #7C2130 50%, #4A111B 100%); }
+    .rc-head.gold { background: linear-gradient(140deg, #C9A227 0%, #A87B24 55%, #77551A 100%); }
+    .rc-head.rust { background: linear-gradient(140deg, #B25A3C 0%, #8C3A24 58%, #5C2415 100%); }
+    .rc-head.sofa { background: linear-gradient(140deg, #7C4485 0%, #5B2A63 58%, #391B40 100%); }
+    .sofa-panel-head { background: linear-gradient(140deg, #7C4485 0%, #5B2A63 60%, #391B40 100%); border-bottom: 2px solid var(--gold-soft); }
+    .esc-far-chip { background: linear-gradient(135deg, #E7CD7E, #C9A227); color: #4A3510; }
+
+  </style>
 </head>
 <body>
 
