@@ -1,7 +1,8 @@
-const CACHE_NAME = 'santafe-historica-v1';
+const CACHE_NAME = 'santafe-historica-v2-1491';
 const urlsToCache = [
   './',
   './index.html',
+  './vr.html',
   './manifest.json',
   './capilogo.png'
 ];
@@ -28,19 +29,39 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const isPage = req.mode === 'navigate' || req.url.endsWith('/index.html') || req.url.endsWith('/');
+
+  if (isPage) {
+    // La página principal: SIEMPRE intenta la red primero, para que las
+    // actualizaciones (fotos, textos, funciones nuevas) se vean al instante.
+    // Si no hay conexión, se sirve la última copia guardada.
+    event.respondWith(
+      fetch(req, { cache: 'no-store' })
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          return res;
+        })
+        .catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Resto de recursos (imágenes, iconos, librerías): caché primero para ir
+  // rápido y funcionar sin conexión, y se guarda una copia nueva si no estaba.
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .catch(() => {
-            // Si falla la red y es una página, devolver index.html
-            if (event.request.mode === 'navigate') {
-              return caches.match('./index.html');
-            }
-          });
-      })
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === 'basic') {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => cached);
+    })
   );
 });
