@@ -71,7 +71,14 @@
   body { font-family:'EB Garamond', Georgia, serif; background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.32 0 0 0 0 0.16 0 0 0 0.055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
     linear-gradient(160deg,#FAF4E4 0%,#F2E7CE 50%,#F7EFDC 100%); color:#2E2013; }
-  .m-hero { background:linear-gradient(140deg,#24523C 0%,#2F6B4F 60%,#7C2130 145%); border:1px solid rgba(201,162,39,0.5); border-bottom:3px solid #C9A227; box-shadow:0 14px 34px rgba(60,40,10,0.25); }
+  .m-hero {
+    background:
+      linear-gradient(195deg, rgba(18,42,32,0.72) 0%, rgba(24,56,42,0.42) 55%, rgba(90,20,30,0.55) 100%),
+      url('img/calle-puerta.jpg');
+    background-size:cover; background-position:center 20%;
+    border:1px solid rgba(201,162,39,0.5); border-bottom:3px solid #C9A227; box-shadow:0 14px 34px rgba(60,40,10,0.25);
+  }
+  .m-hero * { text-shadow:0 2px 10px rgba(0,0,0,0.45); }
   .m-hero h1 { font-family:'Cinzel', serif; letter-spacing:0.05em; }
   .m-card { background:#FFFDF6; border:1px solid rgba(186,150,80,0.45); box-shadow:0 6px 20px rgba(110,75,25,0.1), inset 0 0 0 1px rgba(255,250,236,0.65); }
   .m-card h2 { font-family:'Cinzel', serif; font-size:14px; letter-spacing:0.04em; color:#4A3320; }

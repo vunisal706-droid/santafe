@@ -1210,7 +1210,10 @@
 
     /* Splash: estandarte real */
     #splash {
-      background: radial-gradient(ellipse 100% 75% at 50% 15%, #8C2A3A 0%, #5A1520 58%, #3B0D16 100%);
+      background:
+        linear-gradient(165deg, rgba(90,21,32,0.62) 0%, rgba(58,14,22,0.66) 100%),
+        url('img/ciudad-aerea.jpg');
+      background-size: cover; background-position: center 30%;
     }
     .splash-logo { box-shadow: 0 0 0 3px #C9A227, 0 0 0 10px rgba(201,162,39,0.22), 0 0 60px rgba(201,162,39,0.35); }
     .splash-title { letter-spacing: 0.1em; }
@@ -1220,7 +1223,10 @@
 
     /* Cabecera del home: paño de borgoña con filo de oro */
     .home-head {
-      background: linear-gradient(150deg, #7C2130 0%, #5A1520 55%, #40101A 100%);
+      background:
+        linear-gradient(165deg, rgba(90,21,32,0.60) 0%, rgba(64,16,26,0.64) 100%),
+        url('img/ciudad-plano-rotulado.jpg');
+      background-size: cover; background-position: center 20%;
       border-bottom: 3px solid var(--gold);
     }
 
@@ -1230,7 +1236,12 @@
       background: radial-gradient(ellipse 70% 85% at 8% 6%, rgba(255,240,200,0.30), transparent 55%);
     }
     .rc-head { border-bottom: 2px solid var(--gold-soft); }
-    .rc-head.esc { background: linear-gradient(140deg, #2F6B4F 0%, #24523C 58%, #18382A 100%); }
+    .rc-head.esc {
+      background:
+        linear-gradient(195deg, rgba(20,48,36,0.72) 0%, rgba(24,56,42,0.50) 55%, rgba(24,56,42,0.20) 100%),
+        url('img/calle-puerta.jpg');
+      background-size: cover; background-position: center 25%;
+    }
 
     /* Marcos de pergamino con doble filete */
     .rc, .home-info {
@@ -1247,7 +1258,10 @@
 
     /* Escape room: héroe pino real con remate burdeos y oro */
     .esc-hero {
-      background: linear-gradient(140deg, #24523C 0%, #2F6B4F 60%, #7C2130 145%);
+      background:
+        linear-gradient(195deg, rgba(18,42,32,0.72) 0%, rgba(24,56,42,0.42) 55%, rgba(24,56,42,0.16) 100%),
+        url('img/calle-puerta.jpg');
+      background-size: cover; background-position: center 22%;
       border-bottom: 3px solid var(--gold);
     }
     .esc-continue-btn { border: 1px solid var(--gold-soft); }
@@ -1289,14 +1303,82 @@
         radial-gradient(ellipse 50% 60% at 88% 18%, rgba(124,33,48,0.08) 0%, transparent 55%),
         radial-gradient(ellipse 55% 45% at 50% 100%, rgba(168,123,36,0.10) 0%, transparent 55%);
     }
-    .rc-head.navy { background: linear-gradient(140deg, #93303F 0%, #7C2130 50%, #4A111B 100%); }
-    .rc-head.gold { background: linear-gradient(140deg, #C9A227 0%, #A87B24 55%, #77551A 100%); }
-    .rc-head.rust { background: linear-gradient(140deg, #B25A3C 0%, #8C3A24 58%, #5C2415 100%); }
-    .rc-head.sofa { background: linear-gradient(140deg, #7C4485 0%, #5B2A63 58%, #391B40 100%); }
-    .sofa-panel-head { background: linear-gradient(140deg, #7C4485 0%, #5B2A63 60%, #391B40 100%); border-bottom: 2px solid var(--gold-soft); }
+    .rc-head.navy {
+      background:
+        linear-gradient(195deg, rgba(58,13,20,0.74) 0%, rgba(74,17,27,0.50) 55%, rgba(74,17,27,0.20) 100%),
+        url('img/ciudad-plano.jpg');
+      background-size: cover; background-position: center 22%;
+    }
+    .rc-head.gold {
+      background:
+        linear-gradient(195deg, rgba(95,68,20,0.74) 0%, rgba(119,85,26,0.50) 55%, rgba(119,85,26,0.18) 100%),
+        url('img/ciudad-plano-rotulado.jpg');
+      background-size: cover; background-position: center 22%;
+    }
+    .rc-head.rust {
+      background:
+        linear-gradient(195deg, rgba(72,28,16,0.74) 0%, rgba(92,36,21,0.50) 55%, rgba(92,36,21,0.18) 100%),
+        url('img/calle-puerta.jpg');
+      background-size: cover; background-position: center 30%;
+    }
+    .rc-head.sofa {
+      background:
+        linear-gradient(195deg, rgba(44,21,50,0.74) 0%, rgba(57,27,64,0.50) 55%, rgba(57,27,64,0.18) 100%),
+        url('img/ciudad-maqueta.jpg');
+      background-size: cover; background-position: center 25%;
+    }
+    .sofa-panel-head {
+      background:
+        linear-gradient(195deg, rgba(44,21,50,0.74) 0%, rgba(57,27,64,0.50) 55%, rgba(57,27,64,0.18) 100%),
+        url('img/ciudad-maqueta.jpg');
+      background-size: cover; background-position: center 25%;
+      border-bottom: 2px solid var(--gold-soft);
+    }
     .esc-far-chip { background: linear-gradient(135deg, #E7CD7E, #C9A227); color: #4A3510; }
 
-  </style>
+  
+    /* Legibilidad del texto sobre las cabeceras con foto */
+    .home-head, .rc-head, .esc-hero, .sofa-panel-head { background-blend-mode: normal; }
+    .home-head *, .rc-head *, .esc-hero *, .sofa-panel-head * { text-shadow: 0 2px 10px rgba(0,0,0,0.35); }
+
+    /* ── Galería histórica ── */
+    .gal-wrap { margin: 22px 0 26px; }
+    .gal-strip {
+      display:flex; gap:12px; overflow-x:auto; padding:4px 2px 10px;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling:touch;
+    }
+    .gal-strip::-webkit-scrollbar { height:6px; }
+    .gal-strip::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius:6px; }
+    .gal-item {
+      position:relative; flex:0 0 auto; width:168px; height:210px; border-radius:16px;
+      overflow:hidden; cursor:pointer; scroll-snap-align:start;
+      border:1.5px solid var(--gold-soft); box-shadow: var(--sh);
+    }
+    .gal-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease; }
+    .gal-item:active img { transform:scale(1.06); }
+    .gal-cap {
+      position:absolute; left:0; right:0; bottom:0; padding:10px 10px 9px;
+      background:linear-gradient(0deg, rgba(30,18,8,0.82), transparent);
+      color:#FCF3DC; font-size:11.5px; font-weight:600; line-height:1.3;
+    }
+    .gal-lightbox {
+      position:fixed; inset:0; z-index:3000; background:rgba(20,12,6,0.92);
+      display:none; align-items:center; justify-content:center; flex-direction:column;
+      padding:20px;
+    }
+    .gal-lightbox.on { display:flex; }
+    .gal-lightbox img { max-width:100%; max-height:74vh; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:2px solid rgba(201,162,39,0.5); }
+    .gal-lb-cap { color:#FCF3DC; font-size:14px; margin-top:14px; text-align:center; max-width:480px; font-weight:600; }
+    .gal-lb-close {
+      position:absolute; top:18px; right:18px; width:40px; height:40px; border-radius:50%;
+      background:rgba(255,253,246,0.15); color:#FCF3DC; font-size:18px; border:1px solid rgba(255,253,246,0.3);
+    }
+    .gal-lb-nav {
+      position:absolute; top:50%; transform:translateY(-50%); width:46px; height:46px; border-radius:50%;
+      background:rgba(255,253,246,0.15); color:#FCF3DC; font-size:26px; border:1px solid rgba(255,253,246,0.3);
+    }
+    .gal-lb-nav.prev { left:12px; } .gal-lb-nav.next { right:12px; }
+</style>
 </head>
 <body>
 
@@ -1461,6 +1543,19 @@
         <button class="rc-btn esc-btn" onclick="escOpen()">
           ¡Resolver el enigma! <span class="rc-btn-arrow">→</span>
         </button>
+      </div>
+    </div>
+
+    <!-- Galería histórica -->
+    <div class="gal-wrap">
+      <div class="sec-label"><h2>🖼️ Santa Fe en 1491</h2></div>
+      <div class="gal-strip" id="gal-strip">
+        <div class="gal-item" onclick="galOpen(0)"><img src="img/ciudad-aerea.jpg" alt="Vista aérea de Santa Fe amurallada" loading="lazy"><span class="gal-cap">Vista aérea de la ciudad amurallada</span></div>
+        <div class="gal-item" onclick="galOpen(1)"><img src="img/ciudad-plano-rotulado.jpg" alt="Plano de Santa Fe con sus cuatro puertas" loading="lazy"><span class="gal-cap">Las cuatro puertas de la muralla</span></div>
+        <div class="gal-item" onclick="galOpen(2)"><img src="img/mercado.jpg" alt="Calle del mercado en Santa Fe" loading="lazy"><span class="gal-cap">Un día de mercado en la calle mayor</span></div>
+        <div class="gal-item" onclick="galOpen(3)"><img src="img/calle-puerta.jpg" alt="Calle a los pies de una puerta de la muralla" loading="lazy"><span class="gal-cap">La guardia junto a la puerta</span></div>
+        <div class="gal-item" onclick="galOpen(4)"><img src="img/ciudad-plano.jpg" alt="Plano cenital de la ciudad" loading="lazy"><span class="gal-cap">El trazado en cuadrícula, calle a calle</span></div>
+        <div class="gal-item" onclick="galOpen(5)"><img src="img/ciudad-maqueta.jpg" alt="Maqueta de Santa Fe sobre pergamino" loading="lazy"><span class="gal-cap">La ciudad, recreada en maqueta</span></div>
       </div>
     </div>
 
@@ -4632,9 +4727,50 @@ window.addEventListener('resize', () => {
 // ================================================================
 // PWA - Service Worker
 // ================================================================
+
+const GAL_ITEMS = [
+  {src:'img/ciudad-aerea.jpg', cap:'Vista aérea de la ciudad amurallada'},
+  {src:'img/ciudad-plano-rotulado.jpg', cap:'Las cuatro puertas de la muralla'},
+  {src:'img/mercado.jpg', cap:'Un día de mercado en la calle mayor'},
+  {src:'img/calle-puerta.jpg', cap:'La guardia junto a la puerta'},
+  {src:'img/ciudad-plano.jpg', cap:'El trazado en cuadrícula, calle a calle'},
+  {src:'img/ciudad-maqueta.jpg', cap:'La ciudad, recreada en maqueta'}
+];
+let galIdx = 0;
+function galOpen(i) {
+  galIdx = i;
+  galRender();
+  document.getElementById('gal-lightbox').classList.add('on');
+}
+function galRender() {
+  const it = GAL_ITEMS[galIdx];
+  document.getElementById('gal-lb-img').src = it.src;
+  document.getElementById('gal-lb-img').alt = it.cap;
+  document.getElementById('gal-lb-cap').textContent = it.cap;
+}
+function galStep(d) {
+  galIdx = (galIdx + d + GAL_ITEMS.length) % GAL_ITEMS.length;
+  galRender();
+}
+function galClose() { document.getElementById('gal-lightbox').classList.remove('on'); }
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('gal-lightbox').classList.contains('on')) return;
+  if (e.key === 'Escape') galClose();
+  if (e.key === 'ArrowLeft') galStep(-1);
+  if (e.key === 'ArrowRight') galStep(1);
+});
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 </script>
+
+<div id="gal-lightbox" class="gal-lightbox" onclick="if(event.target===this)galClose()">
+  <button class="gal-lb-close" onclick="galClose()" aria-label="Cerrar">✕</button>
+  <button class="gal-lb-nav prev" onclick="galStep(-1)" aria-label="Anterior">‹</button>
+  <img id="gal-lb-img" src="" alt="">
+  <button class="gal-lb-nav next" onclick="galStep(1)" aria-label="Siguiente">›</button>
+  <div class="gal-lb-cap" id="gal-lb-cap"></div>
+</div>
 </body>
 </html>
