@@ -1378,6 +1378,124 @@
       background:rgba(255,253,246,0.15); color:#FCF3DC; font-size:26px; border:1px solid rgba(255,253,246,0.3);
     }
     .gal-lb-nav.prev { left:12px; } .gal-lb-nav.next { right:12px; }
+
+    /* ── Mini-galería de documentos (dentro del overlay de Capitulaciones) ── */
+    .cap-strip { display:flex; gap:10px; overflow-x:auto; padding:6px 2px 14px; -webkit-overflow-scrolling:touch; }
+    .cap-strip::-webkit-scrollbar { height:6px; }
+    .cap-strip::-webkit-scrollbar-thumb { background: var(--gold-soft); border-radius:6px; }
+    .cap-item {
+      position:relative; flex:0 0 auto; width:104px; height:142px; border-radius:10px;
+      overflow:hidden; cursor:pointer; border:1.5px solid var(--gold-soft); box-shadow:var(--sh);
+    }
+    .cap-item img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cap-num {
+      position:absolute; bottom:5px; right:6px; background:rgba(30,18,8,0.78); color:#FCF3DC;
+      font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:100px;
+    }
+
+    /* ── Menú «Descubre Santa Fe» ── */
+    .disc-wrap { margin: 8px 0 26px; }
+    .disc-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .disc-tile {
+      background:#FFFDF6; border:1.5px solid var(--gold-soft); border-radius:16px;
+      padding:16px 14px; cursor:pointer; box-shadow:var(--sh); text-align:left;
+      transition:transform .15s ease;
+    }
+    .disc-tile:active { transform:scale(0.97); }
+    .disc-ico { font-size:26px; display:block; margin-bottom:8px; }
+    .disc-name { font-family:var(--fd); font-weight:700; font-size:14.5px; color:var(--ink); line-height:1.25; }
+    .disc-sub { font-size:11.5px; color:var(--text-2); margin-top:4px; line-height:1.35; }
+
+    /* ── Overlay de lectura (historia / personajes) ── */
+    .hist-overlay {
+      position:fixed; inset:0; z-index:2500; background:rgba(28,18,8,0.55);
+      display:none; align-items:flex-end; justify-content:center;
+    }
+    .hist-overlay.on { display:flex; }
+    .hist-sheet {
+      background:var(--grad-sky); width:100%; max-width:560px; height:92vh;
+      border-radius:22px 22px 0 0; display:flex; flex-direction:column; overflow:hidden;
+      border-top:3px solid var(--gold);
+    }
+    .hist-head {
+      display:flex; align-items:center; gap:12px; padding:16px 18px;
+      background:linear-gradient(150deg, rgba(124,33,48,0.94), rgba(90,21,32,0.96));
+      border-bottom:2px solid var(--gold-soft); flex-shrink:0;
+    }
+    .hist-back {
+      width:36px; height:36px; border-radius:50%; background:rgba(255,253,246,0.15);
+      color:#FCF3DC; border:1px solid rgba(255,253,246,0.3); font-size:16px; flex-shrink:0;
+    }
+    .hist-head h2 { font-family:var(--fd); color:#FCF3DC; font-size:17px; font-weight:700; }
+    .hist-body { padding:20px 18px 40px; overflow-y:auto; flex:1; }
+    .hist-body h3 { font-family:var(--fd); color:var(--ink); font-size:15.5px; margin:20px 0 8px; }
+    .hist-body h3:first-child { margin-top:0; }
+    .hist-body p { font-size:14.5px; color:var(--ink-2); line-height:1.6; margin-bottom:10px; }
+    .hist-body ul { padding-left:20px; margin-bottom:10px; }
+    .hist-body li { font-size:14px; color:var(--ink-2); line-height:1.55; margin-bottom:6px; }
+    .hist-body strong { color:var(--blue-1); }
+
+    .hist-timeline { margin-bottom:18px; }
+    .ht-item {
+      display:flex; gap:12px; padding:10px 0; border-left:2px solid var(--gold-soft);
+      padding-left:16px; margin-left:6px; position:relative;
+    }
+    .ht-item::before {
+      content:''; position:absolute; left:-6px; top:14px; width:10px; height:10px;
+      border-radius:50%; background:var(--gold);
+    }
+    .ht-date { font-family:var(--fd); font-weight:700; color:var(--blue-1); font-size:13px; min-width:82px; flex-shrink:0; }
+    .ht-txt { font-size:13.5px; color:var(--ink-2); line-height:1.4; }
+
+    .arco-card {
+      background:#FFFDF6; border:1.5px solid var(--gold-soft); border-radius:14px;
+      padding:14px; margin-bottom:12px; box-shadow:var(--sh);
+    }
+    .arco-card-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .arco-ico { font-size:24px; }
+    .arco-name { font-family:var(--fd); font-weight:700; font-size:14px; color:var(--ink); }
+    .arco-ori { font-size:11px; color:var(--gold); font-weight:700; letter-spacing:0.06em; text-transform:uppercase; }
+    .arco-card p { margin-bottom:0; }
+
+    .quote-box {
+      margin-top:10px; padding:14px; background:linear-gradient(150deg,#FBF2D8,#F3E3B4);
+      border:1px solid #CDA845; border-radius:12px; font-style:italic; font-size:13.5px;
+      color:#5C4416; line-height:1.55;
+    }
+    .quote-src { display:block; margin-top:8px; font-style:normal; font-weight:700; font-size:11.5px; color:#8A6A1E; }
+
+    .sabias-box {
+      background:linear-gradient(150deg,#FBF6EA,#F3E7C8); border:1.5px solid var(--gold-soft);
+      border-radius:16px; padding:16px; margin-bottom:6px;
+    }
+    .sabias-tag {
+      display:inline-block; background:var(--gold); color:#4A3510; font-size:11px; font-weight:800;
+      letter-spacing:0.06em; text-transform:uppercase; padding:3px 10px; border-radius:100px;
+    }
+
+    /* ── Personajes ── */
+    .pj-intro { font-size:13px; color:var(--text-2); margin-bottom:14px; }
+    .pj-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .pj-card {
+      background:#FFFDF6; border:1.5px solid var(--gold-soft); border-radius:14px;
+      padding:14px 10px; text-align:center; cursor:pointer; box-shadow:var(--sh);
+    }
+    .pj-avatar {
+      position:relative; width:64px; height:64px; border-radius:50%; margin:0 auto 8px;
+      background:linear-gradient(150deg,#C9A227,#8C6A1A); display:flex; align-items:center;
+      justify-content:center; overflow:hidden; border:2px solid var(--gold);
+    }
+    .pj-avatar span { font-family:var(--fd); font-size:24px; font-weight:700; color:#FFFDF6; }
+    .pj-avatar img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .pj-name { font-family:var(--fd); font-weight:700; font-size:12.5px; color:var(--ink); line-height:1.25; margin-bottom:3px; }
+    .pj-fechas { font-size:10.5px; color:var(--gold); font-weight:700; margin-bottom:4px; }
+    .pj-oficio { font-size:10.5px; color:var(--text-2); line-height:1.3; }
+    .pj-detail {
+      display:none; text-align:left; margin-top:10px; padding-top:10px;
+      border-top:1px dashed var(--gold-soft); font-size:12px; color:var(--ink-2); line-height:1.5;
+    }
+    .pj-detail.on { display:block; }
+    .pj-detail b { color:var(--blue-1); }
 </style>
 </head>
 <body>
@@ -1414,6 +1532,33 @@
       <div class="how-bar-text">
         <strong>Elige tu ruta y comienza la visita</strong>
         <span>Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.</span>
+      </div>
+    </div>
+
+    <!-- Descubre Santa Fe: menú de historia -->
+    <div class="disc-wrap">
+      <div class="sec-label"><h2>📜 Descubre Santa Fe</h2></div>
+      <div class="disc-grid">
+        <div class="disc-tile" onclick="histOpen('fundacion')">
+          <span class="disc-ico">📜</span>
+          <div class="disc-name">La Fundación</div>
+          <div class="disc-sub">De campamento a ciudad, en 80 días</div>
+        </div>
+        <div class="disc-tile" onclick="histOpen('arcos')">
+          <span class="disc-ico">🏯</span>
+          <div class="disc-name">Los Cuatro Arcos</div>
+          <div class="disc-sub">Historia y curiosidades de cada puerta</div>
+        </div>
+        <div class="disc-tile" onclick="histOpen('curiosidades')">
+          <span class="disc-ico">⚜️</span>
+          <div class="disc-name">Las Capitulaciones</div>
+          <div class="disc-sub">Curiosidades sobre los grandes acuerdos</div>
+        </div>
+        <div class="disc-tile" onclick="pjOpen()">
+          <span class="disc-ico">🖋️</span>
+          <div class="disc-name">Personajes de 1492</div>
+          <div class="disc-sub">9 protagonistas de la historia</div>
+        </div>
       </div>
     </div>
 
@@ -2022,7 +2167,7 @@ let POIS = [
     }
   },
   {
-    id:'arco-jaen', icon:'🏯', color:'#a84020', lat:37.18220, lng:-3.71558,
+    id:'arco-jaen', icon:'🏯', color:'#a84020', lat:37.18840, lng:-3.71558,
     video:null, audio:null,
     names:{ es:'Arco de Jaén', en:'Arch of Jaén', fr:'Arc de Jaén', zh:'哈恩拱门', ar:'قوس خاين' },
     types:{ es:'Puerta sur · Muralla histórica', en:'South gate · Historic wall', fr:'Porte sud · Mur historique', zh:'南门 · 历史城墙', ar:'البوابة الجنوبية · الأسوار التاريخية' },
@@ -2035,7 +2180,7 @@ let POIS = [
     }
   },
   {
-    id:'arco-real', icon:'👑', color:'#6d3a8a', lat:37.18840, lng:-3.71558,
+    id:'arco-real', icon:'👑', color:'#6d3a8a', lat:37.18220, lng:-3.71558,
     video:null, audio:null,
     names:{ es:'Arco Real', en:'Royal Arch', fr:'Arc Royal', zh:'皇家拱门', ar:'القوس الملكي' },
     types:{ es:'Puerta norte · Muralla histórica', en:'North gate · Historic wall', fr:'Porte nord · Mur historique', zh:'北门 · 历史城墙', ar:'البوابة الشمالية · الأسوار التاريخية' },
@@ -2930,9 +3075,9 @@ const ESC_STATIONS = [
     pista:'En el Arco de Loja está la placa fundacional de la ciudad, escrita en latín con letras de plomo.' },
   { id:'arco-granada', x:318, y:200, ord:1, digit:'4',
     pista:'Busca la cúpula en lo alto del Arco de Granada: es la única puerta que la conserva.' },
-  { id:'arco-jaen',    x:180, y:338, ord:2, digit:'9',
+  { id:'arco-jaen',    x:180, y:62,  ord:2, digit:'9',
     pista:'Dentro del Arco de Jaén se esconde la Santa Escala: subirla de rodillas en el día señalado otorga una indulgencia.' },
-  { id:'arco-real',    x:180, y:62,  ord:3, digit:'2',
+  { id:'arco-real',    x:180, y:338, ord:3, digit:'2',
     pista:'Bajo el dintel exterior del Arco Real vigila la Virgen del Pópolo desde el siglo XVI.' },
   { id:'iglesia',      x:236, y:262, final:true,
     pista:'Uno de los dos órganos de la Iglesia Mayor no ha sonado jamás… y nunca lo hará.' }
@@ -4736,20 +4881,34 @@ const GAL_ITEMS = [
   {src:'img/ciudad-plano.jpg', cap:'El trazado en cuadrícula, calle a calle'},
   {src:'img/ciudad-maqueta.jpg', cap:'La ciudad, recreada en maqueta'}
 ];
+const CAP_ITEMS = [
+  {src:'img/capitulaciones/c1.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 1'},
+  {src:'img/capitulaciones/c2.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 2'},
+  {src:'img/capitulaciones/c3.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 3'},
+  {src:'img/capitulaciones/c4.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 4'},
+  {src:'img/capitulaciones/c5.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 5'},
+  {src:'img/capitulaciones/c6.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 6'},
+  {src:'img/capitulaciones/c7.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 7'},
+  {src:'img/capitulaciones/c8.jpg', cap:'Capitulaciones de Santa Fe con Colón — folio 8'}
+];
+let LB_ACTIVE = GAL_ITEMS;
 let galIdx = 0;
-function galOpen(i) {
+function lbShow(items, i) {
+  LB_ACTIVE = items;
   galIdx = i;
   galRender();
   document.getElementById('gal-lightbox').classList.add('on');
 }
+function galOpen(i) { lbShow(GAL_ITEMS, i); }
+function capOpen(i) { lbShow(CAP_ITEMS, i); }
 function galRender() {
-  const it = GAL_ITEMS[galIdx];
+  const it = LB_ACTIVE[galIdx];
   document.getElementById('gal-lb-img').src = it.src;
   document.getElementById('gal-lb-img').alt = it.cap;
   document.getElementById('gal-lb-cap').textContent = it.cap;
 }
 function galStep(d) {
-  galIdx = (galIdx + d + GAL_ITEMS.length) % GAL_ITEMS.length;
+  galIdx = (galIdx + d + LB_ACTIVE.length) % LB_ACTIVE.length;
   galRender();
 }
 function galClose() { document.getElementById('gal-lightbox').classList.remove('on'); }
@@ -4758,6 +4917,45 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') galClose();
   if (e.key === 'ArrowLeft') galStep(-1);
   if (e.key === 'ArrowRight') galStep(1);
+});
+
+
+const HIST_CONTENT = {"fundacion": "\n<div class=\"hist-timeline\">\n  <div class=\"ht-item\"><span class=\"ht-date\">2 oct 1491</span><span class=\"ht-txt\">Fundación de Santa Fe, ciudad-campamento para el asedio final a Granada</span></div>\n  <div class=\"ht-item\"><span class=\"ht-date\">25 nov 1491</span><span class=\"ht-txt\">Se firman en Santa Fe las Capitulaciones para la rendición de Granada</span></div>\n  <div class=\"ht-item\"><span class=\"ht-date\">17 abr 1492</span><span class=\"ht-txt\">Se firman las Capitulaciones de Santa Fe con Cristóbal Colón</span></div>\n</div>\n\n<h3>De las tiendas de lona a la ciudad de piedra</h3>\n<p>Los Reyes Católicos instalaron primero, en 1483, un campamento provisional en los llamados \"Ojos del Huécar\". En julio de 1491, un incendio destruyó aquel campamento de madera y lona. En lugar de rendirse, decidieron construir una ciudad-fortaleza permanente de piedra y ladrillo: Santa Fe.</p>\n<p>Se estima que participaron unos 60.000 hombres —entre 50.000 infantes y 10.000 jinetes— y que la obra se completó en apenas <strong>80 días</strong>. La planta, rectangular como un campamento militar romano, tenía dos calles principales que se cruzaban en una plaza de armas central, muralla con foso y torres defensivas en las cuatro puertas.</p>\n\n<h3>De campamento militar a villa poblada</h3>\n<p>Al principio Santa Fe era una estructura puramente militar. Tras la conquista de Granada (2 de enero de 1492), en marzo de ese año los Reyes ordenaron poblarla: concedieron <strong>200 cartas de vecindad</strong> a personas casadas que se comprometieran a residir cinco años con su familia. Los primeros vecinos rondarían el millar de personas, venidos sobre todo de los reinos de Sevilla, Jaén y el obispado de Córdoba.</p>\n\n<h3>Los privilegios de la ciudad</h3>\n<p>Para atraer población, los Reyes concedieron a Santa Fe importantes privilegios, recogidos en el <em>Libro de Privilegios</em> que aún se conserva en el Ayuntamiento:</p>\n<ul>\n  <li>Exención del <strong>almojarifazgo</strong> (impuesto sobre mercancías entre reinos)</li>\n  <li>Exención del <strong>portazgo</strong> (peaje de caminos)</li>\n  <li>Exención del <strong>diezmo</strong> civil</li>\n  <li><strong>Jurisdicción propia:</strong> el alcaide impartía justicia sin depender de Granada</li>\n</ul>\n\n<h3>Un modelo urbano exportado a América</h3>\n<p>El trazado de Santa Fe se inspiró en el de Briviesca (Burgos): dos calles principales cruzándose en una plaza central. Este esquema reticular está considerado el <strong>primer modelo urbano de la España moderna</strong>, y sirvió de referencia para el trazado de numerosas ciudades fundadas después en América.</p>\n\n<h3>El terremoto de 1806</h3>\n<p>Un terremoto dejó la ciudad \"en un montón de ruinas\", hasta el punto de plantearse su traslado. Se reconstruyó y consolidó. La actual iglesia de la Encarnación, dirigida por Domingo Lois Monteagudo, se había consagrado antes, en 1785, sustituyendo al templo original de los Reyes Católicos.</p>\n", "arcos": "\n<p>Los cuatro arcos eran las únicas entradas a la ciudad amurallada, protegidas por puentes levadizos sobre el foso. Con el paso de los siglos perdieron su función defensiva y se reconvirtieron en <strong>capillas dedicadas a la Virgen</strong>, aunque conservan su estructura monumental original.</p>\n\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Puerta de Granada</div><div class=\"arco-ori\">Este</div></div></div>\n  <p>Reconstruida en 1698. Su capilla barroca está dedicada a la <strong>Virgen del Rosario</strong> y es la de ornamentación interior más rica y efectista de las cuatro.</p>\n</div>\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Puerta de Jaén (o de los Carros)</div><div class=\"arco-ori\">Norte</div></div></div>\n  <p>Capilla de la <strong>Virgen de Belén</strong>. En su interior se esconde la Santa Escala, una escalinata de peldaños diminutos. La tradición manda subirla de rodillas y rezando, y solo en determinados días del año se gana con ello una indulgencia.</p>\n</div>\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">👑</span><div><div class=\"arco-name\">Puerta de Sevilla</div><div class=\"arco-ori\">Sur</div></div></div>\n  <p>Remodelada en 1798. Dedicada a <strong>Nuestra Señora de los Dolores</strong>.</p>\n</div>\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Puerta de Loja (o de Jerez)</div><div class=\"arco-ori\">Oeste</div></div></div>\n  <p>Reconstruida en 1698. Capilla dedicada a la <strong>Virgen del Carmen</strong>. Aquí se colocó un tetrástico del cronista Pedro Mártir de Anglería que explica el propio nombre de la ciudad:</p>\n  <div class=\"quote-box\">\n    \"El Rey Fernando y la Reina Isabel esta ciudad que ves en muy pocos días levantaron. Erigióse para destruir a los enemigos contrarios a la fe, por eso ha de llamarse Santa Fe.\"\n    <span class=\"quote-src\">— Inscripción de la Puerta de Loja</span>\n  </div>\n</div>\n\n<h3>Curiosidades de los arcos</h3>\n<ul>\n  <li>Originalmente eran las únicas entradas a la ciudad y protegían, con torres y baluartes, los puntos más débiles de la muralla.</li>\n  <li>Durante mucho tiempo sirvieron como imagen de marca de la ciudad; hoy son símbolo de su patrimonio.</li>\n  <li>En fechas como el Puente de Andalucía o Navidad, el Ayuntamiento organiza jornadas de puertas abiertas para visitarlos por dentro.</li>\n</ul>\n", "curiosidades": "\n<div class=\"sabias-box\">\n  <div class=\"sabias-tag\">¿Sabías que…?</div>\n  <h3 style=\"margin-top:6px\">¿Firmaron de verdad los Reyes Católicos las Capitulaciones?</h3>\n  <p>Sí, pero con matices. El documento se cierra con la fórmula protocolaria <strong>\"Yo el Rey. Yo la Reina\"</strong>, que expresa su voluntad y aprobación real. Esas palabras, sin embargo, no las escribieron de su puño y letra: las redactó su secretario, <strong>Juan de Coloma</strong>, \"por mandado del Rey e de la Reyna\". Al final de cada cláusula del documento aparece además la fórmula de aceptación real: <em>\"Plaze a sus Altezas. Johan de Coloma.\"</em></p>\n  <p>En la práctica jurídica de la época, la validez de un documento real no dependía de una firma autógrafa en cada cláusula, sino del <strong>sello real</strong>, la fórmula de otorgamiento y su registro en los libros de la Cancillería. Así que, jurídicamente, los Reyes sí firman y otorgan las Capitulaciones — pero materialmente, quien las escribe es su secretario, en su nombre.</p>\n</div>\n\n\n<h3>El documento original</h3>\n<p>Estas son fotografías reales de las Capitulaciones de Santa Fe con Cristóbal Colón, conservadas en el Archivo General de Simancas.</p>\n<div class=\"cap-strip\">\n  <div class=\"cap-item\" onclick=\"capOpen(0)\"><img src=\"img/capitulaciones/c1.jpg\" alt=\"Capitulaciones de Santa Fe, folio 1\" loading=\"lazy\"><span class=\"cap-num\">1</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(1)\"><img src=\"img/capitulaciones/c2.jpg\" alt=\"Capitulaciones de Santa Fe, folio 2\" loading=\"lazy\"><span class=\"cap-num\">2</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(2)\"><img src=\"img/capitulaciones/c3.jpg\" alt=\"Capitulaciones de Santa Fe, folio 3\" loading=\"lazy\"><span class=\"cap-num\">3</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(3)\"><img src=\"img/capitulaciones/c4.jpg\" alt=\"Capitulaciones de Santa Fe, folio 4\" loading=\"lazy\"><span class=\"cap-num\">4</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(4)\"><img src=\"img/capitulaciones/c5.jpg\" alt=\"Capitulaciones de Santa Fe, folio 5\" loading=\"lazy\"><span class=\"cap-num\">5</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(5)\"><img src=\"img/capitulaciones/c6.jpg\" alt=\"Capitulaciones de Santa Fe, folio 6\" loading=\"lazy\"><span class=\"cap-num\">6</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(6)\"><img src=\"img/capitulaciones/c7.jpg\" alt=\"Capitulaciones de Santa Fe, folio 7\" loading=\"lazy\"><span class=\"cap-num\">7</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(7)\"><img src=\"img/capitulaciones/c8.jpg\" alt=\"Capitulaciones de Santa Fe, folio 8\" loading=\"lazy\"><span class=\"cap-num\">8</span></div>\n</div>\n<h3>Dos Capitulaciones, no una sola</h3>\n<p>En Santa Fe se firmaron en realidad <strong>dos acuerdos distintos</strong> que comparten nombre:</p>\n<ul>\n  <li>Las <strong>Capitulaciones de Granada</strong> (25 de noviembre de 1491): el pacto para la rendición de la ciudad nazarí, negociado con Boabdil.</li>\n  <li>Las <strong>Capitulaciones de Santa Fe con Colón</strong> (17 de abril de 1492): el acuerdo, redactado en la Casa Real de la ciudad, que hizo posible el viaje a América.</li>\n</ul>\n\n<h3>Lo que ganó Cristóbal Colón</h3>\n<p>El documento firmado el 17 de abril de 1492 le concedía los títulos de <strong>Almirante, Virrey y Gobernador General</strong> de todas las tierras que descubriera, además de una <strong>décima parte de los beneficios</strong> obtenidos y otros derechos económicos y jurisdiccionales sobre ellas.</p>\n\n<h3>Más curiosidades</h3>\n<ul>\n  <li>La Corte siguió residiendo en Santa Fe hasta mayo de 1492 — meses después de la toma de Granada — convirtiendo la villa, durante un tiempo, en el <strong>epicentro político</strong> de los reinos hispánicos.</li>\n  <li>Por acoger ambos acuerdos, Santa Fe es conocida como la <strong>\"Cuna de la Hispanidad\"</strong>: aquí se decidió tanto el fin de al-Ándalus como el inicio de la presencia española en América.</li>\n  <li>Las Capitulaciones con Colón se conservan hoy en el Archivo de la Corona de Aragón, y son uno de los documentos más estudiados de la historia de España.</li>\n</ul>\n"};
+const HIST_TITLES = {fundacion:'La Fundación de Santa Fe', arcos:'Los Cuatro Arcos', curiosidades:'Las Capitulaciones y sus curiosidades'};
+function histOpen(key) {
+  document.getElementById('hist-title').textContent = HIST_TITLES[key] || '';
+  document.getElementById('hist-body').innerHTML = HIST_CONTENT[key] || '';
+  document.getElementById('hist-overlay').classList.add('on');
+  document.getElementById('hist-body').scrollTop = 0;
+}
+function histClose() { document.getElementById('hist-overlay').classList.remove('on'); }
+
+const PJ_DATA = [{"slug": "colon", "nombre": "Cristóbal Colón", "fechas": "1451 – 1506", "oficio": "Navegante, cartógrafo y almirante", "hito": "Consiguió el apoyo de los Reyes Católicos y firmó las Capitulaciones de Santa Fe en 1492; después realizó el viaje que llegó a América el 12 de octubre de 1492.", "nacio": "1451, en Génova (Italia).", "murio": "1506, en Valladolid, aquejado de gota y otras dolencias."}, {"slug": "isabel", "nombre": "Isabel I de Castilla", "fechas": "1451 – 1504", "oficio": "Reina de Castilla", "hito": "Junto a Fernando, apoyó la empresa de Colón y aprobó las Capitulaciones de Santa Fe; fue decisiva en la conquista de Granada.", "nacio": "1451, en Madrigal de las Altas Torres (Castilla).", "murio": "1504, en Medina del Campo, tras una larga enfermedad."}, {"slug": "fernando", "nombre": "Fernando II de Aragón", "fechas": "1452 – 1516", "oficio": "Rey de Aragón y rey consorte de Castilla", "hito": "Participó en la decisión política de apoyar el viaje de Colón y en el proceso que culminó con la firma de las Capitulaciones.", "nacio": "1452, en Sos del Rey Católico (Aragón).", "murio": "1516, en Madrigalejo (Extremadura), por causas naturales."}, {"slug": "coloma", "nombre": "Juan de Coloma", "fechas": "h. 1442 – 1517", "oficio": "Secretario real de la Corona de Aragón", "hito": "Redactó y registró el documento de las Capitulaciones de Santa Fe por mandato de los Reyes Católicos.", "nacio": "Hacia 1442, en Borja (Zaragoza).", "murio": "Agosto de 1517, en Borja, poco después de otorgar testamento."}, {"slug": "fray-juan-perez", "nombre": "Fray Juan Pérez", "fechas": "Fechas no confirmadas", "oficio": "Fraile franciscano, confesor de la reina Isabel", "hito": "Defendió el proyecto de Colón ante la corte y medió en la negociación previa a las Capitulaciones.", "nacio": "Fecha no confirmada.", "murio": "Fecha y causa no confirmadas."}, {"slug": "pinzon-martin", "nombre": "Martín Alonso Pinzón", "fechas": "h. 1441 – 1493", "oficio": "Marino, navegante y capitán", "hito": "Apoyó el primer viaje colombino, ayudó a reclutar tripulación y aportó experiencia náutica decisiva.", "nacio": "Hacia 1441, en Palos de la Frontera (Huelva).", "murio": "1493, probablemente por enfermedad."}, {"slug": "pinzon-vicente", "nombre": "Vicente Yáñez Pinzón", "fechas": "h. 1462 – h. 1514", "oficio": "Navegante y explorador", "hito": "Participó en el primer viaje de Colón al mando de La Niña y después realizó expediciones propias.", "nacio": "Hacia 1462, en Palos de la Frontera (Huelva).", "murio": "Hacia 1514, causa no precisada con exactitud."}, {"slug": "santangel", "nombre": "Luis de Santángel", "fechas": "h. 1435 – 1498", "oficio": "Financiero, escribano de ración de la Corona de Aragón", "hito": "Fue uno de los grandes apoyos económicos del proyecto colombino y facilitó fondos para la expedición.", "nacio": "Hacia 1435, en Valencia.", "murio": "1498, causa no destacada en las fuentes."}, {"slug": "sanchez", "nombre": "Gabriel Sánchez", "fechas": "Siglo XV", "oficio": "Tesorero de la Corona de Aragón", "hito": "Participó también en la financiación del viaje de Colón.", "nacio": "Fecha no confirmada.", "murio": "Fecha y causa no confirmadas."}];
+function pjRenderGrid() {
+  const grid = document.getElementById('pj-grid');
+  if (grid.dataset.done) return;
+  grid.innerHTML = PJ_DATA.map((p, i) => `
+    <div class="pj-card" onclick="pjToggle(${i})">
+      <div class="pj-avatar"><span>${p.nombre.charAt(0)}</span><img src="img/personajes/${p.slug}.jpg" alt="" onerror="this.style.display='none'"></div>
+      <div class="pj-name">${p.nombre}</div>
+      <div class="pj-fechas">${p.fechas}</div>
+      <div class="pj-oficio">${p.oficio}</div>
+      <div class="pj-detail" id="pj-detail-${i}">
+        <p><b>Nació:</b> ${p.nacio}</p>
+        <p><b>Hito:</b> ${p.hito}</p>
+        <p><b>Murió:</b> ${p.murio}</p>
+      </div>
+    </div>`).join('');
+  grid.dataset.done = '1';
+}
+function pjToggle(i) { document.getElementById('pj-detail-' + i).classList.toggle('on'); }
+function pjOpen() { pjRenderGrid(); document.getElementById('pj-overlay').classList.add('on'); }
+function pjClose() { document.getElementById('pj-overlay').classList.remove('on'); }
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('hist-overlay').classList.contains('on')) histClose();
+  if (document.getElementById('pj-overlay').classList.contains('on')) pjClose();
 });
 
 if ('serviceWorker' in navigator) {
@@ -4771,6 +4969,29 @@ if ('serviceWorker' in navigator) {
   <img id="gal-lb-img" src="" alt="">
   <button class="gal-lb-nav next" onclick="galStep(1)" aria-label="Siguiente">›</button>
   <div class="gal-lb-cap" id="gal-lb-cap"></div>
+</div>
+
+<div id="hist-overlay" class="hist-overlay" onclick="if(event.target===this)histClose()">
+  <div class="hist-sheet">
+    <div class="hist-head">
+      <button class="hist-back" onclick="histClose()" aria-label="Volver">←</button>
+      <h2 id="hist-title"></h2>
+    </div>
+    <div class="hist-body" id="hist-body"></div>
+  </div>
+</div>
+
+<div id="pj-overlay" class="hist-overlay" onclick="if(event.target===this)pjClose()">
+  <div class="hist-sheet">
+    <div class="hist-head">
+      <button class="hist-back" onclick="pjClose()" aria-label="Volver">←</button>
+      <h2>Personajes de 1492</h2>
+    </div>
+    <div class="hist-body">
+      <p class="pj-intro">Toca cada ficha para ver su biografía completa.</p>
+      <div class="pj-grid" id="pj-grid"></div>
+    </div>
+  </div>
 </div>
 </body>
 </html>

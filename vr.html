@@ -64,6 +64,7 @@
   #hud { position:fixed; top:10px; left:10px; right:10px; z-index:15; display:none; justify-content:space-between; pointer-events:none; }
   #hud.on { display:flex; }
   .hud-chip { background:rgba(255,255,255,0.92); border:1.5px solid var(--line); border-radius:999px; padding:8px 14px; font-size:14px; font-weight:800; box-shadow:0 4px 14px rgba(28,42,58,0.12); }
+  #hud.museo-mode .hud-game-only { display:none; }
   #hud-exit { pointer-events:auto; cursor:pointer; }
   a-scene { position:fixed; inset:0; z-index:5; }
 
@@ -122,6 +123,7 @@
     <input id="vr-name" class="m-name" type="text" maxlength="24" placeholder="Ej.: Los Guardianes de Capitulín" autocomplete="off">
   </div>
   <button class="m-btn" onclick="vrStart()">🚀 Comenzar la aventura</button>
+  <button class="m-btn ghost" onclick="vrMuseoStart()">🖼️ Museo Virtual</button>
   <button class="m-btn ghost" onclick="vrShowRanking()">🏆 Ver ranking Top 10</button>
   <button class="m-btn ghost" onclick="location.href='index.html'">← Volver a Santa Fe Histórica</button>
   <p class="m-note">Puntuación: +100 al primer intento · +50 al segundo · Bonus del cofre hasta +200.<br>El ranking es común con los modos GPS y Clase de la app.</p>
@@ -139,8 +141,8 @@
 <!-- ═══════════ HUD ═══════════ -->
 <div id="hud">
   <span class="hud-chip" id="hud-exit" onclick="vrExit()">← Salir</span>
-  <span class="hud-chip">⭐ <span id="hud-pts">0</span></span>
-  <span class="hud-chip">🔢 <span id="hud-code">— — — —</span></span>
+  <span class="hud-chip hud-game-only">⭐ <span id="hud-pts">0</span></span>
+  <span class="hud-chip hud-game-only">🔢 <span id="hud-code">— — — —</span></span>
 </div>
 
 <!-- ═══════════ ESCENA A-FRAME ═══════════ -->
@@ -1346,8 +1348,113 @@ function vrExit() {
   if ($('scene').is && $('scene').is('vr-mode')) { try { $('scene').exitVR(); } catch(e){} }
   $('scene').style.display = 'none';
   $('hud').classList.remove('on');
+  $('hud').classList.remove('museo-mode');
   $('menu').classList.remove('gone');
 }
+
+/* ═══════════ MUSEO VIRTUAL ═══════════ */
+const MUSEO_ITEMS = [
+  { src:'img/personajes/colon.jpg',          title:'Cristóbal Colón',        sub:'Navegante y almirante' },
+  { src:'img/personajes/isabel.jpg',         title:'Isabel I de Castilla',   sub:'Reina de Castilla' },
+  { src:'img/personajes/fernando.jpg',       title:'Fernando II de Aragón',  sub:'Rey de Aragón' },
+  { src:'img/personajes/pinzon-martin.jpg',  title:'Martín Alonso Pinzón',   sub:'Marino y capitán' },
+  { src:'img/personajes/pinzon-vicente.jpg', title:'Vicente Yáñez Pinzón',   sub:'Navegante y explorador' },
+  { src:'img/capitulaciones/c1.jpg', title:'Las Capitulaciones', sub:'Folio 1 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c2.jpg', title:'Las Capitulaciones', sub:'Folio 2 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c3.jpg', title:'Las Capitulaciones', sub:'Folio 3 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c4.jpg', title:'Las Capitulaciones', sub:'Folio 4 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c5.jpg', title:'Las Capitulaciones', sub:'Folio 5 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c6.jpg', title:'Las Capitulaciones', sub:'Folio 6 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c7.jpg', title:'Las Capitulaciones', sub:'Folio 7 · Archivo General de Simancas' },
+  { src:'img/capitulaciones/c8.jpg', title:'Las Capitulaciones', sub:'Folio 8 · Archivo General de Simancas' }
+];
+
+function vrMuseoStart() {
+  $('menu').classList.add('gone');
+  $('hud').classList.add('on');
+  $('hud').classList.add('museo-mode');
+  const sc = $('scene'); sc.style.display = 'block';
+  if (sc.hasLoaded) buildMuseoRing();
+  else sc.addEventListener('loaded', buildMuseoRing, { once:true });
+}
+
+function frameEntity(it, angleDeg, radius) {
+  const rad = angleDeg * Math.PI / 180;
+  const x = radius * Math.sin(rad), z = -radius * Math.cos(rad);
+  const g = document.createElement('a-entity');
+  g.setAttribute('position', `${x} 2.1 ${z}`);
+  g.setAttribute('look-at', '0 2.1 0');
+
+  // Marco dorado + lienzo
+  const frame = document.createElement('a-plane');
+  frame.setAttribute('width', '1.5'); frame.setAttribute('height', '2.05');
+  frame.setAttribute('color', '#C9A227');
+  frame.setAttribute('material', 'shader:flat');
+  g.appendChild(frame);
+
+  const pic = document.createElement('a-image');
+  pic.setAttribute('src', it.src);
+  pic.setAttribute('width', '1.36'); pic.setAttribute('height', '1.86');
+  pic.setAttribute('position', '0 0.06 0.01');
+  pic.classList.add('clk');
+  pic.addEventListener('click', () => vrMuseoZoom(it));
+  pic.addEventListener('materialtextureloaded', () => {}, { once:true });
+  g.appendChild(pic);
+
+  const label = textPanel({ w:1.5, h:0.5, px:400, bg:'#FFFDF6', border:'#C9A84C',
+    title: it.title, titleSize:30, body: it.sub, bodySize:22, bodyColor:'#6B5637' });
+  label.setAttribute('position', '0 -1.28 0.01');
+  g.appendChild(label);
+
+  return g;
+}
+
+function buildMuseoRing() {
+  clearWorld();
+  $('scene').setAttribute('background', 'color: #EAD9A8');
+  const w = $('world');
+  const n = MUSEO_ITEMS.length;
+  const radius = 4.6;
+  MUSEO_ITEMS.forEach((it, i) => {
+    const angle = (360 / n) * i;
+    w.appendChild(frameEntity(it, angle, radius));
+  });
+}
+
+function vrMuseoZoom(it) {
+  const w = $('world');
+  const old = document.getElementById('museo-zoom');
+  if (old) old.remove();
+  const g = document.createElement('a-entity');
+  g.id = 'museo-zoom';
+  g.setAttribute('position', '0 1.6 -2.6');
+
+  const bg = document.createElement('a-plane');
+  bg.setAttribute('width', '3.2'); bg.setAttribute('height', '2.6');
+  bg.setAttribute('color', '#1C1208'); bg.setAttribute('material', 'shader:flat; opacity:0.92');
+  bg.setAttribute('position', '0 0 -0.02');
+  g.appendChild(bg);
+
+  const pic = document.createElement('a-image');
+  pic.setAttribute('src', it.src);
+  pic.setAttribute('width', '2.1'); pic.setAttribute('height', '2.05');
+  pic.setAttribute('position', '0 0.25 0');
+  g.appendChild(pic);
+
+  const label = textPanel({ w:2.8, h:0.55, px:640, bg:'#FFFDF6', border:'#C9A84C',
+    title: it.title, titleSize:34, body: it.sub, bodySize:24, bodyColor:'#6B5637' });
+  label.setAttribute('position', '0 -1.05 0');
+  g.appendChild(label);
+
+  const closeBtn = button3d('✕ Cerrar', { w:1.2, h:0.42, bg:'#7C2130', fg:'#FFFFFF', border:'#5A1520' });
+  closeBtn.setAttribute('position', '0 -1.6 0');
+  closeBtn.addEventListener('click', () => g.remove());
+  g.appendChild(closeBtn);
+
+  beep('key');
+  w.appendChild(g);
+}
+
 function updateHUD() {
   $('hud-pts').textContent = S ? S.points : 0;
   const code = [0,1,2,3].map(i => (S && S.digits[i]) ? S.digits[i] : '—').join(' ');
