@@ -1718,7 +1718,7 @@
           <span class="rc-stop">Arco Real</span>
           <span class="rc-stop">Iglesia Mayor</span>
         </div>
-        <button class="rc-btn esc-btn" onclick="playIntroVideo('escape.mp4', () => escOpen())">
+        <button class="rc-btn esc-btn" onclick="playIntroVideos(['escape.mp4','room1.mp4','room2.mp4'], () => escOpen())">
           ¡Resolver el enigma! <span class="rc-btn-arrow">→</span>
         </button>
       </div>
@@ -5352,6 +5352,8 @@ function previewDiploma(kind, key) {
 // VÍDEOS DE INTRODUCCIÓN (rutas, escape room, felicitación por rango)
 // ================================================================
 let videoIntroDone = null;
+let videoQueueRemaining = [];
+let videoQueueFinalDone = null;
 function playIntroVideo(file, onDone) {
   const overlay = document.getElementById('video-intro-overlay');
   const vid = document.getElementById('video-intro-player');
@@ -5373,7 +5375,27 @@ function playIntroVideo(file, onDone) {
   const p = vid.play();
   if (p && p.catch) p.catch(() => finish()); // si el navegador bloquea la reproducción, seguimos sin vídeo
 }
-function videoIntroSkip() { if (videoIntroDone) videoIntroDone(); }
+// Reproduce varios vídeos seguidos, uno tras otro, con el mismo reproductor
+function playIntroVideos(files, onDone) {
+  videoQueueRemaining = files.slice();
+  videoQueueFinalDone = onDone;
+  playNextQueuedVideo();
+}
+function playNextQueuedVideo() {
+  if (videoQueueRemaining.length === 0) {
+    const done = videoQueueFinalDone;
+    videoQueueFinalDone = null;
+    if (done) done();
+    return;
+  }
+  const file = videoQueueRemaining.shift();
+  playIntroVideo(file, playNextQueuedVideo);
+}
+function videoIntroSkip() {
+  // "Saltar" corta TODA la cola pendiente, no solo el vídeo actual
+  videoQueueRemaining = [];
+  if (videoIntroDone) videoIntroDone();
+}
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
