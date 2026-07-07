@@ -1720,6 +1720,22 @@ async function fetchRanking() {
   return Object.values(data).filter(x => x && typeof x.p === 'number')
     .sort((a,b) => (b.p - a.p) || ((a.t||0) - (b.t||0))).slice(0, 10);
 }
+const RANGOS = [
+  { min:0,    key:'cortesano', nombre:'Cortesano de Su Alteza' },
+  { min:600,  key:'soldado',   nombre:'Soldado de la Guarnición' },
+  { min:1000, key:'escribano', nombre:'Escribano Real' },
+  { min:1400, key:'espia',     nombre:'Espía de la Reina' }
+];
+function rangoFor(points) {
+  let r = RANGOS[0];
+  for (const x of RANGOS) if (points >= x.min) r = x;
+  return r;
+}
+function initialsOf(name) {
+  const words = String(name || '').trim().split(/\s+/).filter(Boolean).slice(0, 3);
+  if (!words.length) return '🕵️ Agente Anónimo';
+  return '🕵️ ' + words.map(w => w.charAt(0).toUpperCase() + '.').join(' ');
+}
 async function vrShowRanking() {
   $('rankModal').classList.add('on');
   const box = $('rank-list');
@@ -1729,12 +1745,17 @@ async function vrShowRanking() {
   if (!top.length)  { box.innerHTML = '<div class="rank-loading">Aún no hay puntuaciones. ¡Sé el primero!</div>'; return; }
   const icons = { gps:'📍', clase:'🏫', vr:'🥽' };
   const medals = ['🥇','🥈','🥉'];
-  box.innerHTML = top.map((r, i) => `
+  box.innerHTML = top.map((r, i) => {
+    const rango = rangoFor(r.p);
+    const isSpy = rango.key === 'espia';
+    const nombreMostrado = isSpy ? initialsOf(r.n) : esc(r.n);
+    return `
     <div class="rank-row ${i < 3 ? 'top' : ''}">
       <span class="pos">${medals[i] || (i+1)+'º'}</span>
-      <span class="nm">${esc(r.n)}<small>${icons[r.m] || ''} ${esc(r.d || '')}</small></span>
+      <span class="nm">${nombreMostrado}<small>${rango.nombre} · ${icons[r.m] || ''} ${esc(r.d || '')}</small></span>
       <span class="pt">${r.p} <small>pts</small><small>⏱ ${fmtTime(r.t || 0)}</small></span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 </script>
 </body>

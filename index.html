@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="capilogo.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Dancing+Script:wght@500;600;700&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
 
   <style>
     /* ═══════════════════════════════════════════
@@ -736,6 +736,7 @@
       font-family:var(--fu); font-size:14px;
       border:1.5px solid rgba(26,110,204,0.2); border-radius:var(--r-pill);
     }
+    .admin-hint { font-size:12px; color:var(--text-2); margin-bottom:10px; line-height:1.4; }
     .admin-tabs { display:flex; gap:8px; margin-bottom:16px; }
     .admin-tab {
       flex:1; padding:10px;
@@ -1393,6 +1394,24 @@
       font-size:10.5px; font-weight:800; padding:2px 7px; border-radius:100px;
     }
 
+    /* ── Diplomas ── */
+    .cb-diploma-btn {
+      display:block; width:100%; margin-top:10px; padding:9px 12px; border:1.5px solid rgba(255,255,255,0.4);
+      border-radius:12px; background:rgba(255,255,255,0.14); color:#fff; font-weight:700; font-size:13px;
+    }
+    .diploma-sheet { max-width:600px; }
+    .diploma-label { display:block; font-size:12.5px; font-weight:700; color:var(--text-2); margin-bottom:6px; }
+    .diploma-name-input {
+      width:100%; padding:12px 14px; border:1.5px solid var(--gold-soft); border-radius:12px;
+      font-size:15px; font-family:var(--fu); margin-bottom:16px; background:#FFFDF6; color:var(--ink);
+    }
+    .diploma-canvas-wrap {
+      border-radius:12px; overflow:hidden; box-shadow:var(--sh-lg); margin-bottom:16px;
+      border:1px solid var(--gold-soft); background:#F2E7CE;
+    }
+    .diploma-canvas-wrap img { width:100%; display:block; }
+    .diploma-dl-btn { display:block; text-align:center; text-decoration:none; }
+
     /* ── Menú «Descubre Santa Fe» ── */
     .disc-wrap { margin: 8px 0 26px; }
     .disc-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -1858,6 +1877,7 @@
       </div>
       <div class="esc-best" id="esc-win-best"></div>
       <div class="esc-rank-status" id="esc-win-rank-status"></div>
+      <button class="esc-main-btn" id="esc-win-diploma-btn" onclick="openEscapeDiploma()">📜 Ver y descargar mi diploma</button>
       <button class="esc-main-btn" onclick="escShowRanking()">🏆 Ver ranking Top 10</button>
       <button class="esc-main-btn" onclick="escRestart()">🔁 Jugar de nuevo</button>
       <button class="esc-ghost-btn" onclick="escClose()">Volver al inicio</button>
@@ -1914,6 +1934,7 @@
       <div class="cb-icon">🏆</div>
       <div class="cb-title" id="cb-title">¡Ruta completada!</div>
       <div class="cb-sub" id="cb-sub">Has visitado todos los monumentos</div>
+      <button class="cb-diploma-btn" onclick="openRouteDiploma(currentRouteKey)">📜 Ver mi diploma</button>
       <button class="cb-close" onclick="document.getElementById('completion-banner').classList.add('off')">✕</button>
     </div>
 
@@ -2031,6 +2052,7 @@
       <div class="admin-tabs">
         <button class="admin-tab active" id="tab-btn-content"   onclick="switchAdminTab('content')">🎬 Contenidos</button>
         <button class="admin-tab"        id="tab-btn-monuments" onclick="switchAdminTab('monuments')">📍 Monumentos</button>
+        <button class="admin-tab"        id="tab-btn-diplomas"  onclick="switchAdminTab('diplomas')">📜 Diplomas</button>
       </div>
 
       <!-- Tab: Contenidos -->
@@ -2100,6 +2122,26 @@
         <div class="admin-section">
           <h3>📍 Monumentos actuales</h3>
           <div id="admin-monuments-list"></div>
+        </div>
+        <button class="admin-btn-secondary" onclick="doLogout()">Cerrar sesión</button>
+      </div>
+
+      <!-- Tab: Diplomas -->
+      <div class="admin-tab-content" id="tab-diplomas">
+        <div class="admin-section">
+          <h3>📜 Plantillas de rutas</h3>
+          <p class="admin-hint">Vista previa con datos de ejemplo, sin necesidad de completar la ruta.</p>
+          <button class="admin-btn" onclick="previewDiploma('ruta','completa')">Ruta Completa</button>
+          <button class="admin-btn" onclick="previewDiploma('ruta','arcos')">Ruta de los Arcos</button>
+          <button class="admin-btn" onclick="previewDiploma('ruta','expres')">Ruta Exprés</button>
+        </div>
+        <div class="admin-section">
+          <h3>🏅 Plantillas del Escape Room</h3>
+          <p class="admin-hint">Una por cada rango, de menor a mayor puntuación.</p>
+          <button class="admin-btn" onclick="previewDiploma('escape','cortesano')">🎩 Cortesano de Su Alteza</button>
+          <button class="admin-btn" onclick="previewDiploma('escape','soldado')">🪖 Soldado de la Guarnición</button>
+          <button class="admin-btn" onclick="previewDiploma('escape','escribano')">📜 Escribano Real</button>
+          <button class="admin-btn" onclick="previewDiploma('escape','espia')">🕵️ Espía de la Reina</button>
         </div>
         <button class="admin-btn-secondary" onclick="doLogout()">Cerrar sesión</button>
       </div>
@@ -2320,6 +2362,7 @@ let activePOI = null;
 
 // Ruta activa
 let currentRoute = null;   // array de ids
+let currentRouteKey = null; // clave de la ruta ('completa'/'arcos'/'expres')
 let routeOrder  = [];      // array de POI objects (orden óptimo)
 let visitedIds  = new Set();
 
@@ -2345,6 +2388,8 @@ window.addEventListener('DOMContentLoaded', () => {
 // ================================================================
 function startRoute(routeKey) {
   currentRoute = ROUTES[routeKey];
+  currentRouteKey = routeKey;
+  diplomaShownForRoute = false;
   visitedIds   = new Set();
   routeOrder   = [];
 
@@ -2695,6 +2740,10 @@ function showCompletionBanner() {
     document.getElementById('cb-sub').textContent   = t.navDoneSub;
     banner.classList.remove('off');
     setTimeout(() => banner.classList.add('off'), 8000);
+  }
+  if (!diplomaShownForRoute) {
+    diplomaShownForRoute = true;
+    setTimeout(() => openRouteDiploma(currentRouteKey), 900);
   }
 }
 
@@ -4198,12 +4247,17 @@ async function escShowRanking() {
     return;
   }
   const medals = ['🥇','🥈','🥉'];
-  box.innerHTML = top.map((r, i) => `
+  box.innerHTML = top.map((r, i) => {
+    const rango = rangoFor(r.p);
+    const isSpy = rango.key === 'espia';
+    const nombreMostrado = isSpy ? initialsOf(r.n) : escEsc(r.n);
+    return `
     <div class="esc-rank-row ${i < 3 ? 'top' : ''}">
       <span class="pos">${medals[i] || (i + 1) + 'º'}</span>
-      <span class="nm">${escEsc(r.n)}<small>${ESC_MODE_ICON[r.m] || ''} ${escEsc(r.d || '')}</small></span>
+      <span class="nm">${nombreMostrado}<small>${rango.nombre} · ${ESC_MODE_ICON[r.m] || ''} ${escEsc(r.d || '')}</small></span>
       <span class="pt">${r.p} <small>pts</small><small class="tm">⏱ ${escFmtTime(r.t || 0)}</small></span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 // Estado
@@ -4958,6 +5012,324 @@ document.addEventListener('keydown', e => {
   if (document.getElementById('pj-overlay').classList.contains('on')) pjClose();
 });
 
+
+// ================================================================
+// DIPLOMAS REALES
+// ================================================================
+const ROUTE_NAMES = { completa:'la Ruta Completa', arcos:'la Ruta de los Arcos', expres:'la Ruta Exprés' };
+const RANGOS = [
+  { min:0,    key:'cortesano', nombre:'Cortesano de Su Alteza',
+    desc:'Ha sido recibido en la corte de Santa Fe, aunque los grandes secretos de sus muros todavía se le resisten.' },
+  { min:600,  key:'soldado',   nombre:'Soldado de la Guarnición',
+    desc:'Ha demostrado disciplina y valor defendiendo los secretos de las cuatro puertas de la ciudad.' },
+  { min:1000, key:'escribano', nombre:'Escribano Real',
+    desc:'Ha sabido leer con atención los muros, las puertas y los documentos de esta Real Ciudad, dejando constancia de su buen juicio.' },
+  { min:1400, key:'espia',     nombre:'Espía de la Reina',
+    desc:'Ha demostrado un ingenio excepcional y una lealtad discreta a la Corona, digna de sus agentes más secretos.' }
+];
+function rangoFor(points) {
+  let r = RANGOS[0];
+  for (const x of RANGOS) if (points >= x.min) r = x;
+  return r;
+}
+function initialsOf(name) {
+  const words = String(name || '').trim().split(/\s+/).filter(Boolean).slice(0, 3);
+  if (!words.length) return '🕵️ Agente Anónimo';
+  return '🕵️ ' + words.map(w => w.charAt(0).toUpperCase() + '.').join(' ');
+}
+
+const SEAL_IMG = new Image();
+let SEAL_READY = false;
+SEAL_IMG.onload = () => { SEAL_READY = true; };
+SEAL_IMG.onerror = () => { SEAL_READY = false; };
+SEAL_IMG.src = 'img/sello-real.png';
+
+function diplomaWrap(ctx, text, cx, cy, maxW, lineH) {
+  const words = String(text).split(' ');
+  let line = '', y = cy;
+  const lines = [];
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  lines.forEach((l, i) => ctx.fillText(l, cx, y + i * lineH));
+  return y + lines.length * lineH;
+}
+
+function diplomaFechaHoy() {
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const d = new Date();
+  return `${d.getDate()} de ${meses[d.getMonth()]} del Año de Nuestro Señor de ${d.getFullYear()}`;
+}
+
+// NOTA: Mythshire es una fuente de pago (Envato Elements). En cuanto Víctor suba los
+// archivos con licencia, basta con cambiar estas dos constantes a '"Mythshire", cursive'
+// (y añadir su @font-face) para que todo el diploma pase a usarla automáticamente.
+const DIPLOMA_FONT_TITLE = '"Dancing Script", "IM Fell English SC", cursive';
+const DIPLOMA_FONT_BODY  = '"Dancing Script", "IM Fell English", cursive';
+const DIPLOMA_FONT_SIGN  = '"Dancing Script", cursive';
+const DIPLOMA_FONT_GOTHIC = '"UnifrakturCook", "IM Fell English", serif';
+const DIPLOMA_FONT_LABEL = '"EB Garamond", serif';
+let diplomaFontsReady = false;
+function ensureDiplomaFonts(cb) {
+  if (diplomaFontsReady || !document.fonts) { cb(); return; }
+  const specs = [
+    `700 58px ${DIPLOMA_FONT_TITLE}`, `600 24px ${DIPLOMA_FONT_BODY}`,
+    `700 38px ${DIPLOMA_FONT_SIGN}`, `700 24px ${DIPLOMA_FONT_GOTHIC}`,
+    `700 16px ${DIPLOMA_FONT_LABEL}`
+  ];
+  Promise.all(specs.map(f => document.fonts.load(f).catch(() => {})))
+    .then(() => { diplomaFontsReady = true; cb(); })
+    .catch(() => { diplomaFontsReady = true; cb(); });
+  setTimeout(() => { if (!diplomaFontsReady) { diplomaFontsReady = true; cb(); } }, 1200);
+}
+
+function buildDiplomaCanvas(opts, cb) {
+  ensureDiplomaFonts(() => buildDiplomaCanvasNow(opts, cb));
+}
+
+function buildDiplomaCanvasNow(opts, cb) {
+  const W = 1240, H = 1100;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  const isEspia = opts.kind === 'escape' && opts.rango && opts.rango.key === 'espia';
+
+  // Fondo pergamino
+  const grad = x.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#FBF5E6'); grad.addColorStop(1, '#F1E5C9');
+  x.fillStyle = grad; x.fillRect(0, 0, W, H);
+  const vin = x.createRadialGradient(W/2, H/2, H*0.15, W/2, H/2, H*0.8);
+  vin.addColorStop(0, 'rgba(0,0,0,0)'); vin.addColorStop(1, 'rgba(80,55,15,0.14)');
+  x.fillStyle = vin; x.fillRect(0, 0, W, H);
+
+  // Marco
+  x.strokeStyle = '#C9A227'; x.lineWidth = 7;
+  x.strokeRect(30, 30, W-60, H-60);
+  x.strokeStyle = '#7C2130'; x.lineWidth = 2;
+  x.strokeRect(46, 46, W-92, H-92);
+  if (isEspia) {
+    x.strokeStyle = 'rgba(124,33,48,0.5)'; x.lineWidth = 1;
+    x.strokeRect(56, 56, W-112, H-112);
+  }
+  // Diamantes en las esquinas
+  const corners = [[30,30],[W-30,30],[30,H-30],[W-30,H-30]];
+  corners.forEach(([cx0, cy0]) => {
+    x.fillStyle = '#C9A227';
+    x.beginPath();
+    x.moveTo(cx0, cy0-14); x.lineTo(cx0+14, cy0); x.lineTo(cx0, cy0+14); x.lineTo(cx0-14, cy0);
+    x.closePath(); x.fill();
+  });
+
+  x.textAlign = 'center';
+
+  // Eyebrow
+  x.fillStyle = '#8A754F';
+  x.font = `700 16px ${DIPLOMA_FONT_LABEL}`;
+  x.fillText(isEspia ? 'DOCUMENTO CONFIDENCIAL DE LA CORONA' : 'REAL CIUDAD DE SANTA FE · AÑO DE 1491', W/2, 94);
+
+  // Título principal
+  x.fillStyle = '#7C2130';
+  x.font = `700 58px ${DIPLOMA_FONT_TITLE}`;
+  const titulo = opts.kind === 'escape' ? 'Decreto del Real Campamento' : 'Real Cédula de Visita';
+  x.fillText(titulo, W/2, 158);
+
+  // Filete decorativo bajo el título
+  x.strokeStyle = '#C9A227'; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(W/2-120, 180); x.lineTo(W/2+120, 180); x.stroke();
+  x.fillStyle = '#C9A227';
+  x.beginPath(); x.arc(W/2, 180, 4, 0, Math.PI*2); x.fill();
+
+  // Cuerpo del texto — fórmula de apertura en letra gótica de escriba, negra y enlazada
+  x.fillStyle = '#000000';
+  x.font = `700 25px ${DIPLOMA_FONT_GOTHIC}`;
+  let bodyText;
+  if (opts.kind === 'ruta') {
+    bodyText = `Sepan cuantos esta carta vieren que, en este día, el/la visitante ${opts.name} ha recorrido con éxito ${opts.routeName}, visitando ${opts.monCount} monumentos de esta Real Ciudad, dando fe de su curiosidad y aprecio por esta historia.`;
+  } else {
+    bodyText = `Sepan cuantos esta carta vieren que, en este día, el/la visitante ${opts.name} ha cruzado con éxito los cuatro umbrales de esta Real Ciudad —las puertas de Jaén, Granada, Sevilla y Loja— y ha resuelto el enigma que guardaba el Cofre de las Capitulaciones.`;
+  }
+  let y = diplomaWrap(x, bodyText, W/2, 236, W-300, 40);
+
+  if (opts.kind === 'escape') {
+    y += 24;
+    x.fillStyle = '#2E2013';
+    x.font = `600 25px ${DIPLOMA_FONT_BODY}`;
+    x.fillText('Habiendo demostrado gran ingenio, destreza y curiosidad por los secretos de esta ciudad,', W/2, y);
+    y += 36;
+    x.fillText('se le otorga con honores el rango de:', W/2, y);
+    y += 62;
+    x.fillStyle = '#8A5A10';
+    x.font = `700 54px ${DIPLOMA_FONT_TITLE}`;
+    x.fillText('✦ ' + opts.rango.nombre + ' ✦', W/2, y);
+    y += 46;
+    x.fillStyle = '#6B5637';
+    x.font = `600 25px ${DIPLOMA_FONT_BODY}`;
+    y = diplomaWrap(x, opts.rango.desc, W/2, y, W-360, 30);
+
+    y += 18;
+    x.fillStyle = '#2E2013';
+    x.font = `700 20px ${DIPLOMA_FONT_BODY}`;
+    x.fillText(`⭐ ${opts.points} puntos reales   ·   ⏱ ${opts.timeTxt}   ·   ✔ ${opts.hits}/${opts.totalQ} aciertos`, W/2, y);
+
+    if (isEspia) {
+      y += 38;
+      x.fillStyle = '#8A754F';
+      x.font = `600 20px ${DIPLOMA_FONT_BODY}`;
+      x.fillText(`Exp. Nº ${opts.expNum} · Por orden secreta de Su Alteza, se reconoce su lealtad discreta a la Corona`, W/2, y);
+    }
+  } else {
+    // Diploma de ruta: en vez de dejar el hueco central vacío, mostramos
+    // el nombre del visitante a gran tamaño, como pieza central del documento.
+    y += 56;
+    x.strokeStyle = '#C9A227'; x.lineWidth = 1.5;
+    x.beginPath(); x.moveTo(W/2-170, y-38); x.lineTo(W/2+170, y-38); x.stroke();
+    x.fillStyle = '#7C2130';
+    x.font = `700 74px ${DIPLOMA_FONT_TITLE}`;
+    x.fillText(opts.name, W/2, y + 20);
+    y += 46;
+    x.strokeStyle = '#C9A227';
+    x.beginPath(); x.moveTo(W/2-170, y); x.lineTo(W/2+170, y); x.stroke();
+    y += 32;
+    x.fillStyle = '#8A754F';
+    x.font = `700 14px ${DIPLOMA_FONT_LABEL}`;
+    x.fillText('VISITANTE DISTINGUIDO DE LA REAL CIUDAD DE SANTA FE', W/2, y);
+  }
+
+  // Bloque inferior (fecha, firmas, sello, pie) — anclado con margen mínimo garantizado
+  // para no solaparse nunca con el cuerpo del texto, sea cual sea su longitud.
+  const dateY1 = Math.max(y + 70, H - 315);
+  const dateY2 = dateY1 + 26;
+  const sealY  = dateY2 + 108;
+  const sealSize = 150;
+  const footerY = sealY + sealSize/2 + 46;
+  window.__lastDiplomaLayout = { bodyEndY: y, dateY1, dateY2, sealY, sealSize, footerY, H, W };
+
+  x.textAlign = 'center';
+  x.fillStyle = '#6B5637';
+  x.font = `600 19px ${DIPLOMA_FONT_BODY}`;
+  x.fillText(`Y para que conste y sea reconocido, se expide el presente salvoconducto en la Fiel y Real Ciudad`, W/2, dateY1);
+  x.fillText(`de Santa Fe, a ${diplomaFechaHoy()}.`, W/2, dateY2);
+
+  // Firmas + sello
+  x.textAlign = 'right';
+  x.fillStyle = '#2E2013';
+  x.font = `700 38px ${DIPLOMA_FONT_SIGN}`;
+  x.fillText('Yo la Reina', W/2 - 140, sealY - 26);
+  x.font = `700 13px ${DIPLOMA_FONT_LABEL}`; x.fillStyle = '#6B5637';
+  x.fillText('ISABEL I DE CASTILLA', W/2 - 140, sealY - 4);
+
+  x.textAlign = 'left';
+  x.fillStyle = '#2E2013';
+  x.font = `700 38px ${DIPLOMA_FONT_SIGN}`;
+  x.fillText('Yo el Rey', W/2 + 140, sealY - 26);
+  x.font = `700 13px ${DIPLOMA_FONT_LABEL}`; x.fillStyle = '#6B5637';
+  x.fillText('FERNANDO II DE ARAGÓN', W/2 + 140, sealY - 4);
+
+  x.textAlign = 'center';
+  x.fillStyle = '#8A754F';
+  x.font = `700 14px ${DIPLOMA_FONT_LABEL}`;
+  x.fillText('REAL CIUDAD DE SANTA FE · MCDXCI', W/2, footerY);
+
+  function drawSealAndFinish() {
+    if (SEAL_READY) {
+      const ratio = SEAL_IMG.naturalHeight / SEAL_IMG.naturalWidth;
+      const sw = sealSize, sh = sealSize * ratio;
+      x.drawImage(SEAL_IMG, W/2 - sw/2, sealY - sh/2, sw, sh);
+    }
+    cb(cv);
+  }
+  if (SEAL_READY || !SEAL_IMG.src) drawSealAndFinish();
+  else {
+    SEAL_IMG.addEventListener('load', drawSealAndFinish, { once:true });
+    SEAL_IMG.addEventListener('error', () => cb(cv), { once:true });
+    setTimeout(() => { if (!SEAL_READY) cb(cv); }, 1500);
+  }
+}
+
+let DIPLOMA_STATE = null;
+let diplomaShownForRoute = false;
+
+
+function diplomaSavedName() {
+  try { return localStorage.getItem('santafe_diploma_name') || ''; } catch(e) { return ''; }
+}
+
+function openRouteDiploma(routeKey) {
+  if (!routeKey) return;
+  DIPLOMA_STATE = { kind:'ruta', routeKey, routeName: ROUTE_NAMES[routeKey] || 'una ruta de Santa Fe', monCount: routeOrder.length || (ROUTES[routeKey]||[]).length };
+  document.getElementById('diploma-heading').textContent = 'Tu Real Cédula de Visita';
+  document.getElementById('diploma-name-input').value = diplomaSavedName();
+  renderDiploma();
+  document.getElementById('diploma-overlay').classList.add('on');
+}
+
+function openEscapeDiploma() {
+  if (!escState) return;
+  const hits = Object.values(escState.answered || {}).filter(v => v === 'ok1' || v === 'ok2').length;
+  const total = Object.keys(escState.answered || {}).length;
+  DIPLOMA_STATE = {
+    kind:'escape', points: escState.points, timeTxt: escFmtTime(escState.elapsed),
+    hits, totalQ: total, rango: rangoFor(escState.points),
+    expNum: String(Math.floor(1000 + Math.random()*9000)) + '-SF-1492'
+  };
+  document.getElementById('diploma-heading').textContent = 'Tu Decreto Real';
+  document.getElementById('diploma-name-input').value = escState.name || diplomaSavedName();
+  renderDiploma();
+  document.getElementById('diploma-overlay').classList.add('on');
+}
+
+function diplomaClose() { document.getElementById('diploma-overlay').classList.remove('on'); }
+
+let diplomaDebounce = null;
+function diplomaNameChanged() {
+  clearTimeout(diplomaDebounce);
+  diplomaDebounce = setTimeout(renderDiploma, 200);
+  try { localStorage.setItem('santafe_diploma_name', document.getElementById('diploma-name-input').value); } catch(e) {}
+}
+
+function renderDiploma() {
+  if (!DIPLOMA_STATE) return;
+  const name = (document.getElementById('diploma-name-input').value || '').trim() || 'Explorador/a';
+  const opts = Object.assign({ name }, DIPLOMA_STATE);
+  buildDiplomaCanvas(opts, (canvas) => {
+    const url = canvas.toDataURL('image/png');
+    document.getElementById('diploma-img').src = url;
+    const a = document.getElementById('diploma-download');
+    a.href = url;
+    a.download = DIPLOMA_STATE.kind === 'escape'
+      ? 'diploma-' + DIPLOMA_STATE.rango.key + '.png'
+      : 'diploma-' + (DIPLOMA_STATE.routeKey || 'ruta') + '.png';
+  });
+}
+
+// ── Vista previa desde el panel de Admin (sin necesidad de jugar) ──
+const RANGO_EXAMPLE = {
+  cortesano: { points:350,  hits:5,  time:'18:20' },
+  soldado:   { points:750,  hits:9,  time:'14:05' },
+  escribano: { points:1100, hits:12, time:'10:40' },
+  espia:     { points:1650, hits:15, time:'07:55' }
+};
+function previewDiploma(kind, key) {
+  if (kind === 'ruta') {
+    DIPLOMA_STATE = { kind:'ruta', routeKey:key, routeName: ROUTE_NAMES[key] || 'una ruta de Santa Fe', monCount: (ROUTES[key]||[]).length };
+    document.getElementById('diploma-heading').textContent = 'Vista previa · Real Cédula de Visita';
+  } else {
+    const rango = RANGOS.find(r => r.key === key);
+    const ex = RANGO_EXAMPLE[key] || { points:0, hits:0, time:'00:00' };
+    DIPLOMA_STATE = {
+      kind:'escape', points: ex.points, timeTxt: ex.time, hits: ex.hits, totalQ:15,
+      rango, expNum: '4821-SF-1492'
+    };
+    document.getElementById('diploma-heading').textContent = 'Vista previa · ' + rango.nombre;
+  }
+  document.getElementById('diploma-name-input').value = 'Nombre de Ejemplo';
+  renderDiploma();
+  document.getElementById('diploma-overlay').classList.add('on');
+}
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
@@ -4990,6 +5362,21 @@ if ('serviceWorker' in navigator) {
     <div class="hist-body">
       <p class="pj-intro">Toca cada ficha para ver su biografía completa.</p>
       <div class="pj-grid" id="pj-grid"></div>
+    </div>
+  </div>
+</div>
+
+<div id="diploma-overlay" class="hist-overlay" onclick="if(event.target===this)diplomaClose()">
+  <div class="hist-sheet diploma-sheet">
+    <div class="hist-head">
+      <button class="hist-back" onclick="diplomaClose()" aria-label="Volver">←</button>
+      <h2 id="diploma-heading">Tu diploma</h2>
+    </div>
+    <div class="hist-body">
+      <label class="diploma-label" for="diploma-name-input">Nombre para el diploma</label>
+      <input id="diploma-name-input" class="diploma-name-input" type="text" maxlength="30" placeholder="Ej.: Ana María López" oninput="diplomaNameChanged()" autocomplete="off">
+      <div class="diploma-canvas-wrap"><img id="diploma-img" alt="Diploma"></div>
+      <a id="diploma-download" class="esc-main-btn diploma-dl-btn" download="diploma.png">⬇️ Descargar diploma</a>
     </div>
   </div>
 </div>
