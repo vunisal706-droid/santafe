@@ -1515,6 +1515,20 @@
     }
     .pj-detail.on { display:block; }
     .pj-detail b { color:var(--blue-1); }
+
+    /* ── Vídeo de introducción (rutas / escape / diplomas) ── */
+    .video-intro-overlay {
+      position:fixed; inset:0; z-index:4000; background:#000;
+      display:none; align-items:center; justify-content:center;
+    }
+    .video-intro-overlay.on { display:flex; }
+    .video-intro-overlay video { width:100%; height:100%; object-fit:cover; }
+    .video-intro-skip {
+      position:absolute; bottom:max(24px, env(safe-area-inset-bottom)); right:20px; z-index:4001;
+      background:rgba(255,255,255,0.16); color:#fff; border:1.5px solid rgba(255,255,255,0.45);
+      padding:10px 20px; border-radius:100px; font-weight:700; font-size:14px; font-family:var(--fu);
+      backdrop-filter: blur(4px);
+    }
 </style>
 </head>
 <body>
@@ -1608,7 +1622,7 @@
           <span class="rc-stop">Arco Real</span>
           <span class="rc-stop">Centro Damián Bayón</span>
         </div>
-        <button class="rc-btn" onclick="startRoute('completa')">
+        <button class="rc-btn" onclick="playIntroVideo('completa.mp4', () => startRoute('completa'))">
           ¡Iniciar esta ruta! <span class="rc-btn-arrow">→</span>
         </button>
       </div>
@@ -1632,7 +1646,7 @@
           <span class="rc-stop">Arco de Jaén</span>
           <span class="rc-stop">Arco Real</span>
         </div>
-        <button class="rc-btn" onclick="startRoute('arcos')">
+        <button class="rc-btn" onclick="playIntroVideo('arcos.mp4', () => startRoute('arcos'))">
           ¡Iniciar esta ruta! <span class="rc-btn-arrow">→</span>
         </button>
       </div>
@@ -1655,7 +1669,7 @@
           <span class="rc-stop">Iglesia Mayor</span>
           <span class="rc-stop">Arco Real</span>
         </div>
-        <button class="rc-btn" onclick="startRoute('expres')">
+        <button class="rc-btn" onclick="playIntroVideo('express.mp4', () => startRoute('expres'))">
           ¡Iniciar esta ruta! <span class="rc-btn-arrow">→</span>
         </button>
       </div>
@@ -1679,7 +1693,7 @@
           <span class="rc-stop">Cuatro Arcos</span>
           <span class="rc-stop">Centro Damián Bayón</span>
         </div>
-        <button class="rc-btn sofa-btn" onclick="startSofaMode()">
+        <button class="rc-btn sofa-btn" onclick="playIntroVideo('sofa.mp4', () => startSofaMode())">
           Explorar desde casa <span class="rc-btn-arrow">→</span>
         </button>
       </div>
@@ -1704,7 +1718,7 @@
           <span class="rc-stop">Arco Real</span>
           <span class="rc-stop">Iglesia Mayor</span>
         </div>
-        <button class="rc-btn esc-btn" onclick="escOpen()">
+        <button class="rc-btn esc-btn" onclick="playIntroVideo('escape.mp4', () => escOpen())">
           ¡Resolver el enigma! <span class="rc-btn-arrow">→</span>
         </button>
       </div>
@@ -4831,10 +4845,13 @@ function escFinish(bonus) {
   document.getElementById('esc-win-best').innerHTML = bestTxt;
 
   try { localStorage.removeItem(ESC_KEY_STATE); } catch(e) {}
-  escGoScreen('esc-win');
-  escConfetti(4200);
-  escBeep('win');
-  escSubmitScore(hits, total);
+  const rango = rangoFor(escState.points);
+  playIntroVideo(rango.key + '.mp4', () => {
+    escGoScreen('esc-win');
+    escConfetti(4200);
+    escBeep('win');
+    escSubmitScore(hits, total);
+  });
 }
 
 // ── Cuaderno de pistas ──────────────────────────────────────────
@@ -5330,6 +5347,34 @@ function previewDiploma(kind, key) {
   document.getElementById('diploma-overlay').classList.add('on');
 }
 
+
+// ================================================================
+// VÍDEOS DE INTRODUCCIÓN (rutas, escape room, felicitación por rango)
+// ================================================================
+let videoIntroDone = null;
+function playIntroVideo(file, onDone) {
+  const overlay = document.getElementById('video-intro-overlay');
+  const vid = document.getElementById('video-intro-player');
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    videoIntroDone = null;
+    try { vid.pause(); } catch(e) {}
+    overlay.classList.remove('on');
+    vid.removeEventListener('ended', finish);
+    onDone();
+  };
+  videoIntroDone = finish;
+  vid.src = 'videos/' + file;
+  vid.currentTime = 0;
+  overlay.classList.add('on');
+  vid.addEventListener('ended', finish, { once:true });
+  const p = vid.play();
+  if (p && p.catch) p.catch(() => finish()); // si el navegador bloquea la reproducción, seguimos sin vídeo
+}
+function videoIntroSkip() { if (videoIntroDone) videoIntroDone(); }
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
@@ -5379,6 +5424,11 @@ if ('serviceWorker' in navigator) {
       <a id="diploma-download" class="esc-main-btn diploma-dl-btn" download="diploma.png">⬇️ Descargar diploma</a>
     </div>
   </div>
+</div>
+
+<div id="video-intro-overlay" class="video-intro-overlay">
+  <video id="video-intro-player" playsinline webkit-playsinline></video>
+  <button id="video-intro-skip" class="video-intro-skip" onclick="videoIntroSkip()">Saltar ▶</button>
 </div>
 </body>
 </html>
