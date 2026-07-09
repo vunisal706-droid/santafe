@@ -3074,8 +3074,26 @@ function openAdminPanel() {
 function closeAdminPanel() {
   document.getElementById('admin-panel').classList.remove('open');
 }
-function doLogin() {
-  if (document.getElementById('admin-pass').value === 'claustro26') {
+const ADMIN_HASH_URL = 'https://santafe-2bd4e-default-rtdb.europe-west1.firebasedatabase.app/santafe_admin/hash.json';
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function doLogin() {
+  const inp = document.getElementById('admin-pass');
+  const fail = (msg) => {
+    inp.value = '';
+    inp.placeholder = msg;
+    setTimeout(() => inp.placeholder = 'Contraseña', 2500);
+  };
+  let remoteHash = null;
+  try {
+    const r = await fetch(ADMIN_HASH_URL, { cache: 'no-store' });
+    remoteHash = await r.json();
+  } catch (e) { return fail('❌ Sin conexión para verificar'); }
+  if (!remoteHash || typeof remoteHash !== 'string') return fail('❌ Hash no configurado en Firebase');
+  const inputHash = await sha256Hex(inp.value);
+  if (inputHash === remoteHash.toLowerCase()) {
     isAdmin = true;
     document.getElementById('admin-login').style.display = 'none';
     document.getElementById('admin-content').style.display = 'block';
@@ -3083,9 +3101,7 @@ function doLogin() {
     updateContentList();
     updateMonumentsList();
   } else {
-    document.getElementById('admin-pass').value = '';
-    document.getElementById('admin-pass').placeholder = '❌ Contraseña incorrecta';
-    setTimeout(() => document.getElementById('admin-pass').placeholder = 'Contraseña', 2000);
+    fail('❌ Contraseña incorrecta');
   }
 }
 function doLogout() {
