@@ -434,6 +434,7 @@
       font-size:13.5px; font-weight:700; padding:8px 14px; border-radius:20px; cursor:pointer;
     }
     .tts-btn.speaking { background:var(--blue-1); color:#fff; }
+    .tts-btn.tts-head { margin:0 0 0 auto; padding:6px 12px; font-size:15px; flex-shrink:0; }
     /* Pictogramas y agenda visual */
     .picto { width:64px; height:64px; object-fit:contain; background:#fff; border-radius:10px; border:1.5px solid var(--gold-soft); }
     .agenda-steps { display:flex; gap:8px; align-items:stretch; justify-content:space-between; margin:6px 0 18px; flex-wrap:wrap; }
@@ -2167,6 +2168,17 @@
         <button class="admin-tab active" id="tab-btn-content"   onclick="switchAdminTab('content')">🎬 Contenidos</button>
         <button class="admin-tab"        id="tab-btn-monuments" onclick="switchAdminTab('monuments')">📍 Monumentos</button>
         <button class="admin-tab"        id="tab-btn-diplomas"  onclick="switchAdminTab('diplomas')">📜 Diplomas</button>
+        <button class="admin-tab"        id="tab-btn-ranking"   onclick="switchAdminTab('ranking')">🏆 Ranking</button>
+      </div>
+
+      <!-- Tab: Ranking (moderación) -->
+      <div class="admin-tab-content" id="tab-ranking">
+        <div class="admin-section">
+          <h3>🏆 Moderar ranking del Escape Room</h3>
+          <p style="font-size:12.5px;color:var(--ink-2);margin-bottom:10px">Los nombres inapropiados se filtran automáticamente. Aquí puedes eliminar cualquier entrada.</p>
+          <button class="admin-btn" onclick="adminLoadRanking()">🔄 Cargar ranking</button>
+          <div id="admin-rank-list" style="margin-top:12px"></div>
+        </div>
       </div>
 
       <!-- Tab: Contenidos -->
@@ -2953,6 +2965,27 @@ function speakPOIText() {
   const tmp = document.createElement('div');
   tmp.innerHTML = activePOI.texts[lang] || '';
   const u = new SpeechSynthesisUtterance(activePOI.names[lang] + '. ' + (tmp.textContent || ''));
+  u.lang = VOICE_LANGS[lang] || 'es-ES';
+  u.rate = 0.95;
+  u.onend = () => { if (btn) btn.classList.remove('speaking'); };
+  if (btn) btn.classList.add('speaking');
+  speechSynthesis.speak(u);
+}
+
+// Lee en voz alta el contenido de un overlay (historia, personajes)
+function speakOverlay(bodyId, btnId) {
+  if (!('speechSynthesis' in window)) return;
+  const btn = document.getElementById(btnId);
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    document.querySelectorAll('.tts-btn.speaking').forEach(b => b.classList.remove('speaking'));
+    return;
+  }
+  const el = document.getElementById(bodyId);
+  if (!el) return;
+  const text = (el.innerText || '').replace(/\s+/g, ' ').trim();
+  if (!text) return;
+  const u = new SpeechSynthesisUtterance(text);
   u.lang = VOICE_LANGS[lang] || 'es-ES';
   u.rate = 0.95;
   u.onend = () => { if (btn) btn.classList.remove('speaking'); };
@@ -4573,12 +4606,56 @@ function escEsc(s) {
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// Filtro de nombres inapropiados (es/en, con normalización de trucos tipo l33t)
+const BAD_SUB = ['gilipollas','cabron','joder','follar','maricon','subnormal','mongolo','retrasad','pendejo','hijoput','hijueput','fuck','shit','bitch','asshole','pussy','cunt','nigg','whore','slut','porn','nazi','hitler','prostitut','imbecil','mierda','gonorrea','malparid','carechimb','pichacorta','comemierda'];
+const BAD_WORD = ['puta','puto','putas','putos','ano','culo','culos','sexo','sex','teta','tetas','pene','penes','mamon','marica','capullo','idiota','verga','polla','pollas','picha','zorra','zorras','cono','conyo','chocho','chochos','cipote','nabo','felacion','semen','vagina','anal'];
+function escNameIsBad(name) {
+  let n = (name || '').toLowerCase()
+    .replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/7/g,'t').replace(/@/g,'a').replace(/\$/g,'s')
+    .normalize('NFD').replace(/[\u0300-\u0302\u0304-\u036f]/g,''); // conserva la ñ (u0303)
+  const compact = n.replace(/[^a-zñ]/g,'');
+  if (BAD_SUB.some(w => compact.includes(w))) return true;
+  const words = n.replace(/ñ/g,'n').split(/[^a-z]+/).filter(Boolean);
+  const wordsN = n.split(/[^a-zñ]+/).filter(Boolean);
+  return BAD_WORD.some(w => words.includes(w) || wordsN.includes(w)) || wordsN.includes('coño'.normalize('NFD').replace(/\u0303/g,'ñ'));
+}
+function escSafeName(name) { return escNameIsBad(name) ? 'Explorador/a 🙊' : name; }
+
+// ── Moderación del ranking (admin) ──
+async function adminLoadRanking() {
+  const box = document.getElementById('admin-rank-list');
+  box.innerHTML = '⏳ Cargando…';
+  let data = null;
+  try { const r = await fetch(ESC_FB_URL + '.json'); if (r.ok) data = await r.json(); } catch (e) {}
+  if (!data) { box.innerHTML = '⚠️ No se pudo cargar (¿sin conexión?).'; return; }
+  const rows = Object.entries(data).filter(([k, x]) => x && x.n !== undefined)
+    .sort((a, b) => (b[1].p || 0) - (a[1].p || 0));
+  if (!rows.length) { box.innerHTML = 'El ranking está vacío.'; return; }
+  box.innerHTML = rows.map(([k, x]) =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--gold-soft);border-radius:10px;margin-bottom:6px;font-size:13px">
+      <span style="flex:1"><b>${escEsc(x.n || '—')}</b> · ${x.p || 0} pts · ${x.d || ''}</span>
+      <button onclick="adminDeleteRank('${k}', this)" style="border:1.5px solid #dc2626;color:#dc2626;background:#fff;border-radius:8px;padding:5px 10px;cursor:pointer">🗑 Borrar</button>
+    </div>`).join('');
+}
+async function adminDeleteRank(key, btn) {
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(ESC_FB_URL + '/' + key + '.json', { method: 'DELETE' });
+    if (!r.ok) throw new Error(r.status);
+    btn.closest('div').remove();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '🗑 Borrar';
+    const url = 'https://console.firebase.google.com/project/santafe-2bd4e/database/santafe-2bd4e-default-rtdb/data/~2Fsantafe_escape~2Franking~2F' + key;
+    if (confirm('Las reglas de seguridad de Firebase impiden borrar desde la app (es lo esperado con reglas estrictas). ¿Abrir la consola de Firebase para borrar esta entrada con un clic?')) window.open(url, '_blank');
+  }
+}
+
 async function escSubmitScore(hits, total) {
   const el = document.getElementById('esc-win-rank-status');
   if (el) el.textContent = 'Guardando tu puntuación en el ranking…';
   try {
     const body = {
-      n: (escState.name || 'Explorador/a').slice(0, 24),
+      n: escSafeName((escState.name || 'Explorador/a').slice(0, 24)),
       p: escState.points, t: escState.elapsed,
       h: hits, tt: total, m: escState.mode || 'clase',
       d: new Date().toISOString().slice(0, 10)
@@ -4607,8 +4684,9 @@ async function escFetchRanking() {
     } catch(e) {}
   }
   if (!data) return null;
-  return Object.values(data)
-    .filter(x => x && typeof x.p === 'number')
+  return Object.entries(data)
+    .filter(([k, x]) => x && typeof x.p === 'number')
+    .map(([k, x]) => Object.assign({}, x, { _k: k, n: escSafeName(x.n || '') }))
     .sort((a, b) => (b.p - a.p) || ((a.t || 0) - (b.t || 0)))
     .slice(0, 10);
 }
@@ -5387,7 +5465,7 @@ function histOpen(key) {
   document.getElementById('hist-overlay').classList.add('on');
   document.getElementById('hist-body').scrollTop = 0;
 }
-function histClose() { document.getElementById('hist-overlay').classList.remove('on'); }
+function histClose() { document.getElementById('hist-overlay').classList.remove('on'); try { speechSynthesis.cancel(); } catch(e){} }
 
 const PJ_I18N = {"labels": {"es": ["Nació", "Hito", "Murió"], "en": ["Born", "Milestone", "Died"], "fr": ["Naissance", "Fait marquant", "Décès"], "zh": ["出生", "事迹", "逝世"], "ar": ["الميلاد", "الإنجاز", "الوفاة"]}, "en": {"colon": {"oficio": "Navigator, cartographer and admiral", "hito": "Won the support of the Catholic Monarchs and signed the Capitulations of Santa Fe in 1492; his voyage reached America on 12 October 1492.", "nacio": "1451, in Genoa (Italy).", "murio": "1506, in Valladolid, suffering from gout and other ailments."}, "isabel": {"oficio": "Queen of Castile", "hito": "Together with Ferdinand, she backed Columbus's venture and approved the Capitulations; she was decisive in the conquest of Granada.", "nacio": "1451, in Madrigal de las Altas Torres (Castile).", "murio": "1504, in Medina del Campo, after a long illness."}, "fernando": {"oficio": "King of Aragon and king consort of Castile", "hito": "Took part in the political decision to support Columbus's voyage and in the process leading to the Capitulations.", "nacio": "1452, in Sos del Rey Católico (Aragon).", "murio": "1516, in Madrigalejo (Extremadura), of natural causes."}, "coloma": {"oficio": "Royal secretary of the Crown of Aragon", "hito": "Drafted and registered the document of the Capitulations of Santa Fe by order of the Catholic Monarchs.", "nacio": "Around 1442, in Borja (Zaragoza).", "murio": "August 1517, in Borja, shortly after making his will."}, "fray-juan-perez": {"oficio": "Franciscan friar, confessor to Queen Isabella", "hito": "Defended Columbus's project at court and mediated in the negotiations before the Capitulations.", "nacio": "Date not confirmed.", "murio": "Date and cause not confirmed."}, "pinzon-martin": {"oficio": "Sailor, navigator and captain", "hito": "Supported the first Columbian voyage, helped recruit the crew and provided decisive nautical expertise.", "nacio": "Around 1441, in Palos de la Frontera (Huelva).", "murio": "1493, probably from illness."}, "pinzon-vicente": {"oficio": "Navigator and explorer", "hito": "Took part in Columbus's first voyage commanding La Niña, and later led his own expeditions.", "nacio": "Around 1462, in Palos de la Frontera (Huelva).", "murio": "Around 1514, cause not precisely known."}, "santangel": {"oficio": "Financier, royal clerk of the Crown of Aragon", "hito": "One of the main financial backers of Columbus's project; provided funds for the expedition.", "nacio": "Around 1435, in Valencia.", "murio": "1498, cause not highlighted in the sources."}, "sanchez": {"oficio": "Treasurer of the Crown of Aragon", "hito": "Also took part in financing Columbus's voyage.", "nacio": "Date not confirmed.", "murio": "Date and cause not confirmed."}}, "fr": {"colon": {"oficio": "Navigateur, cartographe et amiral", "hito": "Obtint l'appui des Rois Catholiques et signa les Capitulations de Santa Fe en 1492 ; son voyage atteignit l'Amérique le 12 octobre 1492.", "nacio": "1451, à Gênes (Italie).", "murio": "1506, à Valladolid, atteint de goutte et d'autres maux."}, "isabel": {"oficio": "Reine de Castille", "hito": "Avec Ferdinand, elle soutint l'entreprise de Colomb et approuva les Capitulations ; décisive dans la conquête de Grenade.", "nacio": "1451, à Madrigal de las Altas Torres (Castille).", "murio": "1504, à Medina del Campo, après une longue maladie."}, "fernando": {"oficio": "Roi d'Aragon et roi consort de Castille", "hito": "Participa à la décision politique de soutenir le voyage de Colomb et au processus menant aux Capitulations.", "nacio": "1452, à Sos del Rey Católico (Aragon).", "murio": "1516, à Madrigalejo (Estrémadure), de causes naturelles."}, "coloma": {"oficio": "Secrétaire royal de la Couronne d'Aragon", "hito": "Rédigea et enregistra le document des Capitulations de Santa Fe sur ordre des Rois Catholiques.", "nacio": "Vers 1442, à Borja (Saragosse).", "murio": "Août 1517, à Borja, peu après avoir testé."}, "fray-juan-perez": {"oficio": "Frère franciscain, confesseur de la reine Isabelle", "hito": "Défendit le projet de Colomb à la cour et servit de médiateur avant les Capitulations.", "nacio": "Date non confirmée.", "murio": "Date et cause non confirmées."}, "pinzon-martin": {"oficio": "Marin, navigateur et capitaine", "hito": "Soutint le premier voyage colombien, aida à recruter l'équipage et apporta une expérience nautique décisive.", "nacio": "Vers 1441, à Palos de la Frontera (Huelva).", "murio": "1493, probablement de maladie."}, "pinzon-vicente": {"oficio": "Navigateur et explorateur", "hito": "Participa au premier voyage de Colomb au commandement de La Niña, puis mena ses propres expéditions.", "nacio": "Vers 1462, à Palos de la Frontera (Huelva).", "murio": "Vers 1514, cause imprécise."}, "santangel": {"oficio": "Financier, écrivain de ration de la Couronne d'Aragon", "hito": "L'un des grands soutiens financiers du projet colombien ; fournit des fonds pour l'expédition.", "nacio": "Vers 1435, à Valence.", "murio": "1498, cause non précisée dans les sources."}, "sanchez": {"oficio": "Trésorier de la Couronne d'Aragon", "hito": "Participa lui aussi au financement du voyage de Colomb.", "nacio": "Date non confirmée.", "murio": "Date et cause non confirmées."}}, "zh": {"colon": {"oficio": "航海家、制图师和海军上将", "hito": "获得天主教双王的支持，于1492年签署《圣菲协定》；随后于1492年10月12日抵达美洲。", "nacio": "1451年，生于热那亚（意大利）。", "murio": "1506年，卒于巴利亚多利德，患痛风等疾病。"}, "isabel": {"oficio": "卡斯蒂利亚女王", "hito": "与费尔南多一起支持哥伦布的事业并批准协定；在征服格拉纳达中起决定性作用。", "nacio": "1451年，生于卡斯蒂利亚。", "murio": "1504年，久病后卒于梅迪纳-德尔坎波。"}, "fernando": {"oficio": "阿拉贡国王、卡斯蒂利亚王夫", "hito": "参与支持哥伦布航行的政治决策及签署协定的过程。", "nacio": "1452年，生于阿拉贡。", "murio": "1516年，自然原因逝世于埃斯特雷马杜拉。"}, "coloma": {"oficio": "阿拉贡王室秘书", "hito": "奉天主教双王之命起草并登记《圣菲协定》文件。", "nacio": "约1442年，生于博尔哈（萨拉戈萨）。", "murio": "1517年8月，立遗嘱后不久卒于博尔哈。"}, "fray-juan-perez": {"oficio": "方济各会修士，伊莎贝尔女王的告解神父", "hito": "在宫廷为哥伦布的计划辩护，并在协定谈判中斡旋。", "nacio": "日期不详。", "murio": "日期和原因不详。"}, "pinzon-martin": {"oficio": "水手、航海家和船长", "hito": "支持哥伦布首航，帮助招募船员，提供了关键的航海经验。", "nacio": "约1441年，生于帕洛斯（韦尔瓦）。", "murio": "1493年，可能死于疾病。"}, "pinzon-vicente": {"oficio": "航海家和探险家", "hito": "指挥『尼尼亚号』参加哥伦布首航，后自行组织探险。", "nacio": "约1462年，生于帕洛斯（韦尔瓦）。", "murio": "约1514年，原因不详。"}, "santangel": {"oficio": "金融家，阿拉贡王室文书官", "hito": "哥伦布计划的主要资助者之一，为远征提供资金。", "nacio": "约1435年，生于瓦伦西亚。", "murio": "1498年，史料未详述原因。"}, "sanchez": {"oficio": "阿拉贡王室司库", "hito": "同样参与资助哥伦布的航行。", "nacio": "日期不详。", "murio": "日期和原因不详。"}}, "ar": {"colon": {"oficio": "بحّار ورسّام خرائط وأميرال", "hito": "نال دعم الملكين الكاثوليكيين ووقّع اتفاقيات سانتا في عام 1492؛ ثم قام بالرحلة التي بلغت أمريكا في 12 أكتوبر 1492.", "nacio": "1451، في جنوة (إيطاليا).", "murio": "1506، في بلد الوليد، متأثرًا بالنقرس وأمراض أخرى."}, "isabel": {"oficio": "ملكة قشتالة", "hito": "دعمت مع فرناندو مشروع كولومبوس ووافقت على الاتفاقيات؛ وكانت حاسمة في فتح غرناطة.", "nacio": "1451، في قشتالة.", "murio": "1504، في مدينة ديل كامبو بعد مرض طويل."}, "fernando": {"oficio": "ملك أراغون وملك قرين لقشتالة", "hito": "شارك في القرار السياسي بدعم رحلة كولومبوس وفي مسار توقيع الاتفاقيات.", "nacio": "1452، في أراغون.", "murio": "1516، في إكستريمادورا، لأسباب طبيعية."}, "coloma": {"oficio": "سكرتير ملكي لتاج أراغون", "hito": "حرّر وسجّل وثيقة اتفاقيات سانتا في بأمر الملكين الكاثوليكيين.", "nacio": "نحو 1442، في بورخا (سرقسطة).", "murio": "أغسطس 1517، في بورخا، بعيد كتابة وصيته."}, "fray-juan-perez": {"oficio": "راهب فرنسيسكاني ومُعرِّف الملكة إيزابيل", "hito": "دافع عن مشروع كولومبوس أمام البلاط وتوسّط في المفاوضات قبل الاتفاقيات.", "nacio": "التاريخ غير مؤكد.", "murio": "التاريخ والسبب غير مؤكدين."}, "pinzon-martin": {"oficio": "بحّار وملّاح وقبطان", "hito": "دعم رحلة كولومبوس الأولى وساعد في تجنيد الطاقم وقدّم خبرة بحرية حاسمة.", "nacio": "نحو 1441، في بالوس (ولبة).", "murio": "1493، على الأرجح بسبب المرض."}, "pinzon-vicente": {"oficio": "ملّاح ومستكشف", "hito": "شارك في رحلة كولومبوس الأولى قائدًا لسفينة لا نينيا، ثم قاد بعثات خاصة به.", "nacio": "نحو 1462، في بالوس (ولبة).", "murio": "نحو 1514، السبب غير محدد."}, "santangel": {"oficio": "مموّل وكاتب ديوان تاج أراغون", "hito": "كان من أكبر الداعمين الماليين لمشروع كولومبوس ووفّر أموالًا للبعثة.", "nacio": "نحو 1435، في بلنسية.", "murio": "1498، لم تُبرز المصادر السبب."}, "sanchez": {"oficio": "أمين خزانة تاج أراغون", "hito": "شارك أيضًا في تمويل رحلة كولومبوس.", "nacio": "التاريخ غير مؤكد.", "murio": "التاريخ والسبب غير مؤكدين."}}};
 const PJ_DATA = [{"slug": "colon", "nombre": "Cristóbal Colón", "fechas": "1451 – 1506", "oficio": "Navegante, cartógrafo y almirante", "hito": "Consiguió el apoyo de los Reyes Católicos y firmó las Capitulaciones de Santa Fe en 1492; después realizó el viaje que llegó a América el 12 de octubre de 1492.", "nacio": "1451, en Génova (Italia).", "murio": "1506, en Valladolid, aquejado de gota y otras dolencias."}, {"slug": "isabel", "nombre": "Isabel I de Castilla", "fechas": "1451 – 1504", "oficio": "Reina de Castilla", "hito": "Junto a Fernando, apoyó la empresa de Colón y aprobó las Capitulaciones de Santa Fe; fue decisiva en la conquista de Granada.", "nacio": "1451, en Madrigal de las Altas Torres (Castilla).", "murio": "1504, en Medina del Campo, tras una larga enfermedad."}, {"slug": "fernando", "nombre": "Fernando II de Aragón", "fechas": "1452 – 1516", "oficio": "Rey de Aragón y rey consorte de Castilla", "hito": "Participó en la decisión política de apoyar el viaje de Colón y en el proceso que culminó con la firma de las Capitulaciones.", "nacio": "1452, en Sos del Rey Católico (Aragón).", "murio": "1516, en Madrigalejo (Extremadura), por causas naturales."}, {"slug": "coloma", "nombre": "Juan de Coloma", "fechas": "h. 1442 – 1517", "oficio": "Secretario real de la Corona de Aragón", "hito": "Redactó y registró el documento de las Capitulaciones de Santa Fe por mandato de los Reyes Católicos.", "nacio": "Hacia 1442, en Borja (Zaragoza).", "murio": "Agosto de 1517, en Borja, poco después de otorgar testamento."}, {"slug": "fray-juan-perez", "nombre": "Fray Juan Pérez", "fechas": "Fechas no confirmadas", "oficio": "Fraile franciscano, confesor de la reina Isabel", "hito": "Defendió el proyecto de Colón ante la corte y medió en la negociación previa a las Capitulaciones.", "nacio": "Fecha no confirmada.", "murio": "Fecha y causa no confirmadas."}, {"slug": "pinzon-martin", "nombre": "Martín Alonso Pinzón", "fechas": "h. 1441 – 1493", "oficio": "Marino, navegante y capitán", "hito": "Apoyó el primer viaje colombino, ayudó a reclutar tripulación y aportó experiencia náutica decisiva.", "nacio": "Hacia 1441, en Palos de la Frontera (Huelva).", "murio": "1493, probablemente por enfermedad."}, {"slug": "pinzon-vicente", "nombre": "Vicente Yáñez Pinzón", "fechas": "h. 1462 – h. 1514", "oficio": "Navegante y explorador", "hito": "Participó en el primer viaje de Colón al mando de La Niña y después realizó expediciones propias.", "nacio": "Hacia 1462, en Palos de la Frontera (Huelva).", "murio": "Hacia 1514, causa no precisada con exactitud."}, {"slug": "santangel", "nombre": "Luis de Santángel", "fechas": "h. 1435 – 1498", "oficio": "Financiero, escribano de ración de la Corona de Aragón", "hito": "Fue uno de los grandes apoyos económicos del proyecto colombino y facilitó fondos para la expedición.", "nacio": "Hacia 1435, en Valencia.", "murio": "1498, causa no destacada en las fuentes."}, {"slug": "sanchez", "nombre": "Gabriel Sánchez", "fechas": "Siglo XV", "oficio": "Tesorero de la Corona de Aragón", "hito": "Participó también en la financiación del viaje de Colón.", "nacio": "Fecha no confirmada.", "murio": "Fecha y causa no confirmadas."}];
@@ -5413,7 +5491,7 @@ function pjRenderGrid() {
 }
 function pjToggle(i) { document.getElementById('pj-detail-' + i).classList.toggle('on'); }
 function pjOpen() { pjRenderGrid(); document.getElementById('pj-overlay').classList.add('on'); }
-function pjClose() { document.getElementById('pj-overlay').classList.remove('on'); }
+function pjClose() { document.getElementById('pj-overlay').classList.remove('on'); try { speechSynthesis.cancel(); } catch(e){} }
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
@@ -5807,6 +5885,7 @@ if ('serviceWorker' in navigator) {
     <div class="hist-head">
       <button class="hist-back" onclick="histClose()" aria-label="Volver">←</button>
       <h2 id="hist-title"></h2>
+      <button class="tts-btn tts-head" id="hist-tts" onclick="speakOverlay('hist-body','hist-tts')">🔊</button>
     </div>
     <div class="hist-body" id="hist-body"></div>
   </div>
@@ -5827,6 +5906,7 @@ if ('serviceWorker' in navigator) {
     <div class="hist-head">
       <button class="hist-back" onclick="pjClose()" aria-label="Volver">←</button>
       <h2>Personajes de 1492</h2>
+      <button class="tts-btn tts-head" id="pj-tts" onclick="speakOverlay('pj-grid','pj-tts')">🔊</button>
     </div>
     <div class="hist-body">
       <p class="pj-intro">Toca cada ficha para ver su biografía completa.</p>
