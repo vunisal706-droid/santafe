@@ -399,6 +399,51 @@
       width:38px; height:38px; box-shadow:var(--sh); cursor:pointer;
     }
     #voice-btn.on { background:#E8F4FF; border-color:var(--blue-1); }
+    #home-acc-btn { right:196px; font-weight:700; color:rgba(255,255,255,0.85); }
+    #acc-panel {
+      position:fixed; top:56px; right:12px; z-index:1100;
+      background:#fff; border:1.5px solid var(--gold-soft); border-radius:14px;
+      box-shadow:0 8px 30px rgba(60,40,10,0.18); padding:14px 16px; min-width:230px;
+    }
+    #acc-panel.off { display:none; }
+    .acc-title { font-weight:700; font-size:14px; color:var(--ink); margin-bottom:10px; }
+    .acc-row { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:10px; font-size:13.5px; color:var(--ink-2); }
+    .acc-row:last-child { margin-bottom:0; }
+    .acc-sizes { display:flex; gap:6px; }
+    .acc-fs-btn { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--gold-soft); background:#fff; font-size:13px; cursor:pointer; }
+    .acc-fs-btn.on { background:#E8F4FF; border-color:var(--blue-1); font-weight:700; }
+    .acc-toggle { width:46px; height:26px; border-radius:20px; border:1.5px solid var(--gold-soft); background:#eee; position:relative; cursor:pointer; }
+    .acc-toggle span { position:absolute; top:2px; left:2px; width:19px; height:19px; border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.25); transition:left .18s; }
+    .acc-toggle.on { background:var(--blue-1); }
+    .acc-toggle.on span { left:23px; }
+    /* Tamaño de letra: escala las zonas de texto, nunca el mapa */
+    html.acc-fs1 :is(.home-body,.hist-sheet,#detail-panel,#list-panel,#info-panel,#nav-strip,.sofa-grid) { zoom:1.15; }
+    html.acc-fs2 :is(.home-body,.hist-sheet,#detail-panel,#list-panel,#info-panel,#nav-strip,.sofa-grid) { zoom:1.3; }
+    /* Letra fácil: tipografía sencilla, más aire */
+    html.acc-dys :is(p,li,span,div,button,input,strong,h1,h2,h3,h4) {
+      font-family:Verdana, Arial, sans-serif !important;
+      letter-spacing:0.03em; word-spacing:0.14em;
+    }
+    html.acc-dys :is(p,li,.tc,.hist-body) { line-height:1.9 !important; }
+    .tts-btn {
+      display:inline-flex; align-items:center; gap:6px; margin:8px 0 10px;
+      background:#E8F4FF; border:1.5px solid var(--blue-1); color:var(--blue-1);
+      font-size:13.5px; font-weight:700; padding:8px 14px; border-radius:20px; cursor:pointer;
+    }
+    .tts-btn.speaking { background:var(--blue-1); color:#fff; }
+    /* Pictogramas y agenda visual */
+    .picto { width:64px; height:64px; object-fit:contain; background:#fff; border-radius:10px; border:1.5px solid var(--gold-soft); }
+    .agenda-steps { display:flex; gap:8px; align-items:stretch; justify-content:space-between; margin:6px 0 18px; flex-wrap:wrap; }
+    .ag-step { flex:1; min-width:70px; text-align:center; }
+    .ag-step .ag-ord { font-size:11px; font-weight:700; color:var(--blue-1); text-transform:uppercase; margin-bottom:4px; }
+    .ag-step .ag-lbl { font-size:12.5px; color:var(--ink-2); margin-top:4px; line-height:1.3; }
+    .ag-arrow { align-self:center; font-size:18px; color:var(--gold-1, #c9a84c); }
+    .agenda-monus { display:flex; flex-direction:column; gap:8px; }
+    .ag-monu { display:flex; align-items:center; gap:10px; background:#FFFDF6; border:1.5px solid var(--gold-soft); border-radius:12px; padding:8px 12px; }
+    .ag-monu .ag-num { width:26px; height:26px; border-radius:50%; background:var(--blue-1); color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ag-monu .ag-ico { font-size:20px; }
+    .ag-monu .ag-name { font-size:14px; font-weight:600; color:var(--ink); }
+    .agenda-credit { font-size:10.5px; color:var(--ink-3, #999); margin-top:14px; }
     .ns-dir-arrow { font-size:28px; color:var(--blue-1); flex-shrink:0; line-height:1; width:32px; text-align:center; }
     .ns-info { flex:1; min-width:0; }
     .ns-instruction { font-size:13px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
@@ -1568,6 +1613,7 @@
       <div class="home-title">Santa Fe Histórica</div>
       <div class="home-badge">CEIP Capitulaciones · Granada</div>
     </div>
+    <button class="home-admin-btn" id="home-acc-btn" onclick="toggleAcc()" aria-label="Accesibilidad">♿ Aa</button>
     <button class="home-admin-btn" id="home-lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl2">ES</span></button>
     <button class="home-admin-btn" onclick="openAdminPanel()">⚙ Admin</button>
   </div>
@@ -1783,6 +1829,13 @@
           <span data-t="hF4s">Disponible en español, inglés, francés, chino y árabe.</span>
         </div>
       </div>
+      <div class="hi-row">
+        <div class="hi-ico">♿</div>
+        <div class="hi-txt">
+          <strong data-t="hF5">Atención a la diversidad</strong>
+          <span data-t="hF5s">Lectura en voz alta, tamaño de letra ajustable, letra fácil, pictogramas ARASAAC y agenda visual.</span>
+        </div>
+      </div>
     </div>
 
   </div><!-- /home-body -->
@@ -1930,6 +1983,22 @@
     <button class="lang-opt"     onclick="setLang('ar')">🇸🇦 العربية</button>
   </div>
 
+  <div id="acc-panel" class="off">
+    <div class="acc-title" data-a="accTitle">Accesibilidad</div>
+    <div class="acc-row">
+      <span data-a="accSize">Tamaño de letra</span>
+      <div class="acc-sizes">
+        <button onclick="setFontSize(0)" class="acc-fs-btn" id="afs-0">A</button>
+        <button onclick="setFontSize(1)" class="acc-fs-btn" id="afs-1" style="font-size:17px">A</button>
+        <button onclick="setFontSize(2)" class="acc-fs-btn" id="afs-2" style="font-size:21px">A</button>
+      </div>
+    </div>
+    <div class="acc-row">
+      <span data-a="accEasy">Letra fácil</span>
+      <button class="acc-toggle" id="acc-dys-btn" onclick="toggleDys()" aria-pressed="false"><span></span></button>
+    </div>
+  </div>
+
 <!-- ═══════════════════════ APP ═══════════════════════ -->
 <div id="app" class="gone">
 
@@ -1939,6 +2008,8 @@
       <div id="topbar-name">⚜️ <span id="t-name">Santa Fe Histórica</span></div>
       <div id="topbar-sub">CEIP Capitulaciones · Granada</div>
     </div>
+    <button class="top-btn" id="acc-btn" onclick="toggleAcc()" aria-label="Accesibilidad">♿</button>
+    <button class="top-btn" id="agenda-btn" onclick="agendaOpen()" aria-label="Agenda visual">📋</button>
     <button class="top-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl">ES</span></button>
   </div>
 
@@ -2749,6 +2820,119 @@ function tbtText(step, distM) {
   return txt;
 }
 
+// ── Accesibilidad: tamaño de letra y letra fácil ──
+const ACC_T = {
+  es:{accTitle:'Accesibilidad', accSize:'Tamaño de letra', accEasy:'Letra fácil'},
+  en:{accTitle:'Accessibility', accSize:'Text size', accEasy:'Easy-read font'},
+  fr:{accTitle:'Accessibilité', accSize:'Taille du texte', accEasy:'Police facile'},
+  zh:{accTitle:'无障碍', accSize:'字体大小', accEasy:'易读字体'},
+  ar:{accTitle:'إمكانية الوصول', accSize:'حجم الخط', accEasy:'خط سهل'}
+};
+let accOpen = false;
+function accLoad() {
+  let s = {}; try { s = JSON.parse(localStorage.getItem('sf_acc') || '{}'); } catch (e) {}
+  setFontSize(s.fs || 0, true);
+  if (s.dys) toggleDys(true);
+}
+function accSave() {
+  const fs = document.documentElement.classList.contains('acc-fs2') ? 2 : document.documentElement.classList.contains('acc-fs1') ? 1 : 0;
+  const dys = document.documentElement.classList.contains('acc-dys');
+  try { localStorage.setItem('sf_acc', JSON.stringify({ fs, dys })); } catch (e) {}
+}
+function toggleAcc() {
+  accOpen = !accOpen;
+  document.getElementById('acc-panel').classList.toggle('off', !accOpen);
+  if (accOpen) { document.getElementById('lang-panel').classList.add('off'); langOpen = false; }
+  const at = ACC_T[lang] || ACC_T.es;
+  document.querySelectorAll('[data-a]').forEach(el => { if (at[el.dataset.a]) el.textContent = at[el.dataset.a]; });
+}
+function setFontSize(n, skipSave) {
+  const h = document.documentElement;
+  h.classList.toggle('acc-fs1', n === 1);
+  h.classList.toggle('acc-fs2', n === 2);
+  [0,1,2].forEach(i => { const b = document.getElementById('afs-' + i); if (b) b.classList.toggle('on', i === n); });
+  if (!skipSave) accSave();
+}
+function toggleDys(force) {
+  const h = document.documentElement;
+  const on = force === true ? true : !h.classList.contains('acc-dys');
+  h.classList.toggle('acc-dys', on);
+  const b = document.getElementById('acc-dys-btn');
+  if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }
+  if (force !== true) accSave();
+}
+document.addEventListener('DOMContentLoaded', accLoad);
+
+// ── Pictogramas ARASAAC (arasaac.org · CC BY-NC-SA) ──
+function pictoLoad(imgEl, keyword, emoji) {
+  const cacheKey = 'sf_picto_' + keyword;
+  const setById = (id) => { imgEl.src = 'https://static.arasaac.org/pictograms/' + id + '/' + id + '_300.png'; };
+  const fallback = () => { const s = document.createElement('span'); s.style.fontSize = '44px'; s.textContent = emoji; imgEl.replaceWith(s); };
+  imgEl.onerror = fallback;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) return setById(cached);
+  fetch('https://api.arasaac.org/v1/pictograms/es/bestsearch/' + encodeURIComponent(keyword))
+    .then(r => r.json())
+    .then(arr => {
+      const id = arr && arr[0] && arr[0]._id;
+      if (!id) return fallback();
+      try { localStorage.setItem(cacheKey, id); } catch (e) {}
+      setById(id);
+    })
+    .catch(fallback);
+}
+
+// ── Agenda visual (anticipación TEA) ──
+const AGENDA_T = {
+  es:{title:'📋 Agenda visual', ords:['Primero','Después','Luego','Al final'], steps:['Elijo mi ruta','Camino con la app','Miro y escucho el monumento','Consigo mi diploma'], monus:'Monumentos que voy a visitar', credit:'Pictogramas: ARASAAC (arasaac.org) · CC BY-NC-SA · Gobierno de Aragón'},
+  en:{title:'📋 Visual schedule', ords:['First','Then','Next','Finally'], steps:['I choose my route','I walk with the app','I look and listen to the monument','I get my diploma'], monus:'Monuments I will visit', credit:'Pictograms: ARASAAC (arasaac.org) · CC BY-NC-SA · Government of Aragon'},
+  fr:{title:'📋 Agenda visuel', ords:['D\'abord','Ensuite','Puis','À la fin'], steps:['Je choisis mon parcours','Je marche avec l\'app','Je regarde et j\'écoute le monument','J\'obtiens mon diplôme'], monus:'Monuments que je vais visiter', credit:'Pictogrammes : ARASAAC (arasaac.org) · CC BY-NC-SA · Gouvernement d\'Aragon'},
+  zh:{title:'📋 视觉日程', ords:['首先','然后','接着','最后'], steps:['选择路线','跟着应用走','看和听古迹','获得证书'], monus:'我要参观的古迹', credit:'图标：ARASAAC (arasaac.org) · CC BY-NC-SA · 阿拉贡政府'},
+  ar:{title:'📋 جدول مرئي', ords:['أولًا','بعد ذلك','ثم','في النهاية'], steps:['أختار مساري','أمشي مع التطبيق','أشاهد المعلم وأستمع','أحصل على شهادتي'], monus:'المعالم التي سأزورها', credit:'الرموز: ARASAAC (arasaac.org) · CC BY-NC-SA'}
+};
+const AGENDA_PICTOS = [ ['elegir','👆'], ['caminar','🚶'], ['escuchar','👀'], ['diploma','🏅'] ];
+function agendaOpen() {
+  const at = AGENDA_T[lang] || AGENDA_T.es;
+  document.getElementById('agenda-title').textContent = at.title;
+  let html = '<div class="agenda-steps">';
+  AGENDA_PICTOS.forEach((p, i) => {
+    if (i > 0) html += '<div class="ag-arrow">➜</div>';
+    html += `<div class="ag-step"><div class="ag-ord">${at.ords[i]}</div><img class="picto" id="ag-picto-${i}" alt=""><div class="ag-lbl">${at.steps[i]}</div></div>`;
+  });
+  html += '</div>';
+  const ids = (currentRoute && routeOrder.length ? routeOrder : (currentRoute || POIS.map(p => p.id)));
+  html += `<h3>${at.monus}</h3><div class="agenda-monus">`;
+  ids.forEach((id, i) => {
+    const poi = POIS.find(p => p.id === id);
+    if (!poi) return;
+    html += `<div class="ag-monu"><span class="ag-num">${i + 1}</span><span class="ag-ico">${poi.icon}</span><span class="ag-name">${poi.names[lang]}</span></div>`;
+  });
+  html += `</div><div class="agenda-credit">${at.credit}</div>`;
+  document.getElementById('agenda-body').innerHTML = html;
+  AGENDA_PICTOS.forEach((p, i) => pictoLoad(document.getElementById('ag-picto-' + i), p[0], p[1]));
+  document.getElementById('agenda-overlay').classList.add('on');
+}
+function agendaClose() { document.getElementById('agenda-overlay').classList.remove('on'); }
+
+// ── Lectura en voz alta de la ficha del monumento ──
+function speakPOIText() {
+  const btn = document.getElementById('tts-btn');
+  if (!('speechSynthesis' in window) || !activePOI) return;
+  if (speechSynthesis.speaking) {
+    speechSynthesis.cancel();
+    if (btn) btn.classList.remove('speaking');
+    return;
+  }
+  const tmp = document.createElement('div');
+  tmp.innerHTML = activePOI.texts[lang] || '';
+  const u = new SpeechSynthesisUtterance(activePOI.names[lang] + '. ' + (tmp.textContent || ''));
+  u.lang = VOICE_LANGS[lang] || 'es-ES';
+  u.rate = 0.95;
+  u.onend = () => { if (btn) btn.classList.remove('speaking'); };
+  if (btn) btn.classList.add('speaking');
+  speechSynthesis.speak(u);
+}
+
 // ── Navegación por voz ──
 const VOICE_LANGS = { es:'es-ES', en:'en-GB', fr:'fr-FR', zh:'zh-CN', ar:'ar-SA' };
 const VOICE_MSG = {
@@ -2944,8 +3128,10 @@ function openPOI(id) {
   document.getElementById('dp-type').textContent = poi.types[lang];
 
   // Tab: Texto
+  const TTS_LBL = {es:'Escuchar',en:'Listen',fr:'Écouter',zh:'朗读',ar:'استمع'};
   document.getElementById('tp-text').innerHTML =
     `<div class="kids-tag">⭐ ${t.kidstag}</div>
+     <button class="tts-btn" id="tts-btn" onclick="speakPOIText()">🔊 ${TTS_LBL[lang]||TTS_LBL.es}</button>
      <div class="tc">${poi.texts[lang]}</div>`;
 
   // Tab: Vídeo
@@ -3068,11 +3254,11 @@ function setLang(l) {
 
 // Traducciones de la portada
 const HOME_T = {
-es:{hHero:'Elige tu ruta y comienza la visita',hDisc:'📜 Descubre Santa Fe',hFund:'La Fundación',hFundS:'De campamento a ciudad, en 80 días',hArcos:'Los Cuatro Arcos',hArcosS:'Historia y curiosidades de cada puerta',hCap:'Las Capitulaciones',hCapS:'Curiosidades sobre los grandes acuerdos',hPers:'Personajes de 1492',hPersS:'9 protagonistas de la historia',hRutas:'Elige tu ruta',hR1:'Ruta Completa',hR2:'Ruta de los Arcos',hR3:'Ruta Exprés',hR4:'Desde el Sofá',hR5:'Escape Room',hR4a:'🎬 Vídeo · Audio · Texto',hR4b:'🏠 Sin salir de casa',hR5a:'🗝️ Código secreto',hR5b:'❓ 15 pruebas',hR5c:'⭐ Con puntuación',hGal:'🖼️ Santa Fe en 1491',hG1:'Vista aérea de la ciudad amurallada',hG2:'Las cuatro puertas de la muralla',hG3:'Un día de mercado en la calle mayor',hG4:'La guardia junto a la puerta',hG5:'El trazado en cuadrícula, calle a calle',hG6:'La ciudad, recreada en maqueta',hQue:'📱 ¿Qué es esta app?',hF1:'Detección automática',hF1s:'La app te avisa cuando estás a menos de 80 m de un monumento.',hF2:'Navegación paso a paso',hF2s:'Dirección y distancia al siguiente punto de la ruta en tiempo real.',hF3:'Contenidos del alumnado',hF3s:'Vídeos y audios narrados por los estudiantes del CEIP Capitulaciones.',hF4:'Multilingüe',hF4s:'Disponible en español, inglés, francés, chino y árabe.',hMonW:'monumentos',hHeroS:'📡 Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.'},
-en:{hHero:'Choose your route and start the visit',hDisc:'📜 Discover Santa Fe',hFund:'The Founding',hFundS:'From camp to city, in 80 days',hArcos:'The Four Gates',hArcosS:'History and curiosities of each gate',hCap:'The Capitulations',hCapS:'Curiosities about the great agreements',hPers:'Characters of 1492',hPersS:'9 protagonists of history',hRutas:'Choose your route',hR1:'Complete Route',hR2:'Gates Route',hR3:'Express Route',hR4:'From the Sofa',hR5:'Escape Room',hR4a:'🎬 Video · Audio · Text',hR4b:'🏠 Without leaving home',hR5a:'🗝️ Secret code',hR5b:'❓ 15 challenges',hR5c:'⭐ With scoring',hGal:'🖼️ Santa Fe in 1491',hG1:'Aerial view of the walled city',hG2:'The four gates of the wall',hG3:'A market day on the main street',hG4:'The guard by the gate',hG5:'The grid layout, street by street',hG6:'The city, recreated as a model',hQue:'📱 What is this app?',hF1:'Automatic detection',hF1s:'The app alerts you when you are less than 80 m from a monument.',hF2:'Turn-by-turn navigation',hF2s:'Direction and distance to the next stop in real time.',hF3:'Student content',hF3s:'Videos and audios narrated by CEIP Capitulaciones students.',hF4:'Multilingual',hF4s:'Available in Spanish, English, French, Chinese and Arabic.',hMonW:'monuments',hHeroS:'📡 Turn on GPS and the app will guide you monument by monument with direction and distance instructions.'},
-fr:{hHero:'Choisissez votre parcours et commencez la visite',hDisc:'📜 Découvrez Santa Fe',hFund:'La Fondation',hFundS:'Du campement à la ville, en 80 jours',hArcos:'Les Quatre Portes',hArcosS:'Histoire et curiosités de chaque porte',hCap:'Les Capitulations',hCapS:'Curiosités sur les grands accords',hPers:'Personnages de 1492',hPersS:'9 protagonistes de l\'histoire',hRutas:'Choisissez votre parcours',hR1:'Parcours Complet',hR2:'Parcours des Portes',hR3:'Parcours Express',hR4:'Depuis le Canapé',hR5:'Escape Room',hR4a:'🎬 Vidéo · Audio · Texte',hR4b:'🏠 Sans sortir de chez soi',hR5a:'🗝️ Code secret',hR5b:'❓ 15 épreuves',hR5c:'⭐ Avec score',hGal:'🖼️ Santa Fe en 1491',hG1:'Vue aérienne de la ville fortifiée',hG2:'Les quatre portes de la muraille',hG3:'Un jour de marché dans la rue principale',hG4:'La garde près de la porte',hG5:'Le tracé en damier, rue par rue',hG6:'La ville, recréée en maquette',hQue:'📱 Qu\'est-ce que cette app ?',hF1:'Détection automatique',hF1s:'L\'app vous avertit à moins de 80 m d\'un monument.',hF2:'Navigation pas à pas',hF2s:'Direction et distance jusqu\'au prochain arrêt en temps réel.',hF3:'Contenus des élèves',hF3s:'Vidéos et audios narrés par les élèves du CEIP Capitulaciones.',hF4:'Multilingue',hF4s:'Disponible en espagnol, anglais, français, chinois et arabe.',hMonW:'monuments',hHeroS:'📡 Activez le GPS et l\'app vous guidera monument par monument avec direction et distance.'},
-zh:{hHero:'选择路线，开始参观',hDisc:'📜 探索圣菲',hFund:'建城史',hFundS:'80天，从军营到城市',hArcos:'四座城门',hArcosS:'每座城门的历史与趣闻',hCap:'投降协定',hCapS:'关于重大协定的趣闻',hPers:'1492年的人物',hPersS:'历史上的9位主角',hRutas:'选择路线',hR1:'完整路线',hR2:'城门路线',hR3:'快捷路线',hR4:'足不出户',hR5:'密室逃脱',hR4a:'🎬 视频 · 音频 · 文字',hR4b:'🏠 在家参观',hR5a:'🗝️ 秘密代码',hR5b:'❓ 15个挑战',hR5c:'⭐ 有计分',hGal:'🖼️ 1491年的圣菲',hG1:'城墙之城鸟瞰图',hG2:'城墙的四座城门',hG3:'主街的集市日',hG4:'城门旁的卫兵',hG5:'棋盘式街道布局',hG6:'城市模型再现',hQue:'📱 这是什么应用？',hF1:'自动检测',hF1s:'距古迹不足80米时应用会提醒您。',hF2:'逐步导航',hF2s:'实时显示到下一站的方向和距离。',hF3:'学生内容',hF3s:'由CEIP Capitulaciones学生录制的视频和音频。',hF4:'多语言',hF4s:'提供西班牙语、英语、法语、中文和阿拉伯语。',hMonW:'处古迹',hHeroS:'📡 开启GPS，应用将逐个古迹为您导航，显示方向和距离。'},
-ar:{hHero:'اختر مسارك وابدأ الزيارة',hDisc:'📜 اكتشف سانتا في',hFund:'التأسيس',hFundS:'من معسكر إلى مدينة في 80 يومًا',hArcos:'البوابات الأربع',hArcosS:'تاريخ وطرائف كل بوابة',hCap:'الاتفاقيات',hCapS:'طرائف عن الاتفاقيات الكبرى',hPers:'شخصيات 1492',hPersS:'9 أبطال من التاريخ',hRutas:'اختر مسارك',hR1:'المسار الكامل',hR2:'مسار البوابات',hR3:'المسار السريع',hR4:'من الأريكة',hR5:'غرفة الهروب',hR4a:'🎬 فيديو · صوت · نص',hR4b:'🏠 دون مغادرة المنزل',hR5a:'🗝️ رمز سري',hR5b:'❓ 15 تحديًا',hR5c:'⭐ مع النقاط',hGal:'🖼️ سانتا في عام 1491',hG1:'منظر جوي للمدينة المسوّرة',hG2:'البوابات الأربع للسور',hG3:'يوم سوق في الشارع الرئيسي',hG4:'الحرس عند البوابة',hG5:'التخطيط الشبكي، شارعًا بشارع',hG6:'المدينة في مجسم',hQue:'📱 ما هذا التطبيق؟',hF1:'كشف تلقائي',hF1s:'ينبهك التطبيق عندما تكون على بعد أقل من 80 م من معلم.',hF2:'ملاحة خطوة بخطوة',hF2s:'الاتجاه والمسافة إلى المحطة التالية في الوقت الفعلي.',hF3:'محتوى الطلاب',hF3s:'فيديوهات وتسجيلات بصوت طلاب المدرسة.',hF4:'متعدد اللغات',hF4s:'متاح بالإسبانية والإنجليزية والفرنسية والصينية والعربية.',hMonW:'معالم',hHeroS:'📡 فعّل GPS وسيرشدك التطبيق من معلم إلى معلم مع الاتجاه والمسافة.'}
+es:{hHero:'Elige tu ruta y comienza la visita',hDisc:'📜 Descubre Santa Fe',hFund:'La Fundación',hFundS:'De campamento a ciudad, en 80 días',hArcos:'Los Cuatro Arcos',hArcosS:'Historia y curiosidades de cada puerta',hCap:'Las Capitulaciones',hCapS:'Curiosidades sobre los grandes acuerdos',hPers:'Personajes de 1492',hPersS:'9 protagonistas de la historia',hRutas:'Elige tu ruta',hR1:'Ruta Completa',hR2:'Ruta de los Arcos',hR3:'Ruta Exprés',hR4:'Desde el Sofá',hR5:'Escape Room',hR4a:'🎬 Vídeo · Audio · Texto',hR4b:'🏠 Sin salir de casa',hR5a:'🗝️ Código secreto',hR5b:'❓ 15 pruebas',hR5c:'⭐ Con puntuación',hGal:'🖼️ Santa Fe en 1491',hG1:'Vista aérea de la ciudad amurallada',hG2:'Las cuatro puertas de la muralla',hG3:'Un día de mercado en la calle mayor',hG4:'La guardia junto a la puerta',hG5:'El trazado en cuadrícula, calle a calle',hG6:'La ciudad, recreada en maqueta',hQue:'📱 ¿Qué es esta app?',hF1:'Detección automática',hF1s:'La app te avisa cuando estás a menos de 80 m de un monumento.',hF2:'Navegación paso a paso',hF2s:'Dirección y distancia al siguiente punto de la ruta en tiempo real.',hF3:'Contenidos del alumnado',hF3s:'Vídeos y audios narrados por los estudiantes del CEIP Capitulaciones.',hF4:'Multilingüe',hF4s:'Disponible en español, inglés, francés, chino y árabe.',hMonW:'monumentos',hHeroS:'📡 Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.',hF5:'Atención a la diversidad',hF5s:'Lectura en voz alta, tamaño de letra ajustable, letra fácil, pictogramas ARASAAC y agenda visual.'},
+en:{hHero:'Choose your route and start the visit',hDisc:'📜 Discover Santa Fe',hFund:'The Founding',hFundS:'From camp to city, in 80 days',hArcos:'The Four Gates',hArcosS:'History and curiosities of each gate',hCap:'The Capitulations',hCapS:'Curiosities about the great agreements',hPers:'Characters of 1492',hPersS:'9 protagonists of history',hRutas:'Choose your route',hR1:'Complete Route',hR2:'Gates Route',hR3:'Express Route',hR4:'From the Sofa',hR5:'Escape Room',hR4a:'🎬 Video · Audio · Text',hR4b:'🏠 Without leaving home',hR5a:'🗝️ Secret code',hR5b:'❓ 15 challenges',hR5c:'⭐ With scoring',hGal:'🖼️ Santa Fe in 1491',hG1:'Aerial view of the walled city',hG2:'The four gates of the wall',hG3:'A market day on the main street',hG4:'The guard by the gate',hG5:'The grid layout, street by street',hG6:'The city, recreated as a model',hQue:'📱 What is this app?',hF1:'Automatic detection',hF1s:'The app alerts you when you are less than 80 m from a monument.',hF2:'Turn-by-turn navigation',hF2s:'Direction and distance to the next stop in real time.',hF3:'Student content',hF3s:'Videos and audios narrated by CEIP Capitulaciones students.',hF4:'Multilingual',hF4s:'Available in Spanish, English, French, Chinese and Arabic.',hMonW:'monuments',hHeroS:'📡 Turn on GPS and the app will guide you monument by monument with direction and distance instructions.',hF5:'Inclusive by design',hF5s:'Read-aloud, adjustable text size, easy-read font, ARASAAC pictograms and a visual schedule.'},
+fr:{hHero:'Choisissez votre parcours et commencez la visite',hDisc:'📜 Découvrez Santa Fe',hFund:'La Fondation',hFundS:'Du campement à la ville, en 80 jours',hArcos:'Les Quatre Portes',hArcosS:'Histoire et curiosités de chaque porte',hCap:'Les Capitulations',hCapS:'Curiosités sur les grands accords',hPers:'Personnages de 1492',hPersS:'9 protagonistes de l\'histoire',hRutas:'Choisissez votre parcours',hR1:'Parcours Complet',hR2:'Parcours des Portes',hR3:'Parcours Express',hR4:'Depuis le Canapé',hR5:'Escape Room',hR4a:'🎬 Vidéo · Audio · Texte',hR4b:'🏠 Sans sortir de chez soi',hR5a:'🗝️ Code secret',hR5b:'❓ 15 épreuves',hR5c:'⭐ Avec score',hGal:'🖼️ Santa Fe en 1491',hG1:'Vue aérienne de la ville fortifiée',hG2:'Les quatre portes de la muraille',hG3:'Un jour de marché dans la rue principale',hG4:'La garde près de la porte',hG5:'Le tracé en damier, rue par rue',hG6:'La ville, recréée en maquette',hQue:'📱 Qu\'est-ce que cette app ?',hF1:'Détection automatique',hF1s:'L\'app vous avertit à moins de 80 m d\'un monument.',hF2:'Navigation pas à pas',hF2s:'Direction et distance jusqu\'au prochain arrêt en temps réel.',hF3:'Contenus des élèves',hF3s:'Vidéos et audios narrés par les élèves du CEIP Capitulaciones.',hF4:'Multilingue',hF4s:'Disponible en espagnol, anglais, français, chinois et arabe.',hMonW:'monuments',hHeroS:'📡 Activez le GPS et l\'app vous guidera monument par monument avec direction et distance.',hF5:'Attention à la diversité',hF5s:'Lecture à voix haute, taille du texte réglable, police facile, pictogrammes ARASAAC et agenda visuel.'},
+zh:{hHero:'选择路线，开始参观',hDisc:'📜 探索圣菲',hFund:'建城史',hFundS:'80天，从军营到城市',hArcos:'四座城门',hArcosS:'每座城门的历史与趣闻',hCap:'投降协定',hCapS:'关于重大协定的趣闻',hPers:'1492年的人物',hPersS:'历史上的9位主角',hRutas:'选择路线',hR1:'完整路线',hR2:'城门路线',hR3:'快捷路线',hR4:'足不出户',hR5:'密室逃脱',hR4a:'🎬 视频 · 音频 · 文字',hR4b:'🏠 在家参观',hR5a:'🗝️ 秘密代码',hR5b:'❓ 15个挑战',hR5c:'⭐ 有计分',hGal:'🖼️ 1491年的圣菲',hG1:'城墙之城鸟瞰图',hG2:'城墙的四座城门',hG3:'主街的集市日',hG4:'城门旁的卫兵',hG5:'棋盘式街道布局',hG6:'城市模型再现',hQue:'📱 这是什么应用？',hF1:'自动检测',hF1s:'距古迹不足80米时应用会提醒您。',hF2:'逐步导航',hF2s:'实时显示到下一站的方向和距离。',hF3:'学生内容',hF3s:'由CEIP Capitulaciones学生录制的视频和音频。',hF4:'多语言',hF4s:'提供西班牙语、英语、法语、中文和阿拉伯语。',hMonW:'处古迹',hHeroS:'📡 开启GPS，应用将逐个古迹为您导航，显示方向和距离。',hF5:'无障碍与多样性',hF5s:'朗读、可调字体大小、易读字体、ARASAAC图标和视觉日程。'},
+ar:{hHero:'اختر مسارك وابدأ الزيارة',hDisc:'📜 اكتشف سانتا في',hFund:'التأسيس',hFundS:'من معسكر إلى مدينة في 80 يومًا',hArcos:'البوابات الأربع',hArcosS:'تاريخ وطرائف كل بوابة',hCap:'الاتفاقيات',hCapS:'طرائف عن الاتفاقيات الكبرى',hPers:'شخصيات 1492',hPersS:'9 أبطال من التاريخ',hRutas:'اختر مسارك',hR1:'المسار الكامل',hR2:'مسار البوابات',hR3:'المسار السريع',hR4:'من الأريكة',hR5:'غرفة الهروب',hR4a:'🎬 فيديو · صوت · نص',hR4b:'🏠 دون مغادرة المنزل',hR5a:'🗝️ رمز سري',hR5b:'❓ 15 تحديًا',hR5c:'⭐ مع النقاط',hGal:'🖼️ سانتا في عام 1491',hG1:'منظر جوي للمدينة المسوّرة',hG2:'البوابات الأربع للسور',hG3:'يوم سوق في الشارع الرئيسي',hG4:'الحرس عند البوابة',hG5:'التخطيط الشبكي، شارعًا بشارع',hG6:'المدينة في مجسم',hQue:'📱 ما هذا التطبيق؟',hF1:'كشف تلقائي',hF1s:'ينبهك التطبيق عندما تكون على بعد أقل من 80 م من معلم.',hF2:'ملاحة خطوة بخطوة',hF2s:'الاتجاه والمسافة إلى المحطة التالية في الوقت الفعلي.',hF3:'محتوى الطلاب',hF3s:'فيديوهات وتسجيلات بصوت طلاب المدرسة.',hF4:'متعدد اللغات',hF4s:'متاح بالإسبانية والإنجليزية والفرنسية والصينية والعربية.',hMonW:'معالم',hHeroS:'📡 فعّل GPS وسيرشدك التطبيق من معلم إلى معلم مع الاتجاه والمسافة.',hF5:'مراعاة التنوع',hF5s:'قراءة بصوت عالٍ، حجم خط قابل للتعديل، خط سهل، رموز ARASAAC وجدول مرئي.'}
 };
 
 function updateLanguageUI() {
@@ -3279,6 +3465,9 @@ function loadDataFromStorage() {
 // CERRAR LANG PANEL AL CLIC FUERA
 // ================================================================
 document.addEventListener('click', e => {
+  if (accOpen && !e.target.closest('#acc-panel') && !e.target.closest('#acc-btn') && !e.target.closest('#home-acc-btn')) {
+    accOpen = false; document.getElementById('acc-panel').classList.add('off');
+  }
   if (langOpen && !e.target.closest('#lang-panel') && !e.target.closest('#lang-btn') && !e.target.closest('#home-lang-btn')) {
     langOpen = false;
     document.getElementById('lang-panel').classList.add('off');
@@ -5593,6 +5782,16 @@ if ('serviceWorker' in navigator) {
       <h2 id="hist-title"></h2>
     </div>
     <div class="hist-body" id="hist-body"></div>
+  </div>
+</div>
+
+<div id="agenda-overlay" class="hist-overlay" onclick="if(event.target===this)agendaClose()">
+  <div class="hist-sheet">
+    <div class="hist-head">
+      <button class="hist-back" onclick="agendaClose()" aria-label="Volver">←</button>
+      <h2 id="agenda-title">📋 Agenda visual</h2>
+    </div>
+    <div class="hist-body" id="agenda-body"></div>
   </div>
 </div>
 
