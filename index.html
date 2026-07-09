@@ -400,7 +400,7 @@
     }
     #voice-btn.on { background:#E8F4FF; border-color:var(--blue-1); }
     #home-acc-btn { right:196px; font-weight:700; color:rgba(255,255,255,0.85); }
-    .inf-ico { color:var(--blue-1); font-weight:800; font-size:19px; line-height:1; }
+    .inf-ico { color:#1A6ECC !important; font-weight:800; font-size:19px; line-height:1; }
     #acc-panel {
       position:fixed; top:56px; right:12px; z-index:1100;
       background:#fff; border:1.5px solid var(--gold-soft); border-radius:14px;
@@ -1648,7 +1648,7 @@
           <div class="disc-sub" data-t="hFundS">De campamento a ciudad, en 80 días</div>
         </div>
         <div class="disc-tile" onclick="histOpen('arcos')">
-          <span class="disc-ico">🏯</span>
+          <span class="disc-ico"><svg class="arco-svg" viewBox="0 0 64 64" style="width:1.15em;height:1.15em;vertical-align:-0.18em" aria-hidden="true"><rect x="4" y="18" width="56" height="42" rx="3" fill="#C9A84C"/><rect x="4" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="18" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="32" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="46" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><path d="M21 60 V40 a11 11 0 0 1 22 0 V60 Z" fill="#FFFDF6"/><path d="M21 40 a11 11 0 0 1 22 0" fill="none" stroke="#8A6D2F" stroke-width="1.6" opacity="0.6"/><path d="M4 30 H18 M46 30 H60 M4 48 H19 M45 48 H60 M32 22 V28" stroke="#8A6D2F" stroke-width="1.6" opacity="0.5" fill="none"/></svg></span>
           <div class="disc-name" data-t="hArcos">Los Cuatro Arcos</div>
           <div class="disc-sub" data-t="hArcosS">Historia y curiosidades de cada puerta</div>
         </div>
@@ -1701,7 +1701,7 @@
     <!-- Ruta Arcos -->
     <div class="route-card">
       <div class="rc-head navy">
-        <span class="rc-emoji">🏯</span>
+        <span class="rc-emoji"><svg class="arco-svg" viewBox="0 0 64 64" style="width:1.15em;height:1.15em;vertical-align:-0.18em" aria-hidden="true"><rect x="4" y="18" width="56" height="42" rx="3" fill="#C9A84C"/><rect x="4" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="18" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="32" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="46" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><path d="M21 60 V40 a11 11 0 0 1 22 0 V60 Z" fill="#FFFDF6"/><path d="M21 40 a11 11 0 0 1 22 0" fill="none" stroke="#8A6D2F" stroke-width="1.6" opacity="0.6"/><path d="M4 30 H18 M46 30 H60 M4 48 H19 M45 48 H60 M32 22 V28" stroke="#8A6D2F" stroke-width="1.6" opacity="0.5" fill="none"/></svg></span>
         <div class="rc-name" data-t="hR2">Ruta de los Arcos</div>
         <div class="rc-meta">
           <div class="rc-meta-chip">📍 4 <span data-t="hMonW">monumentos</span></div>
@@ -1867,7 +1867,7 @@
       </div>
       <div class="esc-steps">
         <div class="esc-step">
-          <div class="esc-step-ico">🏯</div>
+          <div class="esc-step-ico"><svg class="arco-svg" viewBox="0 0 64 64" style="width:1.15em;height:1.15em;vertical-align:-0.18em" aria-hidden="true"><rect x="4" y="18" width="56" height="42" rx="3" fill="#C9A84C"/><rect x="4" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="18" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="32" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="46" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><path d="M21 60 V40 a11 11 0 0 1 22 0 V60 Z" fill="#FFFDF6"/><path d="M21 40 a11 11 0 0 1 22 0" fill="none" stroke="#8A6D2F" stroke-width="1.6" opacity="0.6"/><path d="M4 30 H18 M46 30 H60 M4 48 H19 M45 48 H60 M32 22 V28" stroke="#8A6D2F" stroke-width="1.6" opacity="0.5" fill="none"/></svg></div>
           <div class="esc-step-txt"><strong>Visita las 4 puertas</strong>En cada una, supera 3 preguntas para abrir su candado.</div>
         </div>
         <div class="esc-step">
@@ -2281,6 +2281,9 @@
 // ================================================================
 // MONUMENTOS (datos originales preservados íntegramente)
 // ================================================================
+const ARCO_SVG = '<svg class="arco-svg" viewBox="0 0 64 64" style="width:1.15em;height:1.15em;vertical-align:-0.18em" aria-hidden="true"><rect x="4" y="18" width="56" height="42" rx="3" fill="#C9A84C"/><rect x="4" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="18" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="32" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><rect x="46" y="10" width="9" height="10" rx="1.5" fill="#A8862F"/><path d="M21 60 V40 a11 11 0 0 1 22 0 V60 Z" fill="#FFFDF6"/><path d="M21 40 a11 11 0 0 1 22 0" fill="none" stroke="#8A6D2F" stroke-width="1.6" opacity="0.6"/><path d="M4 30 H18 M46 30 H60 M4 48 H19 M45 48 H60 M32 22 V28" stroke="#8A6D2F" stroke-width="1.6" opacity="0.5" fill="none"/></svg>';
+function iconOf(p) { return (p && p.icon === '\ud83c\udfef') ? ARCO_SVG : (p ? p.icon : ''); }
+
 let POIS = [
   {
     id:'plaza', icon:'🏛️', color:'#c9a84c', lat:37.18530, lng:-3.71558,
@@ -2583,7 +2586,7 @@ function buildSofaGrid() {
   document.getElementById('sofa-grid').innerHTML = POIS.map(poi => `
     <div class="sg-card" onclick="sofaOpenPOI('${poi.id}','video')">
       <div class="sg-top" style="background:${poi.color}18">
-        <span>${poi.icon}</span>
+        <span>${iconOf(poi)}</span>
         <div class="sg-dots">
           ${poi.video ? `<div class="sg-dot" style="background:var(--gold)" title="vídeo"></div>` : ''}
           ${poi.audio ? `<div class="sg-dot" style="background:#7B2FBE" title="audio"></div>` : ''}
@@ -2629,7 +2632,7 @@ function rebuildMap() {
 
     // Marcador
     const icon = L.divIcon({
-      html:`<div class="pm" id="pm-${poi.id}" style="background:${poi.color}"><div class="pm-inner">${poi.icon}</div></div>`,
+      html:`<div class="pm" id="pm-${poi.id}" style="background:${poi.color}"><div class="pm-inner">${iconOf(poi)}</div></div>`,
       iconSize:[44,44], iconAnchor:[22,44], className:''
     });
     poiMarks[poi.id] = L.marker([poi.lat, poi.lng], { icon }).addTo(map)
@@ -2944,7 +2947,7 @@ function agendaOpen() {
     let cls = 'ag-monu', chip = '';
     if (done) cls += ' ag-done';
     else if (!nowMarked) { cls += ' ag-now'; chip = `<span class="ag-chip">${(TBT[lang]||TBT.es).now.toUpperCase()}</span>`; nowMarked = true; }
-    html += `<div class="${cls}"><span class="ag-num">${done ? '✓' : (i + 1)}</span><span class="ag-ico">${poi.icon}</span><span class="ag-name">${poi.names[lang]}</span>${chip}</div>`;
+    html += `<div class="${cls}"><span class="ag-num">${done ? '✓' : (i + 1)}</span><span class="ag-ico">${iconOf(poi)}</span><span class="ag-name">${poi.names[lang]}</span>${chip}</div>`;
   });
   html += `</div><div class="agenda-credit">${at.credit}</div>`;
   document.getElementById('agenda-body').innerHTML = html;
@@ -3158,7 +3161,7 @@ function checkProx() {
 function showAlert(poi) {
   nearbyPOI = poi;
   const t = T[lang];
-  document.getElementById('pa-icon').textContent  = poi.icon;
+  document.getElementById('pa-icon').innerHTML = iconOf(poi);
   document.getElementById('pa-name').textContent  = poi.names[lang];
   document.getElementById('pa-msg').textContent   = t.alertMsg;
   document.getElementById('pa-yes').textContent   = t.alertYes;
@@ -3183,7 +3186,7 @@ function openPOI(id) {
   document.getElementById('info-panel').classList.remove('open');
   setActiveNav('map');
 
-  document.getElementById('dp-icon').textContent = poi.icon;
+  document.getElementById('dp-icon').innerHTML = iconOf(poi);
   document.getElementById('dp-name').textContent = poi.names[lang];
   document.getElementById('dp-type').textContent = poi.types[lang];
 
@@ -3280,7 +3283,7 @@ function buildPoiList() {
     }
     html += `
       <div class="poi-item" onclick="openPOI('${poi.id}'); goView('map')">
-        <div class="poi-item-ico" style="background:${poi.color}22;border:2px solid ${poi.color}44">${poi.icon}</div>
+        <div class="poi-item-ico" style="background:${poi.color}22;border:2px solid ${poi.color}44">${iconOf(poi)}</div>
         <div class="poi-item-info">
           <div class="poi-item-name">${poi.names[lang]}</div>
           <div class="poi-item-type">${poi.types[lang]}</div>
@@ -3438,7 +3441,7 @@ function updateContentList() {
   document.getElementById('admin-content-list').innerHTML =
     POIS.map(poi => `
       <div class="content-item">
-        <strong>${poi.icon} ${poi.names.es}</strong>
+        <strong>${iconOf(poi)} ${poi.names.es}</strong>
         <span>🎬${poi.video?'✅':'❌'} 🎵${poi.audio?'✅':'❌'}</span>
         <button onclick="deletePoiContent('${poi.id}')">Borrar</button>
       </div>`).join('');
@@ -3490,7 +3493,7 @@ function updateMonumentsList() {
   document.getElementById('admin-monuments-list').innerHTML =
     POIS.map(poi => `
       <div class="content-item">
-        <strong>${poi.icon} ${poi.names.es}</strong>
+        <strong>${iconOf(poi)} ${poi.names.es}</strong>
         <span>${poi.types.es}</span>
         ${!defaultIds.includes(poi.id)
           ? `<button onclick="deleteMonument('${poi.id}')">Eliminar</button>`
@@ -4841,7 +4844,7 @@ function escBuildNodes() {
     const isFinal = !!st.final;
     const finalLocked = isFinal && Object.keys(escState.digits).length < 4;
     const color = poi ? poi.color : '#1A6ECC';
-    const emoji = poi ? poi.icon : (isFinal ? '⛪' : '🏯');
+    const emoji = poi ? iconOf(poi) : (isFinal ? '⛪' : ARCO_SVG);
     const badge = done ? '✅' : (finalLocked ? '⛓️' : '🔒');
     const cls = 'esc-node' + (done ? ' done' : (finalLocked ? ' locked-far' : ' avail'));
     const r = isFinal ? 30 : 27;
@@ -5002,7 +5005,7 @@ function escCardHead(st, sub) {
   const poi = escStationPoi(st);
   return `
     <div class="esc-card-head">
-      <div class="esc-card-ico">${poi ? poi.icon : '🏛️'}</div>
+      <div class="esc-card-ico">${poi ? iconOf(poi) : '🏛️'}</div>
       <div>
         <div class="esc-card-title">${poi ? poi.names.es : st.id}</div>
         <div class="esc-card-sub">${sub}</div>
@@ -5314,7 +5317,7 @@ function escShowPistas() {
     .filter(st => escState.doneStations.includes(st.id))
     .map(st => {
       const poi = escStationPoi(st);
-      return `<div class="esc-pista-item"><span class="ic">${poi ? poi.icon : '📜'}</span>
+      return `<div class="esc-pista-item"><span class="ic">${poi ? iconOf(poi) : '📜'}</span>
         <span><strong>${poi ? poi.names.es : st.id}</strong>${st.pista}</span></div>`;
     }).join('');
   escShowModal(`
@@ -5462,6 +5465,7 @@ function histOpen(key) {
   document.getElementById('hist-title').textContent = tt[key] || '';
   const cc = (lang !== 'es' && HIST_I18N[lang] && HIST_I18N[lang][key]) ? HIST_I18N[lang][key] : (HIST_CONTENT[key] || '');
   document.getElementById('hist-body').innerHTML = cc;
+  document.querySelectorAll('#hist-body .arco-ico').forEach(el => { if (el.textContent.trim() === '\ud83c\udfef') el.innerHTML = ARCO_SVG; });
   document.getElementById('hist-overlay').classList.add('on');
   document.getElementById('hist-body').scrollTop = 0;
 }
