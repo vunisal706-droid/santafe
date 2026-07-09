@@ -189,6 +189,7 @@
       padding:7px 12px; border-radius:var(--r-pill); transition:all 0.2s;
     }
     .home-admin-btn:hover { background:rgba(255,255,255,0.25); color:var(--white); }
+    #home-lang-btn { right:96px; font-weight:700; color:rgba(255,255,255,0.85); }
 
     .home-body {
       flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
@@ -197,12 +198,19 @@
 
     /* Cómo usar */
     .how-bar {
-      background:var(--glass-2); backdrop-filter:blur(16px);
-      border:1px solid var(--glass-border);
+      background:linear-gradient(135deg,#FFF4E0,#FFE9EC);
+      border:2px solid #dc2626;
       border-radius:var(--r); padding:13px 15px; margin-bottom:18px;
       display:flex; gap:12px; align-items:flex-start;
-      box-shadow:var(--sh);
+      box-shadow:0 4px 16px rgba(220,38,38,0.18);
+      animation:gpsPulse 2s ease-in-out infinite;
     }
+    @keyframes gpsPulse {
+      0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,0.35), 0 4px 16px rgba(220,38,38,0.15); }
+      50%{ box-shadow:0 0 0 8px rgba(220,38,38,0), 0 4px 16px rgba(220,38,38,0.15); }
+    }
+    .how-bar-text span { color:#b91c1c; font-weight:600; }
+    @media (prefers-reduced-motion: reduce){ .how-bar{ animation:none; } }
     .how-bar-icon { font-size:20px; flex-shrink:0; margin-top:1px; }
     .how-bar-text strong { display:block; font-size:13px; font-weight:700; color:var(--ink); margin-bottom:3px; }
     .how-bar-text span { font-size:12px; color:var(--text-2); line-height:1.55; }
@@ -354,7 +362,7 @@
 
     /* Lang panel */
     #lang-panel {
-      position:absolute; top:var(--top-h); right:12px; z-index:300;
+      position:fixed; top:56px; right:12px; z-index:1100;
       background:rgba(255,255,255,0.88); backdrop-filter:blur(24px);
       border:1px solid rgba(255,255,255,0.8);
       border-radius:var(--r); overflow:hidden;
@@ -1554,6 +1562,7 @@
       <div class="home-title">Santa Fe Histórica</div>
       <div class="home-badge">CEIP Capitulaciones · Granada</div>
     </div>
+    <button class="home-admin-btn" id="home-lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl2">ES</span></button>
     <button class="home-admin-btn" onclick="openAdminPanel()">⚙ Admin</button>
   </div>
 
@@ -1563,34 +1572,34 @@
     <div class="how-bar">
       <div class="how-bar-icon">🧭</div>
       <div class="how-bar-text">
-        <strong>Elige tu ruta y comienza la visita</strong>
-        <span>Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.</span>
+        <strong data-t="hHero">Elige tu ruta y comienza la visita</strong>
+        <span data-t="hHeroS">📡 Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.</span>
       </div>
     </div>
 
     <!-- Descubre Santa Fe: menú de historia -->
     <div class="disc-wrap">
-      <div class="sec-label"><h2>📜 Descubre Santa Fe</h2></div>
+      <div class="sec-label"><h2 data-t="hDisc">📜 Descubre Santa Fe</h2></div>
       <div class="disc-grid">
         <div class="disc-tile" onclick="histOpen('fundacion')">
           <span class="disc-ico">📜</span>
-          <div class="disc-name">La Fundación</div>
-          <div class="disc-sub">De campamento a ciudad, en 80 días</div>
+          <div class="disc-name" data-t="hFund">La Fundación</div>
+          <div class="disc-sub" data-t="hFundS">De campamento a ciudad, en 80 días</div>
         </div>
         <div class="disc-tile" onclick="histOpen('arcos')">
           <span class="disc-ico">🏯</span>
-          <div class="disc-name">Los Cuatro Arcos</div>
-          <div class="disc-sub">Historia y curiosidades de cada puerta</div>
+          <div class="disc-name" data-t="hArcos">Los Cuatro Arcos</div>
+          <div class="disc-sub" data-t="hArcosS">Historia y curiosidades de cada puerta</div>
         </div>
         <div class="disc-tile" onclick="histOpen('curiosidades')">
           <span class="disc-ico">⚜️</span>
-          <div class="disc-name">Las Capitulaciones</div>
-          <div class="disc-sub">Curiosidades sobre los grandes acuerdos</div>
+          <div class="disc-name" data-t="hCap">Las Capitulaciones</div>
+          <div class="disc-sub" data-t="hCapS">Curiosidades sobre los grandes acuerdos</div>
         </div>
         <div class="disc-tile" onclick="pjOpen()">
-          <span class="disc-ico">🖋️</span>
-          <div class="disc-name">Personajes de 1492</div>
-          <div class="disc-sub">9 protagonistas de la historia</div>
+          <span class="disc-ico">👥</span>
+          <div class="disc-name" data-t="hPers">Personajes de 1492</div>
+          <div class="disc-sub" data-t="hPersS">9 protagonistas de la historia</div>
         </div>
       </div>
     </div>
@@ -1598,16 +1607,16 @@
     <!-- Rutas -->
     <div class="sec-label">
       <div class="sec-step">1</div>
-      <h2>Elige tu ruta</h2>
+      <h2 data-t="hRutas">Elige tu ruta</h2>
     </div>
 
     <!-- Ruta Completa -->
     <div class="route-card">
       <div class="rc-head gold">
         <span class="rc-emoji">🏛️</span>
-        <div class="rc-name">Ruta Completa</div>
+        <div class="rc-name" data-t="hR1">Ruta Completa</div>
         <div class="rc-meta">
-          <div class="rc-meta-chip">📍 7 monumentos</div>
+          <div class="rc-meta-chip">📍 7 <span data-t="hMonW">monumentos</span></div>
           <div class="rc-meta-chip">⏱ ~45 min</div>
           <div class="rc-meta-chip">🚶 ~1,2 km</div>
         </div>
@@ -1632,9 +1641,9 @@
     <div class="route-card">
       <div class="rc-head navy">
         <span class="rc-emoji">🏯</span>
-        <div class="rc-name">Ruta de los Arcos</div>
+        <div class="rc-name" data-t="hR2">Ruta de los Arcos</div>
         <div class="rc-meta">
-          <div class="rc-meta-chip">📍 4 monumentos</div>
+          <div class="rc-meta-chip">📍 4 <span data-t="hMonW">monumentos</span></div>
           <div class="rc-meta-chip">⏱ ~25 min</div>
           <div class="rc-meta-chip">🚶 ~1,0 km</div>
         </div>
@@ -1656,9 +1665,9 @@
     <div class="route-card">
       <div class="rc-head rust">
         <span class="rc-emoji">⚡</span>
-        <div class="rc-name">Ruta Exprés</div>
+        <div class="rc-name" data-t="hR3">Ruta Exprés</div>
         <div class="rc-meta">
-          <div class="rc-meta-chip">📍 3 monumentos</div>
+          <div class="rc-meta-chip">📍 3 <span data-t="hMonW">monumentos</span></div>
           <div class="rc-meta-chip">⏱ ~15 min</div>
           <div class="rc-meta-chip">🚶 ~0,5 km</div>
         </div>
@@ -1679,11 +1688,11 @@
     <div class="route-card">
       <div class="rc-head sofa">
         <span class="rc-emoji">🛋️</span>
-        <div class="rc-name">Desde el Sofá</div>
+        <div class="rc-name" data-t="hR4">Desde el Sofá</div>
         <div class="rc-meta">
-          <div class="rc-meta-chip">📍 7 monumentos</div>
-          <div class="rc-meta-chip">🎬 Vídeo · Audio · Texto</div>
-          <div class="rc-meta-chip">🏠 Sin salir de casa</div>
+          <div class="rc-meta-chip">📍 7 <span data-t="hMonW">monumentos</span></div>
+          <div class="rc-meta-chip" data-t="hR4a">🎬 Vídeo · Audio · Texto</div>
+          <div class="rc-meta-chip" data-t="hR4b">🏠 Sin salir de casa</div>
         </div>
       </div>
       <div class="rc-body">
@@ -1703,11 +1712,11 @@
     <div class="route-card">
       <div class="rc-head esc">
         <span class="rc-emoji">🔐</span>
-        <div class="rc-name">Escape Room</div>
+        <div class="rc-name" data-t="hR5">Escape Room</div>
         <div class="rc-meta">
-          <div class="rc-meta-chip">🗝️ Código secreto</div>
-          <div class="rc-meta-chip">❓ 15 pruebas</div>
-          <div class="rc-meta-chip">⭐ Con puntuación</div>
+          <div class="rc-meta-chip" data-t="hR5a">🗝️ Código secreto</div>
+          <div class="rc-meta-chip" data-t="hR5b">❓ 15 pruebas</div>
+          <div class="rc-meta-chip" data-t="hR5c">⭐ Con puntuación</div>
         </div>
       </div>
       <div class="rc-body">
@@ -1726,46 +1735,46 @@
 
     <!-- Galería histórica -->
     <div class="gal-wrap">
-      <div class="sec-label"><h2>🖼️ Santa Fe en 1491</h2></div>
+      <div class="sec-label"><h2 data-t="hGal">🖼️ Santa Fe en 1491</h2></div>
       <div class="gal-strip" id="gal-strip">
-        <div class="gal-item" onclick="galOpen(0)"><img src="img/ciudad-aerea.jpg" alt="Vista aérea de Santa Fe amurallada" loading="lazy"><span class="gal-cap">Vista aérea de la ciudad amurallada</span></div>
-        <div class="gal-item" onclick="galOpen(1)"><img src="img/ciudad-plano-rotulado.jpg" alt="Plano de Santa Fe con sus cuatro puertas" loading="lazy"><span class="gal-cap">Las cuatro puertas de la muralla</span></div>
-        <div class="gal-item" onclick="galOpen(2)"><img src="img/mercado.jpg" alt="Calle del mercado en Santa Fe" loading="lazy"><span class="gal-cap">Un día de mercado en la calle mayor</span></div>
-        <div class="gal-item" onclick="galOpen(3)"><img src="img/calle-puerta.jpg" alt="Calle a los pies de una puerta de la muralla" loading="lazy"><span class="gal-cap">La guardia junto a la puerta</span></div>
-        <div class="gal-item" onclick="galOpen(4)"><img src="img/ciudad-plano.jpg" alt="Plano cenital de la ciudad" loading="lazy"><span class="gal-cap">El trazado en cuadrícula, calle a calle</span></div>
-        <div class="gal-item" onclick="galOpen(5)"><img src="img/ciudad-maqueta.jpg" alt="Maqueta de Santa Fe sobre pergamino" loading="lazy"><span class="gal-cap">La ciudad, recreada en maqueta</span></div>
+        <div class="gal-item" onclick="galOpen(0)"><img src="img/ciudad-aerea.jpg" alt="Vista aérea de Santa Fe amurallada" loading="lazy"><span class="gal-cap" data-t="hG1">Vista aérea de la ciudad amurallada</span></div>
+        <div class="gal-item" onclick="galOpen(1)"><img src="img/ciudad-plano-rotulado.jpg" alt="Plano de Santa Fe con sus cuatro puertas" loading="lazy"><span class="gal-cap" data-t="hG2">Las cuatro puertas de la muralla</span></div>
+        <div class="gal-item" onclick="galOpen(2)"><img src="img/mercado.jpg" alt="Calle del mercado en Santa Fe" loading="lazy"><span class="gal-cap" data-t="hG3">Un día de mercado en la calle mayor</span></div>
+        <div class="gal-item" onclick="galOpen(3)"><img src="img/calle-puerta.jpg" alt="Calle a los pies de una puerta de la muralla" loading="lazy"><span class="gal-cap" data-t="hG4">La guardia junto a la puerta</span></div>
+        <div class="gal-item" onclick="galOpen(4)"><img src="img/ciudad-plano.jpg" alt="Plano cenital de la ciudad" loading="lazy"><span class="gal-cap" data-t="hG5">El trazado en cuadrícula, calle a calle</span></div>
+        <div class="gal-item" onclick="galOpen(5)"><img src="img/ciudad-maqueta.jpg" alt="Maqueta de Santa Fe sobre pergamino" loading="lazy"><span class="gal-cap" data-t="hG6">La ciudad, recreada en maqueta</span></div>
       </div>
     </div>
 
     <!-- Info app -->
     <div class="home-info">
-      <h3>📱 ¿Qué es esta app?</h3>
+      <h3 data-t="hQue">📱 ¿Qué es esta app?</h3>
       <div class="hi-row">
         <div class="hi-ico">📍</div>
         <div class="hi-txt">
-          <strong>Detección automática</strong>
-          <span>La app te avisa cuando estás a menos de 80 m de un monumento.</span>
+          <strong data-t="hF1">Detección automática</strong>
+          <span data-t="hF1s">La app te avisa cuando estás a menos de 80 m de un monumento.</span>
         </div>
       </div>
       <div class="hi-row">
         <div class="hi-ico">🧭</div>
         <div class="hi-txt">
-          <strong>Navegación paso a paso</strong>
-          <span>Dirección y distancia al siguiente punto de la ruta en tiempo real.</span>
+          <strong data-t="hF2">Navegación paso a paso</strong>
+          <span data-t="hF2s">Dirección y distancia al siguiente punto de la ruta en tiempo real.</span>
         </div>
       </div>
       <div class="hi-row">
         <div class="hi-ico">🎬</div>
         <div class="hi-txt">
-          <strong>Contenidos del alumnado</strong>
-          <span>Vídeos y audios narrados por los estudiantes del CEIP Capitulaciones.</span>
+          <strong data-t="hF3">Contenidos del alumnado</strong>
+          <span data-t="hF3s">Vídeos y audios narrados por los estudiantes del CEIP Capitulaciones.</span>
         </div>
       </div>
       <div class="hi-row">
         <div class="hi-ico">🌍</div>
         <div class="hi-txt">
-          <strong>Multilingüe</strong>
-          <span>Disponible en español, inglés, francés, chino y árabe.</span>
+          <strong data-t="hF4">Multilingüe</strong>
+          <span data-t="hF4s">Disponible en español, inglés, francés, chino y árabe.</span>
         </div>
       </div>
     </div>
@@ -1907,6 +1916,14 @@
 </div>
 
 
+  <div id="lang-panel" class="off">
+    <button class="lang-opt cur" onclick="setLang('es')">🇪🇸 Español</button>
+    <button class="lang-opt"     onclick="setLang('en')">🇬🇧 English</button>
+    <button class="lang-opt"     onclick="setLang('fr')">🇫🇷 Français</button>
+    <button class="lang-opt"     onclick="setLang('zh')">🇨🇳 中文</button>
+    <button class="lang-opt"     onclick="setLang('ar')">🇸🇦 العربية</button>
+  </div>
+
 <!-- ═══════════════════════ APP ═══════════════════════ -->
 <div id="app" class="gone">
 
@@ -1919,13 +1936,6 @@
     <button class="top-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="t-lang-lbl">ES</span></button>
   </div>
 
-  <div id="lang-panel" class="off">
-    <button class="lang-opt cur" onclick="setLang('es')">🇪🇸 Español</button>
-    <button class="lang-opt"     onclick="setLang('en')">🇬🇧 English</button>
-    <button class="lang-opt"     onclick="setLang('fr')">🇫🇷 Français</button>
-    <button class="lang-opt"     onclick="setLang('zh')">🇨🇳 中文</button>
-    <button class="lang-opt"     onclick="setLang('ar')">🇸🇦 العربية</button>
-  </div>
 
   <div id="map-wrap">
     <div id="map"></div>
@@ -2506,6 +2516,7 @@ function rebuildMap() {
   Object.values(poiMarks).forEach(m => map.removeLayer(m));
   poiMarks = {};
   if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+  _navSteps = null; _navPtr = 1; _osrmLatLngs = null; _osrmKey = null;
 
   POIS.forEach(poi => {
     // Círculo de proximidad
@@ -2581,6 +2592,8 @@ function drawRouteLine() {
 
 // Ruta peatonal real (OSRM/FOSSGIS). Cacheada y con reintento limitado.
 let _osrmKey = null, _osrmBusy = false, _osrmFailUntil = 0;
+let _osrmLatLngs = null; // geometría cacheada de la última ruta OSRM
+let _navSteps = null, _navPtr = 1; // pasos turn-by-turn de OSRM (primer tramo)
 async function enhanceRouteLine(points, layer) {
   if (points.length < 2 || points.length > 12) return;
   if (Date.now() < _osrmFailUntil || _osrmBusy) return;
@@ -2588,18 +2601,27 @@ async function enhanceRouteLine(points, layer) {
   const key = points.map((p, i) => (i === 0
     ? p[0].toFixed(4) + ',' + p[1].toFixed(4)
     : p[0].toFixed(5) + ',' + p[1].toFixed(5))).join('|');
-  if (_osrmKey === key) return;
+  if (_osrmKey === key) {
+    // Misma ruta ya descargada: reaplicar la geometría a la polyline nueva
+    if (_osrmLatLngs && routeLayer === layer && layer) layer.setLatLngs(_osrmLatLngs);
+    return;
+  }
   _osrmBusy = true;
   try {
     const locs = points.map(p => p[1] + ',' + p[0]).join(';');
-    const res = await fetch('https://routing.openstreetmap.de/routed-foot/route/v1/driving/' + locs + '?overview=full&geometries=geojson');
+    const res = await fetch('https://routing.openstreetmap.de/routed-foot/route/v1/driving/' + locs + '?overview=full&geometries=geojson&steps=true');
     if (!res.ok) throw new Error('osrm ' + res.status);
     const j = await res.json();
     if (!j.routes || !j.routes[0] || !j.routes[0].geometry) throw new Error('osrm sin ruta');
     _osrmKey = key;
     // Aplicar solo si esta polyline sigue siendo la vigente
     if (routeLayer === layer && layer) {
-      layer.setLatLngs(j.routes[0].geometry.coordinates.map(c => [c[1], c[0]]));
+      _osrmLatLngs = j.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+      layer.setLatLngs(_osrmLatLngs);
+      // Guardar maniobras del primer tramo para las indicaciones escritas
+      const leg0 = j.routes[0].legs && j.routes[0].legs[0];
+      _navSteps = (leg0 && leg0.steps && leg0.steps.length > 1) ? leg0.steps : null;
+      _navPtr = 1; // el paso 0 es "depart" en la posición del usuario
     }
   } catch (err) {
     console.warn('OSRM no disponible, se mantiene la línea recta:', err.message);
@@ -2690,6 +2712,52 @@ function formatDist(m) {
 }
 
 // ================================================================
+// TURN-BY-TURN: textos de maniobras OSRM en 5 idiomas
+// ================================================================
+const TBT = {
+  es:{now:'Ahora', in_:'En {d}', by:'por', turns:{straight:'sigue recto', left:'gira a la izquierda', right:'gira a la derecha', 'slight left':'gira ligeramente a la izquierda', 'slight right':'gira ligeramente a la derecha', 'sharp left':'gira cerrado a la izquierda', 'sharp right':'gira cerrado a la derecha', uturn:'da media vuelta', roundabout:'en la rotonda, salida {n}', depart:'comienza a caminar', arrive:'llegas al monumento'}},
+  en:{now:'Now', in_:'In {d}', by:'onto', turns:{straight:'continue straight', left:'turn left', right:'turn right', 'slight left':'turn slightly left', 'slight right':'turn slightly right', 'sharp left':'turn sharp left', 'sharp right':'turn sharp right', uturn:'make a U-turn', roundabout:'at the roundabout, exit {n}', depart:'start walking', arrive:'you arrive at the monument'}},
+  fr:{now:'Maintenant', in_:'Dans {d}', by:'sur', turns:{straight:'continuez tout droit', left:'tournez à gauche', right:'tournez à droite', 'slight left':'tournez légèrement à gauche', 'slight right':'tournez légèrement à droite', 'sharp left':'tournez fortement à gauche', 'sharp right':'tournez fortement à droite', uturn:'faites demi-tour', roundabout:'au rond-point, sortie {n}', depart:'commencez à marcher', arrive:'vous arrivez au monument'}},
+  zh:{now:'现在', in_:'{d}后', by:'进入', turns:{straight:'直行', left:'左转', right:'右转', 'slight left':'稍向左转', 'slight right':'稍向右转', 'sharp left':'向左急转', 'sharp right':'向右急转', uturn:'掉头', roundabout:'环岛第{n}出口', depart:'开始步行', arrive:'到达古迹'}},
+  ar:{now:'الآن', in_:'بعد {d}', by:'إلى', turns:{straight:'تابع مباشرة', left:'انعطف يسارًا', right:'انعطف يمينًا', 'slight left':'انعطف قليلاً يسارًا', 'slight right':'انعطف قليلاً يمينًا', 'sharp left':'انعطف بحدة يسارًا', 'sharp right':'انعطف بحدة يمينًا', uturn:'استدر للخلف', roundabout:'عند الدوار، المخرج {n}', depart:'ابدأ المشي', arrive:'وصلت إلى المعلم'}}
+};
+const TBT_ARROWS = {straight:'⬆', left:'⬅', right:'➡', 'slight left':'↖', 'slight right':'↗', 'sharp left':'↙', 'sharp right':'↘', uturn:'⤵', roundabout:'🔄', arrive:'🏁', depart:'⬆'};
+
+function tbtKey(step) {
+  const m = step.maneuver || {};
+  if (m.type === 'arrive') return 'arrive';
+  if (m.type === 'depart') return 'depart';
+  if (m.type === 'rotary' || m.type === 'roundabout') return 'roundabout';
+  const mod = (m.modifier || 'straight').toLowerCase();
+  return mod === 'uturn' ? 'uturn' : (TBT.es.turns[mod] ? mod : 'straight');
+}
+
+function tbtText(step, distM) {
+  const L = TBT[lang] || TBT.es;
+  const key = tbtKey(step);
+  let phrase = L.turns[key] || L.turns.straight;
+  if (key === 'roundabout') phrase = phrase.replace('{n}', (step.maneuver && step.maneuver.exit) || 1);
+  let txt = distM < 12 ? L.now + ', ' + phrase : L.in_.replace('{d}', formatDist(distM)) + ', ' + phrase;
+  if (step.name && key !== 'arrive' && key !== 'depart') txt += ' ' + L.by + ' ' + step.name;
+  return txt;
+}
+
+// Devuelve {arrow, text} de la próxima maniobra, o null si no hay pasos OSRM
+function tbtNext() {
+  if (!_navSteps || userLat === null) return null;
+  // Avanzar el puntero cuando el usuario pasa la maniobra actual (< 18 m)
+  while (_navPtr < _navSteps.length - 1) {
+    const loc = _navSteps[_navPtr].maneuver.location;
+    if (haversine(userLat, userLng, loc[1], loc[0]) < 18) _navPtr++;
+    else break;
+  }
+  const step = _navSteps[Math.min(_navPtr, _navSteps.length - 1)];
+  const loc = step.maneuver.location;
+  const d = haversine(userLat, userLng, loc[1], loc[0]);
+  return { arrow: TBT_ARROWS[tbtKey(step)] || '⬆', text: tbtText(step, d) };
+}
+
+// ================================================================
 // NAVIGATION STRIP: actualizar
 // ================================================================
 function updateNavStripWaiting() {
@@ -2741,8 +2809,9 @@ function updateNavStrip() {
   const arrow   = bearingToArrow(bearing);
   const dir     = bearingToDir(bearing, t);
 
-  document.getElementById('ns-arrow').textContent = arrow;
-  document.getElementById('ns-instruction').textContent = `${dir} · ${formatDist(dist)}`;
+  const tbt = tbtNext();
+  document.getElementById('ns-arrow').textContent = tbt ? tbt.arrow : arrow;
+  document.getElementById('ns-instruction').textContent = tbt ? tbt.text : `${dir} · ${formatDist(dist)}`;
   document.getElementById('ns-next').textContent = `${t.navTo} ${nextPoi.names[lang]}`;
 }
 
@@ -2946,6 +3015,15 @@ function setLang(l) {
   updateLanguageUI();
 }
 
+// Traducciones de la portada
+const HOME_T = {
+es:{hHero:'Elige tu ruta y comienza la visita',hDisc:'📜 Descubre Santa Fe',hFund:'La Fundación',hFundS:'De campamento a ciudad, en 80 días',hArcos:'Los Cuatro Arcos',hArcosS:'Historia y curiosidades de cada puerta',hCap:'Las Capitulaciones',hCapS:'Curiosidades sobre los grandes acuerdos',hPers:'Personajes de 1492',hPersS:'9 protagonistas de la historia',hRutas:'Elige tu ruta',hR1:'Ruta Completa',hR2:'Ruta de los Arcos',hR3:'Ruta Exprés',hR4:'Desde el Sofá',hR5:'Escape Room',hR4a:'🎬 Vídeo · Audio · Texto',hR4b:'🏠 Sin salir de casa',hR5a:'🗝️ Código secreto',hR5b:'❓ 15 pruebas',hR5c:'⭐ Con puntuación',hGal:'🖼️ Santa Fe en 1491',hG1:'Vista aérea de la ciudad amurallada',hG2:'Las cuatro puertas de la muralla',hG3:'Un día de mercado en la calle mayor',hG4:'La guardia junto a la puerta',hG5:'El trazado en cuadrícula, calle a calle',hG6:'La ciudad, recreada en maqueta',hQue:'📱 ¿Qué es esta app?',hF1:'Detección automática',hF1s:'La app te avisa cuando estás a menos de 80 m de un monumento.',hF2:'Navegación paso a paso',hF2s:'Dirección y distancia al siguiente punto de la ruta en tiempo real.',hF3:'Contenidos del alumnado',hF3s:'Vídeos y audios narrados por los estudiantes del CEIP Capitulaciones.',hF4:'Multilingüe',hF4s:'Disponible en español, inglés, francés, chino y árabe.',hMonW:'monumentos',hHeroS:'📡 Activa el GPS y la app te guiará monumento a monumento con instrucciones de dirección y distancia.'},
+en:{hHero:'Choose your route and start the visit',hDisc:'📜 Discover Santa Fe',hFund:'The Founding',hFundS:'From camp to city, in 80 days',hArcos:'The Four Gates',hArcosS:'History and curiosities of each gate',hCap:'The Capitulations',hCapS:'Curiosities about the great agreements',hPers:'Characters of 1492',hPersS:'9 protagonists of history',hRutas:'Choose your route',hR1:'Complete Route',hR2:'Gates Route',hR3:'Express Route',hR4:'From the Sofa',hR5:'Escape Room',hR4a:'🎬 Video · Audio · Text',hR4b:'🏠 Without leaving home',hR5a:'🗝️ Secret code',hR5b:'❓ 15 challenges',hR5c:'⭐ With scoring',hGal:'🖼️ Santa Fe in 1491',hG1:'Aerial view of the walled city',hG2:'The four gates of the wall',hG3:'A market day on the main street',hG4:'The guard by the gate',hG5:'The grid layout, street by street',hG6:'The city, recreated as a model',hQue:'📱 What is this app?',hF1:'Automatic detection',hF1s:'The app alerts you when you are less than 80 m from a monument.',hF2:'Turn-by-turn navigation',hF2s:'Direction and distance to the next stop in real time.',hF3:'Student content',hF3s:'Videos and audios narrated by CEIP Capitulaciones students.',hF4:'Multilingual',hF4s:'Available in Spanish, English, French, Chinese and Arabic.',hMonW:'monuments',hHeroS:'📡 Turn on GPS and the app will guide you monument by monument with direction and distance instructions.'},
+fr:{hHero:'Choisissez votre parcours et commencez la visite',hDisc:'📜 Découvrez Santa Fe',hFund:'La Fondation',hFundS:'Du campement à la ville, en 80 jours',hArcos:'Les Quatre Portes',hArcosS:'Histoire et curiosités de chaque porte',hCap:'Les Capitulations',hCapS:'Curiosités sur les grands accords',hPers:'Personnages de 1492',hPersS:'9 protagonistes de l\'histoire',hRutas:'Choisissez votre parcours',hR1:'Parcours Complet',hR2:'Parcours des Portes',hR3:'Parcours Express',hR4:'Depuis le Canapé',hR5:'Escape Room',hR4a:'🎬 Vidéo · Audio · Texte',hR4b:'🏠 Sans sortir de chez soi',hR5a:'🗝️ Code secret',hR5b:'❓ 15 épreuves',hR5c:'⭐ Avec score',hGal:'🖼️ Santa Fe en 1491',hG1:'Vue aérienne de la ville fortifiée',hG2:'Les quatre portes de la muraille',hG3:'Un jour de marché dans la rue principale',hG4:'La garde près de la porte',hG5:'Le tracé en damier, rue par rue',hG6:'La ville, recréée en maquette',hQue:'📱 Qu\'est-ce que cette app ?',hF1:'Détection automatique',hF1s:'L\'app vous avertit à moins de 80 m d\'un monument.',hF2:'Navigation pas à pas',hF2s:'Direction et distance jusqu\'au prochain arrêt en temps réel.',hF3:'Contenus des élèves',hF3s:'Vidéos et audios narrés par les élèves du CEIP Capitulaciones.',hF4:'Multilingue',hF4s:'Disponible en espagnol, anglais, français, chinois et arabe.',hMonW:'monuments',hHeroS:'📡 Activez le GPS et l\'app vous guidera monument par monument avec direction et distance.'},
+zh:{hHero:'选择路线，开始参观',hDisc:'📜 探索圣菲',hFund:'建城史',hFundS:'80天，从军营到城市',hArcos:'四座城门',hArcosS:'每座城门的历史与趣闻',hCap:'投降协定',hCapS:'关于重大协定的趣闻',hPers:'1492年的人物',hPersS:'历史上的9位主角',hRutas:'选择路线',hR1:'完整路线',hR2:'城门路线',hR3:'快捷路线',hR4:'足不出户',hR5:'密室逃脱',hR4a:'🎬 视频 · 音频 · 文字',hR4b:'🏠 在家参观',hR5a:'🗝️ 秘密代码',hR5b:'❓ 15个挑战',hR5c:'⭐ 有计分',hGal:'🖼️ 1491年的圣菲',hG1:'城墙之城鸟瞰图',hG2:'城墙的四座城门',hG3:'主街的集市日',hG4:'城门旁的卫兵',hG5:'棋盘式街道布局',hG6:'城市模型再现',hQue:'📱 这是什么应用？',hF1:'自动检测',hF1s:'距古迹不足80米时应用会提醒您。',hF2:'逐步导航',hF2s:'实时显示到下一站的方向和距离。',hF3:'学生内容',hF3s:'由CEIP Capitulaciones学生录制的视频和音频。',hF4:'多语言',hF4s:'提供西班牙语、英语、法语、中文和阿拉伯语。',hMonW:'处古迹',hHeroS:'📡 开启GPS，应用将逐个古迹为您导航，显示方向和距离。'},
+ar:{hHero:'اختر مسارك وابدأ الزيارة',hDisc:'📜 اكتشف سانتا في',hFund:'التأسيس',hFundS:'من معسكر إلى مدينة في 80 يومًا',hArcos:'البوابات الأربع',hArcosS:'تاريخ وطرائف كل بوابة',hCap:'الاتفاقيات',hCapS:'طرائف عن الاتفاقيات الكبرى',hPers:'شخصيات 1492',hPersS:'9 أبطال من التاريخ',hRutas:'اختر مسارك',hR1:'المسار الكامل',hR2:'مسار البوابات',hR3:'المسار السريع',hR4:'من الأريكة',hR5:'غرفة الهروب',hR4a:'🎬 فيديو · صوت · نص',hR4b:'🏠 دون مغادرة المنزل',hR5a:'🗝️ رمز سري',hR5b:'❓ 15 تحديًا',hR5c:'⭐ مع النقاط',hGal:'🖼️ سانتا في عام 1491',hG1:'منظر جوي للمدينة المسوّرة',hG2:'البوابات الأربع للسور',hG3:'يوم سوق في الشارع الرئيسي',hG4:'الحرس عند البوابة',hG5:'التخطيط الشبكي، شارعًا بشارع',hG6:'المدينة في مجسم',hQue:'📱 ما هذا التطبيق؟',hF1:'كشف تلقائي',hF1s:'ينبهك التطبيق عندما تكون على بعد أقل من 80 م من معلم.',hF2:'ملاحة خطوة بخطوة',hF2s:'الاتجاه والمسافة إلى المحطة التالية في الوقت الفعلي.',hF3:'محتوى الطلاب',hF3s:'فيديوهات وتسجيلات بصوت طلاب المدرسة.',hF4:'متعدد اللغات',hF4s:'متاح بالإسبانية والإنجليزية والفرنسية والصينية والعربية.',hMonW:'معالم',hHeroS:'📡 فعّل GPS وسيرشدك التطبيق من معلم إلى معلم مع الاتجاه والمسافة.'}
+};
+
 function updateLanguageUI() {
   const t = T[lang];
   document.getElementById('t-name').textContent     = t.name;
@@ -2961,8 +3039,23 @@ function updateLanguageUI() {
   document.getElementById('t-list-sub').textContent = t.listsub;
   document.getElementById('t-info-h').textContent   = t.infoh;
 
+  // Portada
+  const ht = HOME_T[lang] || HOME_T.es;
+  document.querySelectorAll('[data-t]').forEach(el => { if (ht[el.dataset.t]) el.textContent = ht[el.dataset.t]; });
+  const lbl2 = document.getElementById('t-lang-lbl2');
+  if (lbl2) lbl2.textContent = t.lbl;
+  // Marcar idioma activo en el panel
+  document.querySelectorAll('.lang-opt').forEach(b => b.classList.toggle('cur', b.getAttribute('onclick').includes("'" + lang + "'")));
+
+  // Refrescar overlays de historia/personajes si están abiertos
+  if (_histKey && document.getElementById('hist-overlay').classList.contains('on')) histOpen(_histKey);
+  const pjOv = document.getElementById('pj-overlay');
+  if (pjOv && pjOv.classList.contains('on')) pjRenderGrid();
+
   // RTL para árabe
-  document.getElementById('app').dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  const rtl = (lang === 'ar') ? 'rtl' : 'ltr';
+  document.getElementById('app').dir = rtl;
+  document.getElementById('home').dir = rtl;
 
   // Actualizar strip y panel activo
   updateNavStrip();
@@ -3119,7 +3212,7 @@ function loadDataFromStorage() {
 // CERRAR LANG PANEL AL CLIC FUERA
 // ================================================================
 document.addEventListener('click', e => {
-  if (langOpen && !e.target.closest('#lang-panel') && !e.target.closest('#lang-btn')) {
+  if (langOpen && !e.target.closest('#lang-panel') && !e.target.closest('#lang-btn') && !e.target.closest('#home-lang-btn')) {
     langOpen = false;
     document.getElementById('lang-panel').classList.add('off');
   }
@@ -4993,31 +5086,47 @@ document.addEventListener('keydown', e => {
 
 const HIST_CONTENT = {"fundacion": "\n<div class=\"hist-timeline\">\n  <div class=\"ht-item\"><span class=\"ht-date\">2 oct 1491</span><span class=\"ht-txt\">Fundación de Santa Fe, ciudad-campamento para el asedio final a Granada</span></div>\n  <div class=\"ht-item\"><span class=\"ht-date\">25 nov 1491</span><span class=\"ht-txt\">Se firman en Santa Fe las Capitulaciones para la rendición de Granada</span></div>\n  <div class=\"ht-item\"><span class=\"ht-date\">17 abr 1492</span><span class=\"ht-txt\">Se firman las Capitulaciones de Santa Fe con Cristóbal Colón</span></div>\n</div>\n\n<h3>De las tiendas de lona a la ciudad de piedra</h3>\n<p>Los Reyes Católicos instalaron primero, en 1483, un campamento provisional en los llamados \"Ojos del Huécar\". En julio de 1491, un incendio destruyó aquel campamento de madera y lona. En lugar de rendirse, decidieron construir una ciudad-fortaleza permanente de piedra y ladrillo: Santa Fe.</p>\n<p>Se estima que participaron unos 60.000 hombres —entre 50.000 infantes y 10.000 jinetes— y que la obra se completó en apenas <strong>80 días</strong>. La planta, rectangular como un campamento militar romano, tenía dos calles principales que se cruzaban en una plaza de armas central, muralla con foso y torres defensivas en las cuatro puertas.</p>\n\n<h3>De campamento militar a villa poblada</h3>\n<p>Al principio Santa Fe era una estructura puramente militar. Tras la conquista de Granada (2 de enero de 1492), en marzo de ese año los Reyes ordenaron poblarla: concedieron <strong>200 cartas de vecindad</strong> a personas casadas que se comprometieran a residir cinco años con su familia. Los primeros vecinos rondarían el millar de personas, venidos sobre todo de los reinos de Sevilla, Jaén y el obispado de Córdoba.</p>\n\n<h3>Los privilegios de la ciudad</h3>\n<p>Para atraer población, los Reyes concedieron a Santa Fe importantes privilegios, recogidos en el <em>Libro de Privilegios</em> que aún se conserva en el Ayuntamiento:</p>\n<ul>\n  <li>Exención del <strong>almojarifazgo</strong> (impuesto sobre mercancías entre reinos)</li>\n  <li>Exención del <strong>portazgo</strong> (peaje de caminos)</li>\n  <li>Exención del <strong>diezmo</strong> civil</li>\n  <li><strong>Jurisdicción propia:</strong> el alcaide impartía justicia sin depender de Granada</li>\n</ul>\n\n<h3>Un modelo urbano exportado a América</h3>\n<p>El trazado de Santa Fe se inspiró en el de Briviesca (Burgos): dos calles principales cruzándose en una plaza central. Este esquema reticular está considerado el <strong>primer modelo urbano de la España moderna</strong>, y sirvió de referencia para el trazado de numerosas ciudades fundadas después en América.</p>\n\n<h3>El terremoto de 1806</h3>\n<p>Un terremoto dejó la ciudad \"en un montón de ruinas\", hasta el punto de plantearse su traslado. Se reconstruyó y consolidó. La actual iglesia de la Encarnación, dirigida por Domingo Lois Monteagudo, se había consagrado antes, en 1785, sustituyendo al templo original de los Reyes Católicos.</p>\n", "arcos": "\n<p>Los cuatro arcos eran las únicas entradas a la ciudad amurallada, protegidas por puentes levadizos sobre el foso. Con el paso de los siglos perdieron su función defensiva y se reconvirtieron en <strong>capillas dedicadas a la Virgen</strong>, aunque conservan su estructura monumental original.</p>\n\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Puerta de Granada</div><div class=\"arco-ori\">Este</div></div></div>\n  <p>Reconstruida en 1698. Su capilla barroca está dedicada a la <strong>Virgen del Rosario</strong> y es la de ornamentación interior más rica y efectista de las cuatro.</p>\n</div>\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Puerta de Jaén (o de los Carros)</div><div class=\"arco-ori\">Norte</div></div></div>\n  <p>Capilla de la <strong>Virgen de Belén</strong>. En su interior se esconde la Santa Escala, una escalinata de peldaños diminutos. La tradición manda subirla de rodillas y rezando, y solo en determinados días del año se gana con ello una indulgencia.</p>\n</div>\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">👑</span><div><div class=\"arco-name\">Puerta de Sevilla</div><div class=\"arco-ori\">Sur</div></div></div>\n  <p>Remodelada en 1798. Dedicada a <strong>Nuestra Señora de los Dolores</strong>.</p>\n</div>\n<div class=\"arco-card\">\n  <div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Puerta de Loja (o de Jerez)</div><div class=\"arco-ori\">Oeste</div></div></div>\n  <p>Reconstruida en 1698. Capilla dedicada a la <strong>Virgen del Carmen</strong>. Aquí se colocó un tetrástico del cronista Pedro Mártir de Anglería que explica el propio nombre de la ciudad:</p>\n  <div class=\"quote-box\">\n    \"El Rey Fernando y la Reina Isabel esta ciudad que ves en muy pocos días levantaron. Erigióse para destruir a los enemigos contrarios a la fe, por eso ha de llamarse Santa Fe.\"\n    <span class=\"quote-src\">— Inscripción de la Puerta de Loja</span>\n  </div>\n</div>\n\n<h3>Curiosidades de los arcos</h3>\n<ul>\n  <li>Originalmente eran las únicas entradas a la ciudad y protegían, con torres y baluartes, los puntos más débiles de la muralla.</li>\n  <li>Durante mucho tiempo sirvieron como imagen de marca de la ciudad; hoy son símbolo de su patrimonio.</li>\n  <li>En fechas como el Puente de Andalucía o Navidad, el Ayuntamiento organiza jornadas de puertas abiertas para visitarlos por dentro.</li>\n</ul>\n", "curiosidades": "\n<div class=\"sabias-box\">\n  <div class=\"sabias-tag\">¿Sabías que…?</div>\n  <h3 style=\"margin-top:6px\">¿Firmaron de verdad los Reyes Católicos las Capitulaciones?</h3>\n  <p>Sí, pero con matices. El documento se cierra con la fórmula protocolaria <strong>\"Yo el Rey. Yo la Reina\"</strong>, que expresa su voluntad y aprobación real. Esas palabras, sin embargo, no las escribieron de su puño y letra: las redactó su secretario, <strong>Juan de Coloma</strong>, \"por mandado del Rey e de la Reyna\". Al final de cada cláusula del documento aparece además la fórmula de aceptación real: <em>\"Plaze a sus Altezas. Johan de Coloma.\"</em></p>\n  <p>En la práctica jurídica de la época, la validez de un documento real no dependía de una firma autógrafa en cada cláusula, sino del <strong>sello real</strong>, la fórmula de otorgamiento y su registro en los libros de la Cancillería. Así que, jurídicamente, los Reyes sí firman y otorgan las Capitulaciones — pero materialmente, quien las escribe es su secretario, en su nombre.</p>\n</div>\n\n\n<h3>El documento original</h3>\n<p>Estas son fotografías reales de las Capitulaciones de Santa Fe con Cristóbal Colón, conservadas en el Archivo General de Simancas.</p>\n<div class=\"cap-strip\">\n  <div class=\"cap-item\" onclick=\"capOpen(0)\"><img src=\"img/capitulaciones/c1.jpg\" alt=\"Capitulaciones de Santa Fe, folio 1\" loading=\"lazy\"><span class=\"cap-num\">1</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(1)\"><img src=\"img/capitulaciones/c2.jpg\" alt=\"Capitulaciones de Santa Fe, folio 2\" loading=\"lazy\"><span class=\"cap-num\">2</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(2)\"><img src=\"img/capitulaciones/c3.jpg\" alt=\"Capitulaciones de Santa Fe, folio 3\" loading=\"lazy\"><span class=\"cap-num\">3</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(3)\"><img src=\"img/capitulaciones/c4.jpg\" alt=\"Capitulaciones de Santa Fe, folio 4\" loading=\"lazy\"><span class=\"cap-num\">4</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(4)\"><img src=\"img/capitulaciones/c5.jpg\" alt=\"Capitulaciones de Santa Fe, folio 5\" loading=\"lazy\"><span class=\"cap-num\">5</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(5)\"><img src=\"img/capitulaciones/c6.jpg\" alt=\"Capitulaciones de Santa Fe, folio 6\" loading=\"lazy\"><span class=\"cap-num\">6</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(6)\"><img src=\"img/capitulaciones/c7.jpg\" alt=\"Capitulaciones de Santa Fe, folio 7\" loading=\"lazy\"><span class=\"cap-num\">7</span></div>\n  <div class=\"cap-item\" onclick=\"capOpen(7)\"><img src=\"img/capitulaciones/c8.jpg\" alt=\"Capitulaciones de Santa Fe, folio 8\" loading=\"lazy\"><span class=\"cap-num\">8</span></div>\n</div>\n<h3>Dos Capitulaciones, no una sola</h3>\n<p>En Santa Fe se firmaron en realidad <strong>dos acuerdos distintos</strong> que comparten nombre:</p>\n<ul>\n  <li>Las <strong>Capitulaciones de Granada</strong> (25 de noviembre de 1491): el pacto para la rendición de la ciudad nazarí, negociado con Boabdil.</li>\n  <li>Las <strong>Capitulaciones de Santa Fe con Colón</strong> (17 de abril de 1492): el acuerdo, redactado en la Casa Real de la ciudad, que hizo posible el viaje a América.</li>\n</ul>\n\n<h3>Lo que ganó Cristóbal Colón</h3>\n<p>El documento firmado el 17 de abril de 1492 le concedía los títulos de <strong>Almirante, Virrey y Gobernador General</strong> de todas las tierras que descubriera, además de una <strong>décima parte de los beneficios</strong> obtenidos y otros derechos económicos y jurisdiccionales sobre ellas.</p>\n\n<h3>Más curiosidades</h3>\n<ul>\n  <li>La Corte siguió residiendo en Santa Fe hasta mayo de 1492 — meses después de la toma de Granada — convirtiendo la villa, durante un tiempo, en el <strong>epicentro político</strong> de los reinos hispánicos.</li>\n  <li>Por acoger ambos acuerdos, Santa Fe es conocida como la <strong>\"Cuna de la Hispanidad\"</strong>: aquí se decidió tanto el fin de al-Ándalus como el inicio de la presencia española en América.</li>\n  <li>Las Capitulaciones con Colón se conservan hoy en el Archivo de la Corona de Aragón, y son uno de los documentos más estudiados de la historia de España.</li>\n</ul>\n"};
 const HIST_TITLES = {fundacion:'La Fundación de Santa Fe', arcos:'Los Cuatro Arcos', curiosidades:'Las Capitulaciones y sus curiosidades'};
+const HIST_TITLES_I18N = {
+es:{fundacion:'La Fundación de Santa Fe', arcos:'Los Cuatro Arcos', curiosidades:'Las Capitulaciones y sus curiosidades'},
+en:{fundacion:'The Founding of Santa Fe', arcos:'The Four Gates', curiosidades:'The Capitulations and their curiosities'},
+fr:{fundacion:'La Fondation de Santa Fe', arcos:'Les Quatre Portes', curiosidades:'Les Capitulations et leurs curiosités'},
+zh:{fundacion:'圣菲的建城', arcos:'四座城门', curiosidades:'协定及其趣闻'},
+ar:{fundacion:'تأسيس سانتا في', arcos:'البوابات الأربع', curiosidades:'الاتفاقيات وطرائفها'}
+};
+const HIST_I18N = {"en": {"fundacion": "<div class=\"hist-timeline\"><div class=\"ht-item\"><span class=\"ht-date\">2 Oct 1491</span><span class=\"ht-txt\">Founding of Santa Fe, a camp-city for the final siege of Granada</span></div><div class=\"ht-item\"><span class=\"ht-date\">25 Nov 1491</span><span class=\"ht-txt\">The Capitulations for the surrender of Granada are signed in Santa Fe</span></div><div class=\"ht-item\"><span class=\"ht-date\">17 Apr 1492</span><span class=\"ht-txt\">The Capitulations of Santa Fe are signed with Christopher Columbus</span></div></div><h3>From canvas tents to a stone city</h3><p>In July 1491 a fire destroyed the Catholic Monarchs' wooden camp. Instead of giving up, they built a permanent fortress-city of stone and brick: Santa Fe. Around <strong>60,000 men</strong> took part and the work was finished in just <strong>80 days</strong>. Its rectangular plan, like a Roman military camp, had two main streets crossing at a central square, a wall with a moat, and towers at the four gates.</p><h3>From military camp to town</h3><p>After the conquest of Granada (2 January 1492), the Monarchs ordered it populated: <strong>200 residency charters</strong> were granted to married settlers committed to living there five years with their families.</p><h3>The city's privileges</h3><ul><li>Exemption from the <strong>almojarifazgo</strong> (trade tax between kingdoms)</li><li>Exemption from the <strong>portazgo</strong> (road toll)</li><li>Exemption from the civil <strong>tithe</strong></li><li><strong>Own jurisdiction</strong>, independent from Granada</li></ul><h3>An urban model exported to America</h3><p>Santa Fe's grid layout is considered the <strong>first urban model of modern Spain</strong> and served as a reference for many cities later founded in America.</p><h3>The 1806 earthquake</h3><p>An earthquake left the town in ruins; it was rebuilt and consolidated. The current church of La Encarnación had been consecrated in 1785.</p>", "arcos": "<p>The four gates were the only entrances to the walled city, protected by drawbridges over the moat. Over the centuries they lost their defensive role and became <strong>chapels dedicated to the Virgin</strong>, while keeping their original monumental structure.</p><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Granada Gate</div><div class=\"arco-ori\">East</div></div></div><p>Rebuilt in 1698. Its baroque chapel is dedicated to the <strong>Virgin of the Rosary</strong> and has the richest interior of the four.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Jaén Gate</div><div class=\"arco-ori\">North</div></div></div><p>Chapel of the <strong>Virgin of Bethlehem</strong>. Inside hides the Santa Escala, a tiny staircase traditionally climbed on one's knees while praying.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">👑</span><div><div class=\"arco-name\">Seville Gate</div><div class=\"arco-ori\">South</div></div></div><p>Remodelled in 1798. Dedicated to <strong>Our Lady of Sorrows</strong>.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Loja Gate</div><div class=\"arco-ori\">West</div></div></div><p>Rebuilt in 1698. Chapel of the <strong>Virgin of Carmen</strong>. A verse by chronicler Peter Martyr explains the city's name: built to defeat the enemies of the faith, so it must be called Santa Fe (Holy Faith).</p></div><h3>Curiosities</h3><ul><li>They were the only entrances and protected the weakest points of the wall.</li><li>Today they are the symbol of the town's heritage.</li><li>On certain holidays the Town Hall opens them to visitors.</li></ul>", "curiosidades": "<div class=\"sabias-box\"><div class=\"sabias-tag\">Did you know…?</div><h3 style=\"margin-top:6px\">Did the Catholic Monarchs really sign the Capitulations?</h3><p>Yes, with nuances. The document closes with the formula <strong>\"Yo el Rey. Yo la Reina\"</strong>, expressing their royal approval — but it was written by their secretary, <strong>Juan de Coloma</strong>, on their orders. Legally the document's validity rested on the <strong>royal seal</strong> and its registration, not on autograph signatures.</p></div><h3>The original document</h3><p>These are real photographs of the Capitulations of Santa Fe with Christopher Columbus.</p><div class=\"cap-strip\">\\n  <div class=\"cap-item\" onclick=\"capOpen(0)\"><img src=\"img/capitulaciones/c1.jpg\" alt=\"Capitulaciones de Santa Fe, folio 1\" loading=\"lazy\"><span class=\"cap-num\">1</span></div>\\n<h3>Two Capitulations, not one</h3><ul><li>The <strong>Capitulations of Granada</strong> (25 Nov 1491): the pact for the surrender of the Nasrid city.</li><li>The <strong>Capitulations of Santa Fe with Columbus</strong> (17 Apr 1492): the agreement that made the voyage to America possible.</li></ul><h3>What Columbus obtained</h3><p>The titles of <strong>Admiral, Viceroy and Governor General</strong> of all lands he discovered, plus <strong>one tenth of the profits</strong>.</p><h3>More curiosities</h3><ul><li>The Court stayed in Santa Fe until May 1492, making the town the political epicentre of the Hispanic kingdoms.</li><li>Santa Fe is known as the <strong>\"Cradle of Hispanic identity\"</strong>: here the end of al-Andalus and the start of Spain's presence in America were decided.</li></ul>"}, "fr": {"fundacion": "<div class=\"hist-timeline\"><div class=\"ht-item\"><span class=\"ht-date\">2 oct. 1491</span><span class=\"ht-txt\">Fondation de Santa Fe, ville-campement pour le siège final de Grenade</span></div><div class=\"ht-item\"><span class=\"ht-date\">25 nov. 1491</span><span class=\"ht-txt\">Signature à Santa Fe des Capitulations pour la reddition de Grenade</span></div><div class=\"ht-item\"><span class=\"ht-date\">17 avr. 1492</span><span class=\"ht-txt\">Signature des Capitulations de Santa Fe avec Christophe Colomb</span></div></div><h3>Des tentes de toile à la ville de pierre</h3><p>En juillet 1491, un incendie détruisit le campement de bois des Rois Catholiques. Ils construisirent alors une ville-forteresse permanente : Santa Fe. Environ <strong>60 000 hommes</strong> y participèrent et l'œuvre fut achevée en à peine <strong>80 jours</strong>. Son plan rectangulaire, comme un camp romain, comptait deux rues principales se croisant sur une place centrale, une muraille avec fossé et des tours aux quatre portes.</p><h3>Du camp militaire à la ville peuplée</h3><p>Après la conquête de Grenade (2 janvier 1492), les Rois ordonnèrent de la peupler : <strong>200 chartes de résidence</strong> furent accordées à des colons mariés s'engageant à y vivre cinq ans en famille.</p><h3>Les privilèges de la ville</h3><ul><li>Exemption de l'<strong>almojarifazgo</strong> (taxe sur le commerce)</li><li>Exemption du <strong>portazgo</strong> (péage)</li><li>Exemption de la <strong>dîme</strong> civile</li><li><strong>Juridiction propre</strong>, indépendante de Grenade</li></ul><h3>Un modèle urbain exporté en Amérique</h3><p>Le tracé en damier de Santa Fe est considéré comme le <strong>premier modèle urbain de l'Espagne moderne</strong> et servit de référence à de nombreuses villes fondées en Amérique.</p><h3>Le tremblement de terre de 1806</h3><p>Un séisme laissa la ville en ruines ; elle fut reconstruite. L'église actuelle de La Encarnación avait été consacrée en 1785.</p>", "arcos": "<p>Les quatre portes étaient les seules entrées de la ville fortifiée, protégées par des ponts-levis. Au fil des siècles, elles devinrent des <strong>chapelles dédiées à la Vierge</strong>, tout en conservant leur structure monumentale.</p><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Porte de Grenade</div><div class=\"arco-ori\">Est</div></div></div><p>Reconstruite en 1698. Sa chapelle baroque, dédiée à la <strong>Vierge du Rosaire</strong>, est la plus richement ornée des quatre.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Porte de Jaén</div><div class=\"arco-ori\">Nord</div></div></div><p>Chapelle de la <strong>Vierge de Bethléem</strong>. À l'intérieur se cache la Santa Escala, un petit escalier que la tradition fait monter à genoux en priant.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">👑</span><div><div class=\"arco-name\">Porte de Séville</div><div class=\"arco-ori\">Sud</div></div></div><p>Remodelée en 1798. Dédiée à <strong>Notre-Dame des Douleurs</strong>.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">Porte de Loja</div><div class=\"arco-ori\">Ouest</div></div></div><p>Reconstruite en 1698. Chapelle de la <strong>Vierge du Carmel</strong>. Un vers du chroniqueur Pierre Martyr y explique le nom de la ville : érigée pour vaincre les ennemis de la foi, elle devait s'appeler Santa Fe (Sainte Foi).</p></div><h3>Curiosités</h3><ul><li>Elles protégeaient les points faibles de la muraille.</li><li>Elles sont aujourd'hui le symbole du patrimoine de la ville.</li><li>Certains jours de fête, la mairie les ouvre au public.</li></ul>", "curiosidades": "<div class=\"sabias-box\"><div class=\"sabias-tag\">Le saviez-vous ?</div><h3 style=\"margin-top:6px\">Les Rois Catholiques ont-ils vraiment signé les Capitulations ?</h3><p>Oui, avec des nuances. Le document se clôt par la formule <strong>« Yo el Rey. Yo la Reina »</strong>, exprimant leur approbation royale — mais il fut rédigé par leur secrétaire, <strong>Juan de Coloma</strong>, sur leur ordre. Juridiquement, la validité reposait sur le <strong>sceau royal</strong> et l'enregistrement, non sur des signatures autographes.</p></div><h3>Le document original</h3><p>Voici des photographies réelles des Capitulations de Santa Fe avec Christophe Colomb.</p><div class=\"cap-strip\">\\n  <div class=\"cap-item\" onclick=\"capOpen(0)\"><img src=\"img/capitulaciones/c1.jpg\" alt=\"Capitulaciones de Santa Fe, folio 1\" loading=\"lazy\"><span class=\"cap-num\">1</span></div>\\n<h3>Deux Capitulations, et non une</h3><ul><li>Les <strong>Capitulations de Grenade</strong> (25 nov. 1491) : le pacte de reddition de la ville nasride.</li><li>Les <strong>Capitulations de Santa Fe avec Colomb</strong> (17 avr. 1492) : l'accord qui rendit possible le voyage vers l'Amérique.</li></ul><h3>Ce que Colomb obtint</h3><p>Les titres d'<strong>Amiral, Vice-roi et Gouverneur général</strong> des terres découvertes, plus <strong>un dixième des bénéfices</strong>.</p><h3>Autres curiosités</h3><ul><li>La Cour resta à Santa Fe jusqu'en mai 1492, faisant de la ville l'épicentre politique des royaumes hispaniques.</li><li>Santa Fe est appelée <strong>« Berceau de l'Hispanité »</strong> : on y décida la fin d'al-Andalus et le début de la présence espagnole en Amérique.</li></ul>"}, "zh": {"fundacion": "<div class=\"hist-timeline\"><div class=\"ht-item\"><span class=\"ht-date\">1491年10月2日</span><span class=\"ht-txt\">圣菲建城，作为围攻格拉纳达的军营之城</span></div><div class=\"ht-item\"><span class=\"ht-date\">1491年11月25日</span><span class=\"ht-txt\">格拉纳达投降协定在圣菲签署</span></div><div class=\"ht-item\"><span class=\"ht-date\">1492年4月17日</span><span class=\"ht-txt\">与哥伦布签署《圣菲协定》</span></div></div><h3>从帆布营帐到石头之城</h3><p>1491年7月，一场大火烧毁了天主教双王的木制营地。他们决定建造一座永久的石砖要塞城市：圣菲。约<strong>6万人</strong>参与建设，仅用<strong>80天</strong>完工。城市呈矩形，如罗马军营：两条主街在中央广场交汇，四座城门设有塔楼，城墙外有护城河。</p><h3>从军营到城镇</h3><p>1492年1月2日格拉纳达被征服后，双王下令移民：向承诺携家居住五年的已婚定居者颁发了<strong>200份居住证</strong>。</p><h3>城市特权</h3><ul><li>免除<strong>王国间贸易税</strong>（almojarifazgo）</li><li>免除<strong>道路通行税</strong>（portazgo）</li><li>免除民事<strong>什一税</strong></li><li>拥有独立于格拉纳达的<strong>自治司法权</strong></li></ul><h3>输出美洲的城市模型</h3><p>圣菲的棋盘式布局被认为是<strong>近代西班牙的第一个城市模型</strong>，成为后来美洲众多城市的规划参考。</p><h3>1806年地震</h3><p>一场地震使城市成为废墟，随后重建。现在的恩卡纳西翁教堂于1785年祝圣。</p>", "arcos": "<p>四座城门是这座城墙之城仅有的入口，由护城河上的吊桥保护。数百年后，它们失去防御功能，改建为<strong>供奉圣母的小教堂</strong>，但保留了原有的宏伟结构。</p><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">格拉纳达门</div><div class=\"arco-ori\">东</div></div></div><p>1698年重建。其巴洛克式教堂供奉<strong>玫瑰圣母</strong>，是四座中内部装饰最华丽的。</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">哈恩门</div><div class=\"arco-ori\">北</div></div></div><p>供奉<strong>伯利恒圣母</strong>。内藏\"圣阶\"——一段小台阶，传统上须跪着祈祷登上。</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">👑</span><div><div class=\"arco-name\">塞维利亚门</div><div class=\"arco-ori\">南</div></div></div><p>1798年改建。供奉<strong>痛苦圣母</strong>。</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">洛哈门</div><div class=\"arco-ori\">西</div></div></div><p>1698年重建。供奉<strong>加尔默罗圣母</strong>。门上的诗句解释了城市之名：为战胜信仰之敌而建，故名圣菲（神圣信仰）。</p></div><h3>趣闻</h3><ul><li>它们守卫着城墙最薄弱的地方。</li><li>如今是小城文化遗产的象征。</li><li>节假日市政厅会开放城门内部供参观。</li></ul>", "curiosidades": "<div class=\"sabias-box\"><div class=\"sabias-tag\">你知道吗？</div><h3 style=\"margin-top:6px\">天主教双王真的签署了协定吗？</h3><p>是的，但有细节。文件以<strong>\"Yo el Rey. Yo la Reina\"（朕国王，朕王后）</strong>结尾，表达王室的批准——但实际执笔的是秘书<strong>胡安·德·科洛马</strong>，奉双王之命。在当时的法律实践中，文件的效力取决于<strong>王室印章</strong>和登记，而非亲笔签名。</p></div><h3>原始文件</h3><p>以下是与哥伦布签署的《圣菲协定》的真实照片。</p><div class=\"cap-strip\">\\n  <div class=\"cap-item\" onclick=\"capOpen(0)\"><img src=\"img/capitulaciones/c1.jpg\" alt=\"Capitulaciones de Santa Fe, folio 1\" loading=\"lazy\"><span class=\"cap-num\">1</span></div>\\n<h3>两份协定，而非一份</h3><ul><li><strong>《格拉纳达协定》</strong>（1491年11月25日）：纳斯里德王朝城市的投降条约。</li><li><strong>《圣菲协定》</strong>（1492年4月17日）：使美洲之行成为可能的协议。</li></ul><h3>哥伦布获得了什么</h3><p>他获得所发现土地的<strong>海军上将、总督和总管</strong>头衔，外加<strong>十分之一的收益</strong>。</p><h3>更多趣闻</h3><ul><li>宫廷在圣菲驻留至1492年5月，小城一度成为西班牙诸王国的政治中心。</li><li>圣菲被称为<strong>\"西班牙世界的摇篮\"</strong>：安达卢斯的终结和西班牙在美洲的开端都在此决定。</li></ul>"}, "ar": {"fundacion": "<div class=\"hist-timeline\"><div class=\"ht-item\"><span class=\"ht-date\">2 أكتوبر 1491</span><span class=\"ht-txt\">تأسيس سانتا في، مدينة-معسكر للحصار الأخير لغرناطة</span></div><div class=\"ht-item\"><span class=\"ht-date\">25 نوفمبر 1491</span><span class=\"ht-txt\">توقيع اتفاقيات استسلام غرناطة في سانتا في</span></div><div class=\"ht-item\"><span class=\"ht-date\">17 أبريل 1492</span><span class=\"ht-txt\">توقيع اتفاقيات سانتا في مع كريستوفر كولومبوس</span></div></div><h3>من خيام القماش إلى مدينة الحجر</h3><p>في يوليو 1491 دمّر حريق المعسكر الخشبي للملكين الكاثوليكيين، فقررا بناء مدينة-قلعة دائمة من الحجر والطوب: سانتا في. شارك نحو <strong>60 ألف رجل</strong> واكتمل العمل في <strong>80 يومًا</strong> فقط. كان مخططها مستطيلًا كمعسكر روماني: شارعان رئيسيان يتقاطعان في ساحة مركزية، وسور بخندق وأبراج عند البوابات الأربع.</p><h3>من معسكر إلى بلدة مأهولة</h3><p>بعد فتح غرناطة (2 يناير 1492) أمر الملكان بإسكانها: مُنحت <strong>200 وثيقة إقامة</strong> لمستوطنين متزوجين تعهدوا بالعيش فيها خمس سنوات مع عائلاتهم.</p><h3>امتيازات المدينة</h3><ul><li>إعفاء من <strong>ضريبة التجارة بين الممالك</strong></li><li>إعفاء من <strong>رسوم الطرق</strong></li><li>إعفاء من <strong>العشور</strong> المدنية</li><li><strong>قضاء مستقل</strong> عن غرناطة</li></ul><h3>نموذج عمراني صُدّر إلى أمريكا</h3><p>يُعتبر التخطيط الشبكي لسانتا في <strong>أول نموذج عمراني لإسبانيا الحديثة</strong>، وكان مرجعًا لمدن كثيرة أُسست لاحقًا في أمريكا.</p><h3>زلزال 1806</h3><p>ترك زلزال المدينة أنقاضًا فأُعيد بناؤها. أما كنيسة التجسد الحالية فقد كُرّست عام 1785.</p>", "arcos": "<p>كانت البوابات الأربع المداخل الوحيدة للمدينة المسوّرة، تحميها جسور متحركة فوق الخندق. مع مرور القرون فقدت دورها الدفاعي وتحولت إلى <strong>كنائس صغيرة مكرسة للعذراء</strong>، محتفظة ببنيتها الأثرية.</p><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">بوابة غرناطة</div><div class=\"arco-ori\">الشرق</div></div></div><p>أُعيد بناؤها عام 1698. كنيستها الباروكية مكرسة <strong>لسيدة الوردية</strong> وهي الأغنى زخرفةً بين الأربع.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">بوابة خاين</div><div class=\"arco-ori\">الشمال</div></div></div><p>كنيسة <strong>سيدة بيت لحم</strong>. في داخلها يختبئ «السلم المقدس»، درج صغير تقضي التقاليد بصعوده ركوعًا مع الصلاة.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">👑</span><div><div class=\"arco-name\">بوابة إشبيلية</div><div class=\"arco-ori\">الجنوب</div></div></div><p>جُددت عام 1798. مكرسة <strong>لسيدة الأحزان</strong>.</p></div><div class=\"arco-card\"><div class=\"arco-card-head\"><span class=\"arco-ico\">🏯</span><div><div class=\"arco-name\">بوابة لوخا</div><div class=\"arco-ori\">الغرب</div></div></div><p>أُعيد بناؤها عام 1698. كنيسة <strong>سيدة الكرمل</strong>. نقش شعري للمؤرخ بيدرو مارتير يشرح اسم المدينة: بُنيت لهزيمة أعداء الإيمان، فسُميت سانتا في (الإيمان المقدس).</p></div><h3>طرائف</h3><ul><li>كانت تحمي أضعف نقاط السور.</li><li>هي اليوم رمز تراث المدينة.</li><li>في بعض الأعياد تفتحها البلدية للزيارة من الداخل.</li></ul>", "curiosidades": "<div class=\"sabias-box\"><div class=\"sabias-tag\">هل تعلم…؟</div><h3 style=\"margin-top:6px\">هل وقّع الملكان الكاثوليكيان الاتفاقيات فعلًا؟</h3><p>نعم، مع تفاصيل. يُختم المستند بعبارة <strong>«أنا الملك. أنا الملكة»</strong> التي تعبّر عن الموافقة الملكية — لكن من كتبها هو سكرتيرهما <strong>خوان دي كولوما</strong> بأمرهما. قانونيًا، كانت صحة الوثيقة تعتمد على <strong>الختم الملكي</strong> وتسجيلها، لا على التوقيع بخط اليد.</p></div><h3>الوثيقة الأصلية</h3><p>هذه صور حقيقية لاتفاقيات سانتا في مع كريستوفر كولومبوس.</p><div class=\"cap-strip\">\\n  <div class=\"cap-item\" onclick=\"capOpen(0)\"><img src=\"img/capitulaciones/c1.jpg\" alt=\"Capitulaciones de Santa Fe, folio 1\" loading=\"lazy\"><span class=\"cap-num\">1</span></div>\\n<h3>اتفاقيتان لا واحدة</h3><ul><li><strong>اتفاقيات غرناطة</strong> (25 نوفمبر 1491): معاهدة استسلام المدينة النصرية.</li><li><strong>اتفاقيات سانتا في مع كولومبوس</strong> (17 أبريل 1492): الاتفاق الذي جعل الرحلة إلى أمريكا ممكنة.</li></ul><h3>ماذا نال كولومبوس</h3><p>ألقاب <strong>الأميرال ونائب الملك والحاكم العام</strong> لكل الأراضي المكتشفة، إضافة إلى <strong>عُشر الأرباح</strong>.</p><h3>مزيد من الطرائف</h3><ul><li>بقي البلاط الملكي في سانتا في حتى مايو 1492، فصارت المدينة مركز القرار السياسي للممالك الإسبانية.</li><li>تُعرف سانتا في بـ<strong>«مهد العالم الإسباني»</strong>: هنا تقررت نهاية الأندلس وبداية الوجود الإسباني في أمريكا.</li></ul>"}};
+let _histKey = null;
 function histOpen(key) {
-  document.getElementById('hist-title').textContent = HIST_TITLES[key] || '';
-  document.getElementById('hist-body').innerHTML = HIST_CONTENT[key] || '';
+  _histKey = key;
+  const tt = HIST_TITLES_I18N[lang] || HIST_TITLES_I18N.es;
+  document.getElementById('hist-title').textContent = tt[key] || '';
+  const cc = (lang !== 'es' && HIST_I18N[lang] && HIST_I18N[lang][key]) ? HIST_I18N[lang][key] : (HIST_CONTENT[key] || '');
+  document.getElementById('hist-body').innerHTML = cc;
   document.getElementById('hist-overlay').classList.add('on');
   document.getElementById('hist-body').scrollTop = 0;
 }
 function histClose() { document.getElementById('hist-overlay').classList.remove('on'); }
 
+const PJ_I18N = {"labels": {"es": ["Nació", "Hito", "Murió"], "en": ["Born", "Milestone", "Died"], "fr": ["Naissance", "Fait marquant", "Décès"], "zh": ["出生", "事迹", "逝世"], "ar": ["الميلاد", "الإنجاز", "الوفاة"]}, "en": {"colon": {"oficio": "Navigator, cartographer and admiral", "hito": "Won the support of the Catholic Monarchs and signed the Capitulations of Santa Fe in 1492; his voyage reached America on 12 October 1492.", "nacio": "1451, in Genoa (Italy).", "murio": "1506, in Valladolid, suffering from gout and other ailments."}, "isabel": {"oficio": "Queen of Castile", "hito": "Together with Ferdinand, she backed Columbus's venture and approved the Capitulations; she was decisive in the conquest of Granada.", "nacio": "1451, in Madrigal de las Altas Torres (Castile).", "murio": "1504, in Medina del Campo, after a long illness."}, "fernando": {"oficio": "King of Aragon and king consort of Castile", "hito": "Took part in the political decision to support Columbus's voyage and in the process leading to the Capitulations.", "nacio": "1452, in Sos del Rey Católico (Aragon).", "murio": "1516, in Madrigalejo (Extremadura), of natural causes."}, "coloma": {"oficio": "Royal secretary of the Crown of Aragon", "hito": "Drafted and registered the document of the Capitulations of Santa Fe by order of the Catholic Monarchs.", "nacio": "Around 1442, in Borja (Zaragoza).", "murio": "August 1517, in Borja, shortly after making his will."}, "fray-juan-perez": {"oficio": "Franciscan friar, confessor to Queen Isabella", "hito": "Defended Columbus's project at court and mediated in the negotiations before the Capitulations.", "nacio": "Date not confirmed.", "murio": "Date and cause not confirmed."}, "pinzon-martin": {"oficio": "Sailor, navigator and captain", "hito": "Supported the first Columbian voyage, helped recruit the crew and provided decisive nautical expertise.", "nacio": "Around 1441, in Palos de la Frontera (Huelva).", "murio": "1493, probably from illness."}, "pinzon-vicente": {"oficio": "Navigator and explorer", "hito": "Took part in Columbus's first voyage commanding La Niña, and later led his own expeditions.", "nacio": "Around 1462, in Palos de la Frontera (Huelva).", "murio": "Around 1514, cause not precisely known."}, "santangel": {"oficio": "Financier, royal clerk of the Crown of Aragon", "hito": "One of the main financial backers of Columbus's project; provided funds for the expedition.", "nacio": "Around 1435, in Valencia.", "murio": "1498, cause not highlighted in the sources."}, "sanchez": {"oficio": "Treasurer of the Crown of Aragon", "hito": "Also took part in financing Columbus's voyage.", "nacio": "Date not confirmed.", "murio": "Date and cause not confirmed."}}, "fr": {"colon": {"oficio": "Navigateur, cartographe et amiral", "hito": "Obtint l'appui des Rois Catholiques et signa les Capitulations de Santa Fe en 1492 ; son voyage atteignit l'Amérique le 12 octobre 1492.", "nacio": "1451, à Gênes (Italie).", "murio": "1506, à Valladolid, atteint de goutte et d'autres maux."}, "isabel": {"oficio": "Reine de Castille", "hito": "Avec Ferdinand, elle soutint l'entreprise de Colomb et approuva les Capitulations ; décisive dans la conquête de Grenade.", "nacio": "1451, à Madrigal de las Altas Torres (Castille).", "murio": "1504, à Medina del Campo, après une longue maladie."}, "fernando": {"oficio": "Roi d'Aragon et roi consort de Castille", "hito": "Participa à la décision politique de soutenir le voyage de Colomb et au processus menant aux Capitulations.", "nacio": "1452, à Sos del Rey Católico (Aragon).", "murio": "1516, à Madrigalejo (Estrémadure), de causes naturelles."}, "coloma": {"oficio": "Secrétaire royal de la Couronne d'Aragon", "hito": "Rédigea et enregistra le document des Capitulations de Santa Fe sur ordre des Rois Catholiques.", "nacio": "Vers 1442, à Borja (Saragosse).", "murio": "Août 1517, à Borja, peu après avoir testé."}, "fray-juan-perez": {"oficio": "Frère franciscain, confesseur de la reine Isabelle", "hito": "Défendit le projet de Colomb à la cour et servit de médiateur avant les Capitulations.", "nacio": "Date non confirmée.", "murio": "Date et cause non confirmées."}, "pinzon-martin": {"oficio": "Marin, navigateur et capitaine", "hito": "Soutint le premier voyage colombien, aida à recruter l'équipage et apporta une expérience nautique décisive.", "nacio": "Vers 1441, à Palos de la Frontera (Huelva).", "murio": "1493, probablement de maladie."}, "pinzon-vicente": {"oficio": "Navigateur et explorateur", "hito": "Participa au premier voyage de Colomb au commandement de La Niña, puis mena ses propres expéditions.", "nacio": "Vers 1462, à Palos de la Frontera (Huelva).", "murio": "Vers 1514, cause imprécise."}, "santangel": {"oficio": "Financier, écrivain de ration de la Couronne d'Aragon", "hito": "L'un des grands soutiens financiers du projet colombien ; fournit des fonds pour l'expédition.", "nacio": "Vers 1435, à Valence.", "murio": "1498, cause non précisée dans les sources."}, "sanchez": {"oficio": "Trésorier de la Couronne d'Aragon", "hito": "Participa lui aussi au financement du voyage de Colomb.", "nacio": "Date non confirmée.", "murio": "Date et cause non confirmées."}}, "zh": {"colon": {"oficio": "航海家、制图师和海军上将", "hito": "获得天主教双王的支持，于1492年签署《圣菲协定》；随后于1492年10月12日抵达美洲。", "nacio": "1451年，生于热那亚（意大利）。", "murio": "1506年，卒于巴利亚多利德，患痛风等疾病。"}, "isabel": {"oficio": "卡斯蒂利亚女王", "hito": "与费尔南多一起支持哥伦布的事业并批准协定；在征服格拉纳达中起决定性作用。", "nacio": "1451年，生于卡斯蒂利亚。", "murio": "1504年，久病后卒于梅迪纳-德尔坎波。"}, "fernando": {"oficio": "阿拉贡国王、卡斯蒂利亚王夫", "hito": "参与支持哥伦布航行的政治决策及签署协定的过程。", "nacio": "1452年，生于阿拉贡。", "murio": "1516年，自然原因逝世于埃斯特雷马杜拉。"}, "coloma": {"oficio": "阿拉贡王室秘书", "hito": "奉天主教双王之命起草并登记《圣菲协定》文件。", "nacio": "约1442年，生于博尔哈（萨拉戈萨）。", "murio": "1517年8月，立遗嘱后不久卒于博尔哈。"}, "fray-juan-perez": {"oficio": "方济各会修士，伊莎贝尔女王的告解神父", "hito": "在宫廷为哥伦布的计划辩护，并在协定谈判中斡旋。", "nacio": "日期不详。", "murio": "日期和原因不详。"}, "pinzon-martin": {"oficio": "水手、航海家和船长", "hito": "支持哥伦布首航，帮助招募船员，提供了关键的航海经验。", "nacio": "约1441年，生于帕洛斯（韦尔瓦）。", "murio": "1493年，可能死于疾病。"}, "pinzon-vicente": {"oficio": "航海家和探险家", "hito": "指挥『尼尼亚号』参加哥伦布首航，后自行组织探险。", "nacio": "约1462年，生于帕洛斯（韦尔瓦）。", "murio": "约1514年，原因不详。"}, "santangel": {"oficio": "金融家，阿拉贡王室文书官", "hito": "哥伦布计划的主要资助者之一，为远征提供资金。", "nacio": "约1435年，生于瓦伦西亚。", "murio": "1498年，史料未详述原因。"}, "sanchez": {"oficio": "阿拉贡王室司库", "hito": "同样参与资助哥伦布的航行。", "nacio": "日期不详。", "murio": "日期和原因不详。"}}, "ar": {"colon": {"oficio": "بحّار ورسّام خرائط وأميرال", "hito": "نال دعم الملكين الكاثوليكيين ووقّع اتفاقيات سانتا في عام 1492؛ ثم قام بالرحلة التي بلغت أمريكا في 12 أكتوبر 1492.", "nacio": "1451، في جنوة (إيطاليا).", "murio": "1506، في بلد الوليد، متأثرًا بالنقرس وأمراض أخرى."}, "isabel": {"oficio": "ملكة قشتالة", "hito": "دعمت مع فرناندو مشروع كولومبوس ووافقت على الاتفاقيات؛ وكانت حاسمة في فتح غرناطة.", "nacio": "1451، في قشتالة.", "murio": "1504، في مدينة ديل كامبو بعد مرض طويل."}, "fernando": {"oficio": "ملك أراغون وملك قرين لقشتالة", "hito": "شارك في القرار السياسي بدعم رحلة كولومبوس وفي مسار توقيع الاتفاقيات.", "nacio": "1452، في أراغون.", "murio": "1516، في إكستريمادورا، لأسباب طبيعية."}, "coloma": {"oficio": "سكرتير ملكي لتاج أراغون", "hito": "حرّر وسجّل وثيقة اتفاقيات سانتا في بأمر الملكين الكاثوليكيين.", "nacio": "نحو 1442، في بورخا (سرقسطة).", "murio": "أغسطس 1517، في بورخا، بعيد كتابة وصيته."}, "fray-juan-perez": {"oficio": "راهب فرنسيسكاني ومُعرِّف الملكة إيزابيل", "hito": "دافع عن مشروع كولومبوس أمام البلاط وتوسّط في المفاوضات قبل الاتفاقيات.", "nacio": "التاريخ غير مؤكد.", "murio": "التاريخ والسبب غير مؤكدين."}, "pinzon-martin": {"oficio": "بحّار وملّاح وقبطان", "hito": "دعم رحلة كولومبوس الأولى وساعد في تجنيد الطاقم وقدّم خبرة بحرية حاسمة.", "nacio": "نحو 1441، في بالوس (ولبة).", "murio": "1493، على الأرجح بسبب المرض."}, "pinzon-vicente": {"oficio": "ملّاح ومستكشف", "hito": "شارك في رحلة كولومبوس الأولى قائدًا لسفينة لا نينيا، ثم قاد بعثات خاصة به.", "nacio": "نحو 1462، في بالوس (ولبة).", "murio": "نحو 1514، السبب غير محدد."}, "santangel": {"oficio": "مموّل وكاتب ديوان تاج أراغون", "hito": "كان من أكبر الداعمين الماليين لمشروع كولومبوس ووفّر أموالًا للبعثة.", "nacio": "نحو 1435، في بلنسية.", "murio": "1498، لم تُبرز المصادر السبب."}, "sanchez": {"oficio": "أمين خزانة تاج أراغون", "hito": "شارك أيضًا في تمويل رحلة كولومبوس.", "nacio": "التاريخ غير مؤكد.", "murio": "التاريخ والسبب غير مؤكدين."}}};
 const PJ_DATA = [{"slug": "colon", "nombre": "Cristóbal Colón", "fechas": "1451 – 1506", "oficio": "Navegante, cartógrafo y almirante", "hito": "Consiguió el apoyo de los Reyes Católicos y firmó las Capitulaciones de Santa Fe en 1492; después realizó el viaje que llegó a América el 12 de octubre de 1492.", "nacio": "1451, en Génova (Italia).", "murio": "1506, en Valladolid, aquejado de gota y otras dolencias."}, {"slug": "isabel", "nombre": "Isabel I de Castilla", "fechas": "1451 – 1504", "oficio": "Reina de Castilla", "hito": "Junto a Fernando, apoyó la empresa de Colón y aprobó las Capitulaciones de Santa Fe; fue decisiva en la conquista de Granada.", "nacio": "1451, en Madrigal de las Altas Torres (Castilla).", "murio": "1504, en Medina del Campo, tras una larga enfermedad."}, {"slug": "fernando", "nombre": "Fernando II de Aragón", "fechas": "1452 – 1516", "oficio": "Rey de Aragón y rey consorte de Castilla", "hito": "Participó en la decisión política de apoyar el viaje de Colón y en el proceso que culminó con la firma de las Capitulaciones.", "nacio": "1452, en Sos del Rey Católico (Aragón).", "murio": "1516, en Madrigalejo (Extremadura), por causas naturales."}, {"slug": "coloma", "nombre": "Juan de Coloma", "fechas": "h. 1442 – 1517", "oficio": "Secretario real de la Corona de Aragón", "hito": "Redactó y registró el documento de las Capitulaciones de Santa Fe por mandato de los Reyes Católicos.", "nacio": "Hacia 1442, en Borja (Zaragoza).", "murio": "Agosto de 1517, en Borja, poco después de otorgar testamento."}, {"slug": "fray-juan-perez", "nombre": "Fray Juan Pérez", "fechas": "Fechas no confirmadas", "oficio": "Fraile franciscano, confesor de la reina Isabel", "hito": "Defendió el proyecto de Colón ante la corte y medió en la negociación previa a las Capitulaciones.", "nacio": "Fecha no confirmada.", "murio": "Fecha y causa no confirmadas."}, {"slug": "pinzon-martin", "nombre": "Martín Alonso Pinzón", "fechas": "h. 1441 – 1493", "oficio": "Marino, navegante y capitán", "hito": "Apoyó el primer viaje colombino, ayudó a reclutar tripulación y aportó experiencia náutica decisiva.", "nacio": "Hacia 1441, en Palos de la Frontera (Huelva).", "murio": "1493, probablemente por enfermedad."}, {"slug": "pinzon-vicente", "nombre": "Vicente Yáñez Pinzón", "fechas": "h. 1462 – h. 1514", "oficio": "Navegante y explorador", "hito": "Participó en el primer viaje de Colón al mando de La Niña y después realizó expediciones propias.", "nacio": "Hacia 1462, en Palos de la Frontera (Huelva).", "murio": "Hacia 1514, causa no precisada con exactitud."}, {"slug": "santangel", "nombre": "Luis de Santángel", "fechas": "h. 1435 – 1498", "oficio": "Financiero, escribano de ración de la Corona de Aragón", "hito": "Fue uno de los grandes apoyos económicos del proyecto colombino y facilitó fondos para la expedición.", "nacio": "Hacia 1435, en Valencia.", "murio": "1498, causa no destacada en las fuentes."}, {"slug": "sanchez", "nombre": "Gabriel Sánchez", "fechas": "Siglo XV", "oficio": "Tesorero de la Corona de Aragón", "hito": "Participó también en la financiación del viaje de Colón.", "nacio": "Fecha no confirmada.", "murio": "Fecha y causa no confirmadas."}];
+function pjField(p, f) {
+  return (lang !== 'es' && PJ_I18N[lang] && PJ_I18N[lang][p.slug] && PJ_I18N[lang][p.slug][f]) || p[f];
+}
 function pjRenderGrid() {
   const grid = document.getElementById('pj-grid');
-  if (grid.dataset.done) return;
+  if (grid.dataset.done === lang) return;
   grid.innerHTML = PJ_DATA.map((p, i) => `
     <div class="pj-card" onclick="pjToggle(${i})">
       <div class="pj-avatar"><span>${p.nombre.charAt(0)}</span><img src="img/personajes/${p.slug}.jpg" alt="" onerror="this.style.display='none'"></div>
       <div class="pj-name">${p.nombre}</div>
       <div class="pj-fechas">${p.fechas}</div>
-      <div class="pj-oficio">${p.oficio}</div>
+      <div class="pj-oficio">${pjField(p,'oficio')}</div>
       <div class="pj-detail" id="pj-detail-${i}">
-        <p><b>Nació:</b> ${p.nacio}</p>
-        <p><b>Hito:</b> ${p.hito}</p>
-        <p><b>Murió:</b> ${p.murio}</p>
+        <p><b>${(PJ_I18N.labels[lang]||PJ_I18N.labels.es)[0]}:</b> ${pjField(p,'nacio')}</p>
+        <p><b>${(PJ_I18N.labels[lang]||PJ_I18N.labels.es)[1]}:</b> ${pjField(p,'hito')}</p>
+        <p><b>${(PJ_I18N.labels[lang]||PJ_I18N.labels.es)[2]}:</b> ${pjField(p,'murio')}</p>
       </div>
     </div>`).join('');
-  grid.dataset.done = '1';
+  grid.dataset.done = lang;
 }
 function pjToggle(i) { document.getElementById('pj-detail-' + i).classList.toggle('on'); }
 function pjOpen() { pjRenderGrid(); document.getElementById('pj-overlay').classList.add('on'); }
