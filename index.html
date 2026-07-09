@@ -393,6 +393,12 @@
       flex-shrink:0; box-shadow:0 -2px 16px rgba(40,80,180,0.1);
     }
     #nav-strip.hidden { display:none; }
+    #voice-btn {
+      flex-shrink:0; font-size:18px; line-height:1;
+      background:#fff; border:1.5px solid var(--gold-soft); border-radius:50%;
+      width:38px; height:38px; box-shadow:var(--sh); cursor:pointer;
+    }
+    #voice-btn.on { background:#E8F4FF; border-color:var(--blue-1); }
     .ns-dir-arrow { font-size:28px; color:var(--blue-1); flex-shrink:0; line-height:1; width:32px; text-align:center; }
     .ns-info { flex:1; min-width:0; }
     .ns-instruction { font-size:13px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
@@ -2030,6 +2036,7 @@
       <div class="ns-instruction" id="ns-instruction">Buscando señal GPS…</div>
       <div class="ns-next-label" id="ns-next">Activa el GPS para navegar</div>
     </div>
+    <button id="voice-btn" onclick="toggleVoice()" aria-label="Voz">🔇</button>
     <div class="ns-right">
       <div class="ns-count" id="ns-count">0/0</div>
       <div class="ns-dots" id="ns-dots"></div>
@@ -2742,6 +2749,49 @@ function tbtText(step, distM) {
   return txt;
 }
 
+// ── Navegación por voz ──
+const VOICE_LANGS = { es:'es-ES', en:'en-GB', fr:'fr-FR', zh:'zh-CN', ar:'ar-SA' };
+const VOICE_MSG = {
+  es:{on:'Navegación por voz activada', off:''},
+  en:{on:'Voice navigation on', off:''},
+  fr:{on:'Navigation vocale activée', off:''},
+  zh:{on:'语音导航已开启', off:''},
+  ar:{on:'تم تفعيل الملاحة الصوتية', off:''}
+};
+let voiceOn = false, _spokenKey = '';
+function speak(text) {
+  if (!('speechSynthesis' in window) || !text) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = VOICE_LANGS[lang] || 'es-ES';
+    u.rate = 1;
+    speechSynthesis.speak(u);
+  } catch (e) { /* sin soporte */ }
+}
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  const btn = document.getElementById('voice-btn');
+  btn.textContent = voiceOn ? '🔊' : '🔇';
+  btn.classList.toggle('on', voiceOn);
+  if (voiceOn) {
+    _spokenKey = '';
+    speak((VOICE_MSG[lang] || VOICE_MSG.es).on); // gesto del usuario: desbloquea la voz en iOS
+  } else {
+    try { speechSynthesis.cancel(); } catch (e) {}
+  }
+}
+// Habla la instrucción al cambiar de maniobra y como recordatorio al acercarse
+function voiceAnnounce(tbt, distM) {
+  if (!voiceOn || !tbt) return;
+  const key = distM < 30 ? ('p' + _navPtr + '-close') : ('p' + _navPtr);
+  if (key === _spokenKey) return;
+  // no repetir la versión lejana si ya se dijo la cercana de ese mismo paso
+  if (_spokenKey === 'p' + _navPtr + '-close' && key === 'p' + _navPtr) return;
+  _spokenKey = key;
+  speak(tbt.text.replace(/^[^\wÀ-ÿ\u0600-\u06FF\u4e00-\u9fff]+/, ''));
+}
+
 // Devuelve {arrow, text} de la próxima maniobra, o null si no hay pasos OSRM
 function tbtNext() {
   if (!_navSteps || userLat === null) return null;
@@ -2754,7 +2804,7 @@ function tbtNext() {
   const step = _navSteps[Math.min(_navPtr, _navSteps.length - 1)];
   const loc = step.maneuver.location;
   const d = haversine(userLat, userLng, loc[1], loc[0]);
-  return { arrow: TBT_ARROWS[tbtKey(step)] || '⬆', text: tbtText(step, d) };
+  return { arrow: TBT_ARROWS[tbtKey(step)] || '⬆', text: tbtText(step, d), dist: d };
 }
 
 // ================================================================
@@ -2812,6 +2862,7 @@ function updateNavStrip() {
   const tbt = tbtNext();
   document.getElementById('ns-arrow').textContent = tbt ? tbt.arrow : arrow;
   document.getElementById('ns-instruction').textContent = tbt ? tbt.text : `${dir} · ${formatDist(dist)}`;
+  if (tbt) voiceAnnounce(tbt, tbt.dist);
   document.getElementById('ns-next').textContent = `${t.navTo} ${nextPoi.names[lang]}`;
 }
 
