@@ -1,4 +1,4 @@
-const CACHE_NAME = 'santafe-historica-v2-1491';
+const CACHE_NAME = 'santafe-historica-v2-1491-b2610102005';
 const urlsToCache = [
   './',
   './index.html',
