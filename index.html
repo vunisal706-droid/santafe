@@ -2528,7 +2528,7 @@ function startRoute(routeKey) {
 
   // Inicializar mapa si no existe
   if (!map) {
-    map = L.map('map', { center:[37.18530,-3.71558], zoom:16, zoomControl:true, attributionControl:false });
+    map = L.map('map', { center:[37.18530,-3.71558], zoom:16, zoomControl:true, attributionControl:true });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(map);
   }
 
@@ -2568,7 +2568,7 @@ function startSofaMode() {
 
   // Inicializar mapa si no existe (necesario aunque no se use en sofá)
   if (!map) {
-    map = L.map('map', { center:[37.18530,-3.71558], zoom:16, zoomControl:true, attributionControl:false });
+    map = L.map('map', { center:[37.18530,-3.71558], zoom:16, zoomControl:true, attributionControl:true });
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'© OpenStreetMap' }).addTo(map);
   }
   rebuildMap();
